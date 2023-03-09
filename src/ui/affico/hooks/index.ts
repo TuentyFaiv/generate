@@ -1,1 +1,0 @@
-export { useAffStructureTable } from "./useAffStructureTable";
