@@ -1,6 +1,6 @@
-use std::io::{self, Write};
+use std::io::{Write};
 use std::fs::File;
-use anyhow::{Context, Result, Ok};
+use anyhow::{Result};
 // use super::Template;
 
 static PROPTYPES: &str = r#"export interface Props {
@@ -15,7 +15,6 @@ import * as responsive from "./NAME.styles.responsive";
 export const NAME_LOWER = css`
   ${responsive.NAME_LOWER}
 `;
-
 "#;
 
 static STYLES_RESPONSIVE: &str = r#"import { css } from "@emotion/css";
@@ -26,34 +25,28 @@ ${forsize({ size: "desktop-mid", content: css`
 
 ` })}
 `;
-
 "#;
 
-static COMPONENT_TS: &str = r#"<script lang="ts">
+static COMPONENT: &str = r#"SCRIPT
+
+<div class={styles.NAME_LOWER}>
+  {prop}
+</div>
+"#;
+
+static SCRIPT_TS: &str = r#"<script lang="ts">
   import type { Props } from "./NAME.proptypes";
 
   import * as styles from "./NAME.styles";
 
   export let prop: Props["prop"];
-</script>
+</script>"#;
 
-<div class={styles.NAME_LOWER}>
-  {prop}
-</div>
-
-"#;
-
-static COMPONENT: &str = r#"<script>
+static SCRIPT: &str = r#"<script>
   import * as styles from "./NAME.styles";
 
   export let prop;
-</script>
-
-<div class={styles.NAME_LOWER}>
-  {prop}
-</div>
-
-"#;
+</script>"#;
 
 pub fn generate(path: &str, name: &str, lang: &String) -> Result<()> {
   let is_ts = lang.as_str() == "typescript";
@@ -66,8 +59,10 @@ pub fn generate(path: &str, name: &str, lang: &String) -> Result<()> {
   let mut ext = ".js".to_string();
 
   if is_ts {
-    component = COMPONENT_TS.to_string();
+    component = component.replace("SCRIPT", &SCRIPT_TS.to_string());
     ext = ".ts".to_string();
+  } else {
+    component = component.replace("SCRIPT", &SCRIPT.to_string());
   }
 
   component = component.replace("NAME_LOWER", &name.to_lowercase());

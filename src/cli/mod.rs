@@ -1,6 +1,29 @@
+pub mod questions;
+
+use std::io::{self, Write};
 use std::process::Command;
 use anyhow::{Result};
+use clap::Parser;
+use console::style;
 use dialoguer::{Select, console::Term, theme::ColorfulTheme, Input};
+
+use crate::statics::DONE;
+
+#[derive(Parser, Debug)]
+#[command(author, version, about)]
+pub struct Args {
+	/// Project name
+	pub name: Option<String>,
+	/// Tool to generate template
+	#[arg(short, long)]
+	pub tool: Option<String>,
+	/// Frontend architecture
+  #[arg(short, long)]
+	pub arch: Option<String>,
+	/// Path to generate template
+  #[arg(short, long)]
+	pub path: Option<String>
+}
 
 pub fn choose_option(prompt: &str, options: Vec<&str>) -> Result<String> {
 	let selection = Select::with_theme(&ColorfulTheme::default())
@@ -38,4 +61,21 @@ pub fn command(program: &str, args: Vec<&str>, path: Option<&str>, error_msg: Op
 		.expect(error_msg.unwrap_or("Failed to execute command"));
 
 	// println!("Out: {:?}", cmd.output());
+}
+
+pub fn msg(content: &String) {
+	let stdout = io::stdout();
+	let mut handle = io::BufWriter::new(stdout.lock());
+
+	writeln!(handle, "").unwrap();
+	writeln!(handle, "{}",content).unwrap();
+	// writeln!(handle, "").unwrap();
+}
+
+pub fn done() {
+
+	// println!("");
+	msg(&format!("{} {}", DONE, style("All done").cyan()));
+	// println!("{} {}", DONE, style("All done").cyan());
+	// println!("");
 }

@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 
+pub mod make;
 pub mod svelte;
 pub mod react;
 pub mod vanilla;
