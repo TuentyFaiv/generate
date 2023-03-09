@@ -59,8 +59,6 @@ pub fn command(program: &str, args: Vec<&str>, path: Option<&str>, error_msg: Op
 		.args(args)
 		.output()
 		.expect(error_msg.unwrap_or("Failed to execute command"));
-
-	// println!("Out: {:?}", cmd.output());
 }
 
 pub fn msg(content: &String) {
@@ -69,13 +67,8 @@ pub fn msg(content: &String) {
 
 	writeln!(handle, "").unwrap();
 	writeln!(handle, "{}",content).unwrap();
-	// writeln!(handle, "").unwrap();
 }
 
 pub fn done() {
-
-	// println!("");
 	msg(&format!("{} {}", DONE, style("All done").cyan()));
-	// println!("{} {}", DONE, style("All done").cyan());
-	// println!("");
 }

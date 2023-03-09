@@ -5,10 +5,12 @@ use clap::Parser;
 mod cli;
 mod statics;
 mod templates;
+mod create;
 
 use crate::cli::{questions, Args, msg};
-use crate::templates::{make, get_templates};
 use crate::statics::{NOT_IMPLEMENTED};
+use crate::templates::get_templates;
+use crate::create::{component, project};
 
 pub fn main() -> Result<()> {
 	// env_logger::init();
@@ -45,7 +47,7 @@ pub fn main() -> Result<()> {
 	}
 	
 	if create_component {
-		make::component(
+		component::make(
 			&answers.name,
 			&answers.tool,
 			&answers.tool_type,
@@ -55,7 +57,7 @@ pub fn main() -> Result<()> {
 	}
 
 	if create_project {
-		make::project(
+		project::make(
 			&template,
 			&answers.name,
 			&answers.path,

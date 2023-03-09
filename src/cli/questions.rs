@@ -1,10 +1,12 @@
 use anyhow::{Result};
 use dialoguer::{theme::ColorfulTheme, Confirm};
 
-use crate::statics::{TOOLS, TOOLS_REACT, TOOLS_SVELTE, TOOLS_WEBCOMPONENTS, TOOLS_BASE, ARCHS, ARCHS_COMPONENT};
+use crate::statics::{TOOLS, TOOLS_REACT, TOOLS_SVELTE, TOOLS_WEBCOMPONENTS, TOOLS_BASE};
+use crate::statics::{ARCHS, ARCHS_REACT, ARCHS_SVELTE, ARCHS_TYPE_COMPONENT, ARCHS_VANILLA};
 
 use super::{choose_option, Args, input};
 
+#[derive(Debug)]
 pub struct Answers {
   pub name: String,
   pub path: String,
@@ -13,10 +15,7 @@ pub struct Answers {
   pub arch: String,
   pub arch_type: String,
   pub template: String,
-  pub accept: bool,
-  pub is_atomic: bool,
-  pub is_library: bool,
-  pub is_component: bool
+  pub accept: bool
 }
 
 fn format_name(name: &String) -> String {
@@ -44,7 +43,10 @@ pub fn make(args: &Args) -> Result<Answers> {
 	let tools_base = TOOLS_BASE.to_vec();
 
   let archs = ARCHS.to_vec();
-	let archs_components = ARCHS_COMPONENT.to_vec();
+  let archs_react = ARCHS_REACT.to_vec();
+  let archs_svelte = ARCHS_SVELTE.to_vec();
+  let archs_vanilla = ARCHS_VANILLA.to_vec();
+	let archs_types_components = ARCHS_TYPE_COMPONENT.to_vec();
 
   let tool = match args.tool.clone() {
 		None => {
@@ -59,13 +61,28 @@ pub fn make(args: &Args) -> Result<Answers> {
 		}
 	};
 
+  let options_archs = match tool.as_str() {
+    "react" => {
+      [archs.clone(), archs_react].concat()
+    },
+    "svelte" => {
+      [archs.clone(), archs_svelte].concat()
+    },
+    "vanilla" => {
+      [archs.clone(), archs_vanilla].concat()
+    },
+    _ => {
+      archs.clone()
+    }
+  };
+
 	let arch = match args.arch.clone() {
 		None => {
-			choose_option("Choose an architecture:", archs)?
+      choose_option("Choose an architecture:", options_archs)?
 		}
 		Some(exist) => {
-			if !archs.contains(&exist.as_str()) {
-				choose_option("Choose an architecture:", archs)?
+			if !options_archs.contains(&exist.as_str()) {
+				choose_option("Choose an architecture:", options_archs)?
 			} else {
 				exist
 			}
@@ -75,11 +92,21 @@ pub fn make(args: &Args) -> Result<Answers> {
 	let is_atomic = arch.as_str() == "atomic";
 	let is_library = arch.as_str() == "library";
 	let is_component = arch.as_str() == "component";
+	let is_hoc = arch.as_str() == "hoc";
+	let is_hook = arch.as_str() == "hook";
+	let is_context = arch.as_str() == "context";
+	let is_layout = arch.as_str() == "layout";
+	let is_page = arch.as_str() == "page";
+	let is_service = arch.as_str() == "service";
+	let is_schema = arch.as_str() == "schema";
+	let is_action = arch.as_str() == "action";
+	let is_store = arch.as_str() == "store";
+	let is_class = arch.as_str() == "class";
 
 	let mut arch_type = String::new();
 
 	if is_component {
-		arch_type = choose_option("Choose type:", archs_components)?;
+		arch_type = choose_option("Choose type:", archs_types_components)?;
 	}
 
 	let tool_type = match format!("{tool}-{arch}").as_str() {
@@ -101,8 +128,26 @@ pub fn make(args: &Args) -> Result<Answers> {
 		None => {
       if is_component {
         input("Component name:", "component")?
-      } else {
+      } else if is_hoc {
+        input("Hoc name:", "component")?
+      } else if is_hook {
+        input("Hook name:", "useHook")?
+      } else if is_context {
+        input("Context name:", "Context")?
+      } else if is_service {
+        input("Service name:", "service")?
+      } else if is_schema {
+        input("Schema name:", "schema")?
+      } else if is_action {
+        input("Action name:", "action")?
+      } else if is_store {
+        input("Store name:", "store")?
+      } else if is_class {
+        input("Class name:", "SomeClass")?
+      } else if is_atomic {
         input("Proyect name:", "new-proyect")?
+      } else {
+        String::new()
       }
 		}
 		Some(exist) => exist
@@ -114,10 +159,37 @@ pub fn make(args: &Args) -> Result<Answers> {
 
 	let path = match args.path.clone() {
 		None => {
-      if is_component {
-        input("Component location:", format!("sharing").as_str())?
+      let path_name = format!("./{name}");
+      let path_ui = "ui/sharing";
+      let path_context = format!("./logic/contexts/{name}");
+      let path_service = "./logic/services";
+      let path_schema = "./logic/schemas";
+      let path_action = "./logic/actions";
+      let path_store = "./logic/stores";
+      let path_class = format!("./logic/classes/{name}");
+
+      if is_component || is_hoc || is_hook || is_page || is_layout {
+        let short_path = input("Choose location:", path_ui)?;
+
+        let full_path = format!("./src/{short_path}");
+
+        full_path
+      } else if is_atomic || is_library {
+        input("Proyect path:", &path_name.as_str())?
+      } else if is_context {
+        input("Choose location:", &path_context.as_str())?
+      } else if is_service {
+        input("Choose location:", path_service)?
+      } else if is_schema {
+        input("Choose location:", path_schema)?
+      } else if is_action {
+        input("Choose location:", path_action)?
+      } else if is_store {
+        input("Choose location:", path_store)?
+      } else if is_class {
+        input("Choose location:", &path_class.as_str())?
       } else {
-        input("Proyect path:", format!("./{name}").as_str())?
+        input("Proyect path:", &path_name.as_str())?
       }
 		}
 		Some(exist) => exist
@@ -138,9 +210,6 @@ pub fn make(args: &Args) -> Result<Answers> {
     arch,
     arch_type,
     accept,
-    is_atomic,
-    is_library,
-    is_component,
     template
   };
 
