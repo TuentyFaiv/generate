@@ -15,7 +15,7 @@ pub fn make(
 ) -> Result<()> {
   let selected = tool.as_str();
   let name_capitalize = capitalize(&name.as_str());
-  let path_proptypes = "./src/logic/typing/hocs";
+  let path_proptypes = "./src/logic/typing/hooks";
   let is_ts = tool_type.as_str() == "typescript";
   
   if selected == "react" {
@@ -31,7 +31,7 @@ pub fn make(
 
   let result = match selected {
     "react" => {
-      react::hoc::generate(
+      react::hook::generate(
         &path.as_str(),
         path_proptypes,
         &name_capitalize.as_str(),
@@ -47,7 +47,7 @@ pub fn make(
     msg(&format!(
       "{} {}",
       OK,
-      style(format!("HOC (Higher-Order-Component) with{name_capitalize} created at {path}")).cyan()
+      style(format!("Custom Hook use{name_capitalize} created at {path}")).cyan()
     ));
   }
 

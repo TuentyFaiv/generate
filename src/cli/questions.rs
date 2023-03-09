@@ -137,7 +137,7 @@ pub fn make(args: &Args) -> Result<Answers> {
 		Some(exist) => exist
 	};
 
-  if is_component {
+  if is_component || is_hoc || is_hook {
     name = format_name(&name);
   }
 
@@ -153,9 +153,22 @@ pub fn make(args: &Args) -> Result<Answers> {
       let path_class = format!("./logic/classes/{name}");
 
       if is_hoc {
-        let path_hoc = "./src/logic/hoc";
+        let path_hoc = "./src/logic/hocs";
         path_hoc.to_string()
-      } else if is_component || is_hook || is_page || is_layout {
+      } else if is_hook {
+        let full_path = match choose_option("Which type is:", ["global", "internal"].to_vec())?.as_str() {
+          "internal" => {
+            let location = input("Where:", "sharing")?;
+
+            format!("./src/ui/{location}/hooks")
+          },
+          _ => {
+            "./src/logic/hooks".to_string()
+          }
+        };
+
+        full_path
+      } else if is_component || is_page || is_layout {
         let short_path = input("Choose location:", path_ui)?;
 
         let full_path = format!("./src/{short_path}");

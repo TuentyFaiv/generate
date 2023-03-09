@@ -2,7 +2,7 @@ pub static HOC_TS: &str = r#"import { forwardRef } from "react";
 import { useDatas } from "@hooks";
 
 import type { ComponentType } from "react";
-import type { HOCNAME, HOCNAMEProps } from "@typing/hoc/withNAME";
+import type { HOCNAME, HOCNAMEProps } from "@typing/hocs/withNAME";
 
 export function withNAME<T extends HOCNAME = HOCNAME>(Component: ComponentType<T>) {
   const WithNAME = forwardRef((props: Omit<T, keyof HOCNAME>, ref) => {
