@@ -1,3 +1,5 @@
+use console::Emoji;
+
 pub static TOOLS: &[&str] = &["react", "svelte", "vanilla"];
 pub static TOOLS_REACT: &[&str] = &["next", "next-ts", "remix", "remix-ts"];
 pub static TOOLS_SVELTE: &[&str] = &["sveltekit", "sveltekit-ts"];
