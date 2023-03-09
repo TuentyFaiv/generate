@@ -22,8 +22,8 @@ pub fn get_templates<'a>() -> HashMap<&'a str, &'a str>{
 	templates.insert("react-typescript-component", "component-react");
 	templates.insert("react-javascript-component", "component-react");
 	// React hoc
-	templates.insert("react-typescript-hoc", not_yet);
-	templates.insert("react-javascript-hoc", not_yet);
+	templates.insert("react-typescript-hoc", "hoc-react");
+	templates.insert("react-javascript-hoc", "hoc-react");
 	// React hook
 	templates.insert("react-typescript-hook", not_yet);
 	templates.insert("react-javascript-hook", not_yet);

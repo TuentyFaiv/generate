@@ -2,6 +2,7 @@ use anyhow::{Result};
 use clap::Parser;
 // use indicatif::ProgressBar;
 
+mod utils;
 mod cli;
 mod statics;
 mod templates;
@@ -10,7 +11,7 @@ mod create;
 use crate::cli::{questions, Args, msg};
 use crate::statics::{NOT_IMPLEMENTED};
 use crate::templates::get_templates;
-use crate::create::{component, project};
+use crate::create::{component, project, hoc};
 
 pub fn main() -> Result<()> {
 	// env_logger::init();
@@ -39,6 +40,7 @@ pub fn main() -> Result<()> {
 	let create_project = template.contains(&"repo");
 	// let create_library = template.contains(&"library");
 	let create_component = template.contains(&"component");
+	let create_hoc = template.contains(&"hoc");
 	let notexist = template.contains(&"notimplemented");
 
 	if notexist {
@@ -46,6 +48,15 @@ pub fn main() -> Result<()> {
 		return Ok(());
 	}
 	
+	if create_hoc {
+		hoc::make(
+			&answers.name,
+			&answers.tool,
+			&answers.tool_type,
+			&answers.path
+		)?;
+	}
+
 	if create_component {
 		component::make(
 			&answers.name,

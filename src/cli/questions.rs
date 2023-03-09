@@ -3,6 +3,7 @@ use dialoguer::{theme::ColorfulTheme, Confirm};
 
 use crate::statics::{TOOLS, TOOLS_REACT, TOOLS_SVELTE, TOOLS_WEBCOMPONENTS, TOOLS_BASE};
 use crate::statics::{ARCHS, ARCHS_REACT, ARCHS_SVELTE, ARCHS_TYPE_COMPONENT, ARCHS_VANILLA};
+use crate::utils::format_name;
 
 use super::{choose_option, Args, input};
 
@@ -16,23 +17,6 @@ pub struct Answers {
   pub arch_type: String,
   pub template: String,
   pub accept: bool
-}
-
-fn format_name(name: &String) -> String {
-	let splitted: Vec<&str> = name.split(&['-', ' '][..]).collect();
-	
-	let mut formatted = String::new();
-
-	for word in splitted {
-		let mut letters: Vec<char> = word.chars().collect();
-		letters[0] = letters[0].to_uppercase().nth(0).unwrap();
-
-		let word_capitalize: String = letters.into_iter().collect();
-		
-		formatted = format!("{formatted}{word_capitalize}");
-	}
-
-	formatted
 }
 
 pub fn make(args: &Args) -> Result<Answers> {
@@ -129,11 +113,11 @@ pub fn make(args: &Args) -> Result<Answers> {
       if is_component {
         input("Component name:", "component")?
       } else if is_hoc {
-        input("Hoc name:", "component")?
+        input("Hoc name:", "hoc")?
       } else if is_hook {
-        input("Hook name:", "useHook")?
+        input("Hook name:", "hook")?
       } else if is_context {
-        input("Context name:", "Context")?
+        input("Context name:", "context")?
       } else if is_service {
         input("Service name:", "service")?
       } else if is_schema {
@@ -143,7 +127,7 @@ pub fn make(args: &Args) -> Result<Answers> {
       } else if is_store {
         input("Store name:", "store")?
       } else if is_class {
-        input("Class name:", "SomeClass")?
+        input("Class name:", "some-new class")?
       } else if is_atomic {
         input("Proyect name:", "new-proyect")?
       } else {
@@ -168,7 +152,10 @@ pub fn make(args: &Args) -> Result<Answers> {
       let path_store = "./logic/stores";
       let path_class = format!("./logic/classes/{name}");
 
-      if is_component || is_hoc || is_hook || is_page || is_layout {
+      if is_hoc {
+        let path_hoc = "./src/logic/hoc";
+        path_hoc.to_string()
+      } else if is_component || is_hook || is_page || is_layout {
         let short_path = input("Choose location:", path_ui)?;
 
         let full_path = format!("./src/{short_path}");
