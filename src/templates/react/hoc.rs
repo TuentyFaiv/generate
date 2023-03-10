@@ -6,7 +6,7 @@ use super::statics::hoc::{PROPTYPES, HOC_TS, HOC};
 
 pub fn generate(path: &str, path_proptypes: &str, name: &str, is_ts: bool) -> Result<()> {
 
-  let proptypes = PROPTYPES.to_string();
+  let mut proptypes = PROPTYPES.to_string();
   
   let mut hoc = HOC.to_string();
   let mut ext = ".js".to_string();
@@ -18,6 +18,7 @@ pub fn generate(path: &str, path_proptypes: &str, name: &str, is_ts: bool) -> Re
   }
 
   hoc = hoc.replace("NAME", name);
+  proptypes = proptypes.replace("NAME", name);
 
   let full_path = format!("{path}/with{name}{ext}x");
   let index_path = format!("{path}/index.ts");

@@ -6,7 +6,7 @@ use super::statics::context::{PROPTYPES, CONTEXT, CONTEXT_TS, REDUCER_TS, REDUCE
 
 pub fn generate(path: &str, path_proptypes: &str, name: &str, is_ts: bool) -> Result<()> {
 
-  let proptypes = PROPTYPES.to_string();
+  let mut proptypes = PROPTYPES.to_string();
   let name_lower = name.to_lowercase();
   
   let mut context = CONTEXT.to_string();
@@ -20,8 +20,10 @@ pub fn generate(path: &str, path_proptypes: &str, name: &str, is_ts: bool) -> Re
     ext = ".ts".to_string();
   }
 
+  proptypes = proptypes.replace("NAME_LOWER", &name_lower);
   context = context.replace("NAME_LOWER", &name_lower);
   reducer = reducer.replace("NAME_LOWER", &name_lower);
+  proptypes = proptypes.replace("NAME", name);
   context = context.replace("NAME", name);
   reducer = reducer.replace("NAME", name);
 

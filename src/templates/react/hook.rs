@@ -6,7 +6,7 @@ use super::statics::hook::{PROPTYPES, HOOK_TS, HOOK};
 
 pub fn generate(path: &str, path_proptypes: &str, name: &str, is_ts: bool) -> Result<()> {
 
-  let proptypes = PROPTYPES.to_string();
+  let mut proptypes = PROPTYPES.to_string();
   
   let mut hook = HOOK.to_string();
   let mut ext = ".js".to_string();
@@ -18,6 +18,7 @@ pub fn generate(path: &str, path_proptypes: &str, name: &str, is_ts: bool) -> Re
   }
 
   hook = hook.replace("NAME", name);
+  proptypes = proptypes.replace("NAME", name);
 
   let full_path = format!("{path}/use{name}{ext}x");
   let index_path = format!("{path}/index.ts");

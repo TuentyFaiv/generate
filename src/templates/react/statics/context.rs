@@ -16,7 +16,7 @@ export function NAMEProvider({ children }: ContextNAMEProvider) {
 
   const [state, dispatch] = useReducer(reducer, initialState);
 
-  const contextValue = useMemo(() => ({ state, dispatch }), [global]);
+  const contextValue = useMemo(() => ({ state, dispatch }), [state]);
 
   return (
     <NAMEContext.Provider value={contextValue}>
@@ -45,7 +45,7 @@ export function NAMEProvider({ children }) {
 
   const [state, dispatch] = useReducer(reducer, initialState);
 
-  const contextValue = useMemo(() => ({ state, dispatch }), [global]);
+  const contextValue = useMemo(() => ({ state, dispatch }), [state]);
 
   return (
     <NAMEContext.Provider value={contextValue}>

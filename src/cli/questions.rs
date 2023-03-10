@@ -151,6 +151,7 @@ pub fn make(args: &Args) -> Result<Answers> {
 		None => {
       let name_lower = name.to_lowercase();
       let path_name = format!("./{name}");
+      let path_default = "sharing";
       let path_ui = "ui/sharing";
       let path_context = format!("./src/logic/contexts/{name_lower}");
       let path_service = "./src/logic/services";
@@ -175,7 +176,25 @@ pub fn make(args: &Args) -> Result<Answers> {
         };
 
         full_path
-      } else if is_component || is_page || is_layout {
+      } else if is_page || is_layout {
+        let short_path = input("Choose location:", path_default)?;
+        name = short_path.clone();
+
+        let full_path = match tool.as_str() {
+          "svelte" => {
+            if short_path.as_str() == "home" || short_path.as_str() == "index" {
+              format!("./src/routes")
+            } else {
+              format!("./src/routes/{short_path}")
+            }
+          },
+          _ => {
+            format!("./src/ui/{short_path}")
+          }
+        };
+
+        full_path
+      } else if is_component {
         let short_path = input("Choose location:", path_ui)?;
 
         let full_path = format!("./src/{short_path}");
