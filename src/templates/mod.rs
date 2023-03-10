@@ -36,8 +36,8 @@ pub fn get_templates<'a>() -> HashMap<&'a str, &'a str>{
 	templates.insert("react-typescript-page", "page-react");
 	templates.insert("react-javascript-page", "page-react");
 	// React layout
-	templates.insert("react-typescript-layout", not_yet);
-	templates.insert("react-javascript-layout", not_yet);
+	templates.insert("react-typescript-layout", "layout-react");
+	templates.insert("react-javascript-layout", "layout-react");
 	// React service
 	templates.insert("react-typescript-service", not_yet);
 	templates.insert("react-javascript-service", not_yet);

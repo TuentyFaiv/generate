@@ -44,6 +44,7 @@ pub fn main() -> Result<()> {
 	let create_hook = template.contains(&"hook");
 	let create_context = template.contains(&"context");
 	let create_page = template.contains(&"page");
+	let create_layout = template.contains(&"layout");
 	let notexist = template.contains(&"notimplemented");
 
 	if notexist {
@@ -79,6 +80,15 @@ pub fn main() -> Result<()> {
 
 	if create_page {
 		global::page::make(
+			&answers.name,
+			&answers.tool,
+			&answers.tool_type,
+			&answers.path
+		)?;
+	}
+
+	if create_layout {
+		global::layout::make(
 			&answers.name,
 			&answers.tool,
 			&answers.tool_type,

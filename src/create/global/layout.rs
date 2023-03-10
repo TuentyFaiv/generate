@@ -16,16 +16,9 @@ pub fn make(
   let selected = tool.as_str();
   let name_capitalize = capitalize(&name.as_str());
   let is_ts = tool_type.as_str() == "typescript";
-  let path_proptypes = "./src/logic/typing/pages";
-  let path_locales = "./public/locales";
+  let path_proptypes = "./src/logic/typing/layouts";
 
   create_dir_all(path).unwrap_or_else(|why| {
-    println!("! {:?}", why.kind());
-  });
-  create_dir_all(format!("{path_locales}/en-US")).unwrap_or_else(|why| {
-    println!("! {:?}", why.kind());
-  });
-  create_dir_all(format!("{path_locales}/es")).unwrap_or_else(|why| {
     println!("! {:?}", why.kind());
   });
   if is_ts {
@@ -36,15 +29,9 @@ pub fn make(
 
   let result = match selected {
     "react" => {
-      let path_routes = "./src/logic/routes";
-      create_dir_all(path_routes.to_string()).unwrap_or_else(|why| {
-        println!("! {:?}", why.kind());
-      });
-      react::page::generate(
+      react::layout::generate(
         &path.as_str(),
         path_proptypes,
-        path_locales,
-        path_routes,
         &name_capitalize.as_str(),
         is_ts
       )?;
@@ -60,7 +47,7 @@ pub fn make(
     msg(&format!(
       "{} {}",
       OK,
-      style(format!("Page {name_capitalize} created at {path}")).cyan()
+      style(format!("Layout {name_capitalize} created at {path}")).cyan()
     ));
   }
 
