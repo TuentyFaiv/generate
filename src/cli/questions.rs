@@ -47,13 +47,19 @@ pub fn make(args: &Args) -> Result<Answers> {
 
   let options_archs = match tool.as_str() {
     "react" => {
-      [archs.clone(), archs_react].concat()
+      let mut options = [archs.clone(), archs_react].concat();
+      options.sort();
+      options
     },
     "svelte" => {
-      [archs.clone(), archs_svelte].concat()
+      let mut options = [archs.clone(), archs_svelte].concat();
+      options.sort();
+      options
     },
     "vanilla" => {
-      [archs.clone(), archs_vanilla].concat()
+      let mut options = [archs.clone(), archs_vanilla].concat();
+      options.sort();
+      options
     },
     _ => {
       archs.clone()

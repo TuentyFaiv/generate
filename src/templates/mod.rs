@@ -35,6 +35,9 @@ pub fn get_templates<'a>() -> HashMap<&'a str, &'a str>{
 	// React page
 	templates.insert("react-typescript-page", not_yet);
 	templates.insert("react-javascript-page", not_yet);
+	// React layout
+	templates.insert("react-typescript-layout", not_yet);
+	templates.insert("react-javascript-layout", not_yet);
 	// React service
 	templates.insert("react-typescript-service", not_yet);
 	templates.insert("react-javascript-service", not_yet);
@@ -86,14 +89,14 @@ pub fn get_templates<'a>() -> HashMap<&'a str, &'a str>{
 	templates.insert("vanilla-typescript-component", not_yet);
 	templates.insert("vanilla-javascript-component", not_yet);
 	// Svelte class
-	templates.insert("svelte-typescript-class", not_yet);
-	templates.insert("svelte-javascript-class", not_yet);
+	templates.insert("vanilla-typescript-class", not_yet);
+	templates.insert("vanilla-javascript-class", not_yet);
 	// Svelte service
-	templates.insert("svelte-typescript-service", not_yet);
-	templates.insert("svelte-javascript-service", not_yet);
+	templates.insert("vanilla-typescript-service", not_yet);
+	templates.insert("vanilla-javascript-service", not_yet);
 	// Svelte schema
-	templates.insert("svelte-typescript-schema", not_yet);
-	templates.insert("svelte-javascript-schema", not_yet);
+	templates.insert("vanilla-typescript-schema", not_yet);
+	templates.insert("vanilla-javascript-schema", not_yet);
 
 	return templates;
 }
