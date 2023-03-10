@@ -74,13 +74,14 @@ export const router = createBrowserRouter([
 "#;
 
 pub static ROUTE: &str = r#"{
-    path: "ROUTE",
+    path: "// ROUTE",
     element: (
       <Suspense fallback={<Loader type="page" portal />}>
         <NAME />
       </Suspense>
     )
-  },"#;
+  },
+  // NEXT_ROUTE"#;
 
 pub static PROPTYPES: &str = r#"// Change for interface if is an object
 export type NAMEState = null;

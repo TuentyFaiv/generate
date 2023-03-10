@@ -151,8 +151,7 @@ pub fn make(args: &Args) -> Result<Answers> {
 		None => {
       let name_lower = name.to_lowercase();
       let path_name = format!("./{name}");
-      let path_default = "sharing";
-      let path_ui = "ui/sharing";
+      let path_ui = "sharing";
       let path_context = format!("./src/logic/contexts/{name_lower}");
       let path_service = "./src/logic/services";
       let path_schema = "./src/logic/schemas";
@@ -166,7 +165,7 @@ pub fn make(args: &Args) -> Result<Answers> {
       } else if is_hook {
         let full_path = match choose_option("Which type is:", ["global", "internal"].to_vec())?.as_str() {
           "internal" => {
-            let location = input("Where:", "sharing")?;
+            let location = input("Where:", path_ui)?;
 
             format!("./src/ui/{location}/hooks")
           },
@@ -177,7 +176,7 @@ pub fn make(args: &Args) -> Result<Answers> {
 
         full_path
       } else if is_page || is_layout {
-        let short_path = input("Choose location:", path_default)?;
+        let short_path = input("Choose location:", path_ui)?;
         name = short_path.clone();
 
         let full_path = match tool.as_str() {
@@ -197,7 +196,7 @@ pub fn make(args: &Args) -> Result<Answers> {
       } else if is_component {
         let short_path = input("Choose location:", path_ui)?;
 
-        let full_path = format!("./src/{short_path}");
+        let full_path = format!("./src/ui/{short_path}");
 
         full_path
       } else if is_atomic || is_library {

@@ -2,7 +2,16 @@ use std::io::{Write, BufReader, Read};
 use std::fs::File;
 use anyhow::{Result};
 
-use super::statics::page::{PROPTYPES, PAGE_TS, PAGE, STYLES, STYLES_RESPONSIVE, ROUTER, ROUTE, LOCALE};
+use super::statics::page::{
+  PROPTYPES,
+  PAGE_TS,
+  PAGE,
+  STYLES,
+  STYLES_RESPONSIVE,
+  ROUTER,
+  ROUTE,
+  LOCALE
+};
 
 pub fn generate(
   path: &str,
@@ -20,6 +29,8 @@ pub fn generate(
   let mut styles = STYLES.to_string();
   let mut responsive = STYLES_RESPONSIVE.to_string();
   let mut locale = LOCALE.to_string();
+  let mut router = ROUTER.to_string();
+  let mut route = ROUTE.to_string();
 
   let ext = match is_ts {
     true => {
@@ -31,7 +42,7 @@ pub fn generate(
     }
   };
 
-  let page_import = format!("const {name} = lazy(() => (import(\"@{name_lower}/page\")));");
+  let page_import = format!("const {name} = lazy(() => (import(\"@{name_lower}/page\")));\n// ROUTES");
 
   proptypes = proptypes.replace("NAME_LOWER", &name_lower);
   page = page.replace("NAME_LOWER", &name_lower);
@@ -42,8 +53,10 @@ pub fn generate(
   styles = styles.replace("NAME", name);
   responsive = responsive.replace("NAME", name);
   locale = locale.replace("NAME", name);
+  route = route.replace("NAME", name);
+  route = route.replace("// ROUTE", format!("/{name_lower}").as_str());
 
-  let router_path = format!("{path_routes}/router{ext}x");
+  let router_path = format!("{path_routes}/router.tsx");
   let page_path = format!("{path}/+page{ext}x");
   let styles_path = format!("{path}/{name}.styles{ext}");
   let responsive_path = format!("{path}/{name}.styles.responsive{ext}");
@@ -55,20 +68,27 @@ pub fn generate(
   let mut responsive_file = File::create(responsive_path)?;
   let mut locale_en_file = File::create(locale_en_path)?;
   let mut locale_es_file = File::create(locale_es_path)?;
+
   match File::open(&router_path) {
-    Ok(router) => {
-      let mut buf_reader = BufReader::new(&router);
+    Ok(router_file) => {
+      let mut buf_reader = BufReader::new(&router_file);
       let mut router_content = String::new();
       buf_reader.read_to_string(&mut router_content)?;
 
       let mut new_router = File::create(&router_path)?;
-      let updated_router = [router_content.as_str(), page_import.as_str()].concat();
-      new_router.write_all(updated_router.as_bytes())?;
+
+      router_content = router_content.replace("// ROUTES", &page_import);
+      router_content = router_content.replace("// NEXT_ROUTE", &route);
+      
+      new_router.write_all(router_content.as_bytes())?;
     },
     Err(_) => {
-      let mut router = File::create(&router_path)?;
+      let mut router_file = File::create(&router_path)?;
 
-      router.write_all(page_import.as_bytes())?;
+      router = router.replace("// ROUTES", &page_import);
+      router = router.replace("// NEXT_ROUTE", &route);
+
+      router_file.write_all(router.as_bytes())?;
     }
   };
   
