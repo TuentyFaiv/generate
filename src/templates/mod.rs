@@ -3,6 +3,7 @@ use std::collections::HashMap;
 pub mod svelte;
 pub mod react;
 pub mod vanilla;
+pub mod global;
 
 pub fn get_templates<'a>() -> HashMap<&'a str, &'a str>{
 	let not_yet = "err-notimplemented";
@@ -42,8 +43,8 @@ pub fn get_templates<'a>() -> HashMap<&'a str, &'a str>{
 	templates.insert("react-typescript-service", not_yet);
 	templates.insert("react-javascript-service", not_yet);
 	// React schema
-	templates.insert("react-typescript-schema", not_yet);
-	templates.insert("react-javascript-schema", not_yet);
+	templates.insert("react-typescript-schema", "schema-react");
+	templates.insert("react-javascript-schema", "schema-react");
 
 	// Svelte template
 	templates.insert("svelte-sveltekit-ts-atomic", "repo-DittoSvelte");
@@ -76,8 +77,8 @@ pub fn get_templates<'a>() -> HashMap<&'a str, &'a str>{
 	templates.insert("svelte-typescript-service", not_yet);
 	templates.insert("svelte-javascript-service", not_yet);
 	// Svelte schema
-	templates.insert("svelte-typescript-schema", not_yet);
-	templates.insert("svelte-javascript-schema", not_yet);
+	templates.insert("svelte-typescript-schema", "schema-svelte");
+	templates.insert("svelte-javascript-schema", "schema-svelte");
 
 	// Vanilla template
 	templates.insert("vanilla-typescript-atomic", not_yet);
@@ -95,8 +96,8 @@ pub fn get_templates<'a>() -> HashMap<&'a str, &'a str>{
 	templates.insert("vanilla-typescript-service", not_yet);
 	templates.insert("vanilla-javascript-service", not_yet);
 	// Svelte schema
-	templates.insert("vanilla-typescript-schema", not_yet);
-	templates.insert("vanilla-javascript-schema", not_yet);
+	templates.insert("vanilla-typescript-schema", "schema-vanilla");
+	templates.insert("vanilla-javascript-schema", "schema-vanilla");
 
 	return templates;
 }

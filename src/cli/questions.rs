@@ -152,9 +152,7 @@ pub fn make(args: &Args) -> Result<Answers> {
       let name_lower = name.to_lowercase();
       let path_name = format!("./{name}");
       let path_ui = "sharing";
-      let path_context = format!("./src/logic/contexts/{name_lower}");
       let path_service = "./src/logic/services";
-      let path_schema = "./src/logic/schemas";
       let path_action = "./src/logic/actions";
       let path_store = "./src/logic/stores";
       let path_class = format!("./src/logic/classes/{name_lower}");
@@ -176,7 +174,7 @@ pub fn make(args: &Args) -> Result<Answers> {
 
         full_path
       } else if is_page || is_layout {
-        let short_path = input("Choose location:", path_ui)?;
+        let short_path = input("Where:", path_ui)?;
         name = short_path.clone();
 
         let full_path = match tool.as_str() {
@@ -194,19 +192,20 @@ pub fn make(args: &Args) -> Result<Answers> {
 
         full_path
       } else if is_component {
-        let short_path = input("Choose location:", path_ui)?;
-
+        let short_path = input("Where:", path_ui)?;
         let full_path = format!("./src/ui/{short_path}");
 
         full_path
       } else if is_atomic || is_library {
         input("Proyect path:", &path_name.as_str())?
       } else if is_context {
-        input("Choose location:", &path_context.as_str())?
+        let path_context = format!("./src/logic/contexts/{name_lower}");
+        path_context
       } else if is_service {
         input("Choose location:", path_service)?
       } else if is_schema {
-        input("Choose location:", path_schema)?
+        let path_schema = "./src/logic/schemas";
+        path_schema.to_string()
       } else if is_action {
         input("Choose location:", path_action)?
       } else if is_store {
