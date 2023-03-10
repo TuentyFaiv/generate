@@ -11,7 +11,7 @@ mod create;
 use crate::cli::{questions, Args, msg};
 use crate::statics::{NOT_IMPLEMENTED};
 use crate::templates::get_templates;
-use crate::create::{component, project, hoc, hook};
+use crate::create::{component, project, hoc, hook, context};
 
 pub fn main() -> Result<()> {
 	// env_logger::init();
@@ -42,6 +42,7 @@ pub fn main() -> Result<()> {
 	let create_component = template.contains(&"component");
 	let create_hoc = template.contains(&"hoc");
 	let create_hook = template.contains(&"hook");
+	let create_context = template.contains(&"context");
 	let notexist = template.contains(&"notimplemented");
 
 	if notexist {
@@ -60,6 +61,14 @@ pub fn main() -> Result<()> {
 
 	if create_hook {
 		hook::make(
+			&answers.name,
+			&answers.tool,
+			&answers.tool_type,
+			&answers.path
+		)?;
+	}
+	if create_context {
+		context::make(
 			&answers.name,
 			&answers.tool,
 			&answers.tool_type,

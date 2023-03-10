@@ -13,6 +13,8 @@ pub fn get_templates<'a>() -> HashMap<&'a str, &'a str>{
 	templates.insert("react-next-atomic", not_yet);
 	templates.insert("react-remix-ts-atomic", not_yet);
 	templates.insert("react-remix-atomic", not_yet);
+	templates.insert("react-native-ts-atomic", not_yet);
+	templates.insert("react-native-atomic", not_yet);
 	templates.insert("react-typescript-atomic", "repo-DittoReact");
 	templates.insert("react-javascript-atomic", not_yet);
 	// React library
@@ -28,8 +30,8 @@ pub fn get_templates<'a>() -> HashMap<&'a str, &'a str>{
 	templates.insert("react-typescript-hook", "hook-react");
 	templates.insert("react-javascript-hook", "hook-react");
 	// React context
-	templates.insert("react-typescript-context", not_yet);
-	templates.insert("react-javascript-context", not_yet);
+	templates.insert("react-typescript-context", "context-react");
+	templates.insert("react-javascript-context", "context-react");
 	// React page
 	templates.insert("react-typescript-page", not_yet);
 	templates.insert("react-javascript-page", not_yet);

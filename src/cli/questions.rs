@@ -143,14 +143,15 @@ pub fn make(args: &Args) -> Result<Answers> {
 
 	let path = match args.path.clone() {
 		None => {
+      let name_lower = name.to_lowercase();
       let path_name = format!("./{name}");
       let path_ui = "ui/sharing";
-      let path_context = format!("./logic/contexts/{name}");
-      let path_service = "./logic/services";
-      let path_schema = "./logic/schemas";
-      let path_action = "./logic/actions";
-      let path_store = "./logic/stores";
-      let path_class = format!("./logic/classes/{name}");
+      let path_context = format!("./src/logic/contexts/{name_lower}");
+      let path_service = "./src/logic/services";
+      let path_schema = "./src/logic/schemas";
+      let path_action = "./src/logic/actions";
+      let path_store = "./src/logic/stores";
+      let path_class = format!("./src/logic/classes/{name_lower}");
 
       if is_hoc {
         let path_hoc = "./src/logic/hocs";
