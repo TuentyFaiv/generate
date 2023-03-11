@@ -46,6 +46,7 @@ pub fn main() -> Result<()> {
 	let create_page = template.contains(&"page");
 	let create_layout = template.contains(&"layout");
 	let create_schema = template.contains(&"schema");
+	let create_service = template.contains(&"service");
 	let notexist = template.contains(&"notimplemented");
 
 	if notexist {
@@ -81,6 +82,14 @@ pub fn main() -> Result<()> {
 
 	if create_schema {
 		global::schema::make(
+			&answers.name,
+			&answers.tool_type,
+			&answers.path
+		)?;
+	}
+
+	if create_service {
+		global::service::make(
 			&answers.name,
 			&answers.tool_type,
 			&answers.path

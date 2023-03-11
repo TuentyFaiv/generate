@@ -1,12 +1,12 @@
 pub static SCHEMA_TS: &str = r#"import { object, string } from "yup";
 
-import type { NAMESchema } from "@typing/schemas/NAME_LOWER"; 
+import type { NAMESchema } from "@typing/schemas/NAME_CAMEL";
 
 export const NAMEFields = object({
   field: string().required("required")
 });
 
-export const DEFAULT_NAME_UPPER_VALUES: NAMESchema = {
+export const DEFAULTNAME_DASH_VALUES: NAMESchema = {
   field: ""
 };
 "#;
@@ -17,12 +17,12 @@ export const NAMEFields = object({
   field: string().required("required")
 });
 
-export const DEFAULT_NAME_UPPER_VALUES = {
+export const DEFAULTNAME_DASH_VALUES = {
   field: ""
 };
 "#;
 
-pub static PROPTYPES: &str = r#"import { NAMEFields } from "@schemas/NAME_LOWER";
+pub static PROPTYPES: &str = r#"import { NAMEFields } from "@schemas/NAME_CAMEL";
 
 import type { InferType } from "yup";
 

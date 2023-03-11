@@ -3,3 +3,4 @@ pub mod project;
 pub mod page;
 pub mod layout;
 pub mod schema;
+pub mod service;

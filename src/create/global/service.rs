@@ -12,11 +12,9 @@ pub fn make(
   tool_type: &String,
   path: &String
 ) -> Result<()> {
-  let name_dash = utils::format_dash_name(name);
-  let name_formatted = utils::format_name(name);
-  let name_capitalize = capitalize(&name_formatted.as_str());
+  let name_capitalize = capitalize(&name.as_str());
   let name_camel = utils::camel(&name_capitalize.as_str());
-  let path_proptypes = "./src/logic/typing/schemas";
+  let path_proptypes = "./src/logic/typing/services";
   let is_ts = tool_type.as_str() == "typescript";
   
   create_dir_all(path).unwrap_or_else(|why| {
@@ -28,11 +26,10 @@ pub fn make(
     });
   }
 
-  global::schema::generate(
+  global::service::generate(
     &path.as_str(),
     path_proptypes,
     &name_capitalize.as_str(),
-    &name_dash.to_uppercase().as_str(),
     is_ts
   )?;
 
@@ -40,7 +37,7 @@ pub fn make(
   msg(&format!(
     "{} {}",
     OK,
-    style(format!("Schema {name_camel} created at {path}")).cyan()
+    style(format!("Service {name_camel} created at {path}")).cyan()
   ));
 
   Ok(())

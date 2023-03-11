@@ -40,8 +40,8 @@ pub fn get_templates<'a>() -> HashMap<&'a str, &'a str>{
 	templates.insert("react-typescript-layout", "layout-react");
 	templates.insert("react-javascript-layout", "layout-react");
 	// React service
-	templates.insert("react-typescript-service", not_yet);
-	templates.insert("react-javascript-service", not_yet);
+	templates.insert("react-typescript-service", "service-react");
+	templates.insert("react-javascript-service", "service-react");
 	// React schema
 	templates.insert("react-typescript-schema", "schema-react");
 	templates.insert("react-javascript-schema", "schema-react");
@@ -74,8 +74,8 @@ pub fn get_templates<'a>() -> HashMap<&'a str, &'a str>{
 	templates.insert("svelte-typescript-store", not_yet);
 	templates.insert("svelte-javascript-store", not_yet);
 	// Svelte service
-	templates.insert("svelte-typescript-service", not_yet);
-	templates.insert("svelte-javascript-service", not_yet);
+	templates.insert("svelte-typescript-service", "service-svelte");
+	templates.insert("svelte-javascript-service", "service-svelte");
 	// Svelte schema
 	templates.insert("svelte-typescript-schema", "schema-svelte");
 	templates.insert("svelte-javascript-schema", "schema-svelte");
@@ -93,8 +93,8 @@ pub fn get_templates<'a>() -> HashMap<&'a str, &'a str>{
 	templates.insert("vanilla-typescript-class", not_yet);
 	templates.insert("vanilla-javascript-class", not_yet);
 	// Svelte service
-	templates.insert("vanilla-typescript-service", not_yet);
-	templates.insert("vanilla-javascript-service", not_yet);
+	templates.insert("vanilla-typescript-service", "service-vanilla");
+	templates.insert("vanilla-javascript-service", "service-vanilla");
 	// Svelte schema
 	templates.insert("vanilla-typescript-schema", "schema-vanilla");
 	templates.insert("vanilla-javascript-schema", "schema-vanilla");

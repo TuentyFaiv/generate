@@ -143,7 +143,7 @@ pub fn make(args: &Args) -> Result<Answers> {
 		Some(exist) => exist
 	};
 
-  if is_component || is_hoc || is_hook {
+  if is_component || is_hoc || is_hook || is_context || is_service {
     name = format_name(&name);
   }
 
@@ -152,7 +152,6 @@ pub fn make(args: &Args) -> Result<Answers> {
       let name_lower = name.to_lowercase();
       let path_name = format!("./{name}");
       let path_ui = "sharing";
-      let path_service = "./src/logic/services";
       let path_action = "./src/logic/actions";
       let path_store = "./src/logic/stores";
       let path_class = format!("./src/logic/classes/{name_lower}");
@@ -202,7 +201,8 @@ pub fn make(args: &Args) -> Result<Answers> {
         let path_context = format!("./src/logic/contexts/{name_lower}");
         path_context
       } else if is_service {
-        input("Choose location:", path_service)?
+        let path_service = "./src/logic/services";
+        path_service.to_string()
       } else if is_schema {
         let path_schema = "./src/logic/schemas";
         path_schema.to_string()
