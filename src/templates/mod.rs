@@ -89,7 +89,13 @@ pub fn get_templates<'a>() -> HashMap<&'a str, &'a str>{
 	// Vanilla component
 	templates.insert("vanilla-typescript-component", not_yet);
 	templates.insert("vanilla-javascript-component", not_yet);
-	// Svelte class
+	// Vanilla page
+	templates.insert("vanilla-typescript-page", not_yet);
+	templates.insert("vanilla-javascript-page", not_yet);
+	// Vanilla layout
+	templates.insert("vanilla-typescript-layout", not_yet);
+	templates.insert("vanilla-javascript-layout", not_yet);
+	// Vanilla class
 	templates.insert("vanilla-typescript-class", not_yet);
 	templates.insert("vanilla-javascript-class", not_yet);
 	// Svelte service

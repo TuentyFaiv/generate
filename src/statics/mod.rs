@@ -6,9 +6,9 @@ pub static TOOLS_SVELTE: &[&str] = &["sveltekit", "sveltekit-ts"];
 pub static TOOLS_WEBCOMPONENTS: &[&str] = &["webcomponent", "webcomponent-ts"];
 pub static TOOLS_BASE: &[&str] = &["javascript", "typescript"];
 
-pub static ARCHS: &[&str] = &["atomic", "library", "component", "service", "schema"];
-pub static ARCHS_REACT: &[&str] = &["hoc", "hook", "context", "page", "layout"];
-pub static ARCHS_SVELTE: &[&str] = &["page", "layout", "action", "store"];
+pub static ARCHS: &[&str] = &["atomic", "library", "component", "service", "schema", "page", "layout"];
+pub static ARCHS_REACT: &[&str] = &["hoc", "hook", "context"];
+pub static ARCHS_SVELTE: &[&str] = &["action", "store"];
 pub static ARCHS_VANILLA: &[&str] = &["class"];
 pub static ARCHS_TYPE_COMPONENT: &[&str] = &["atoms", "molecules", "organisms", "normal"];
 
