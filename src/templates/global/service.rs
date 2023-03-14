@@ -2,43 +2,52 @@ use std::io::{Write, Read, BufReader};
 use std::fs::File;
 use anyhow::{Result};
 
-use crate::utils;
+use crate::utils::{camel};
 
-use super::statics::service::{PROPTYPES, SERVICE, SERVICE_TS, INSTANCES};
+use super::statics::service::{PROPTYPES, SERVICE, SERVICE_TS};
+use super::statics::service::{SERVICE_IMPORT, TYPE_EXPORT, INSTANCES};
 
-pub fn generate(path: &str, path_proptypes: &str, name: &str, is_ts: bool) -> Result<()> {
-
-  let mut proptypes = PROPTYPES.to_string();
+pub fn generate(
+  path: &str,
+  path_proptypes: &str,
+  path_instances: &str,
+  name: &str,
+  namespace: &str,
+  is_ts: bool
+) -> Result<()> {
   let instances = INSTANCES.to_string();
-  let name_lower = name.to_lowercase();
-  let name_camel = utils::camel(name);
+  let name_camel = camel(name);
   
+  let mut proptypes = PROPTYPES.to_string();
   let mut service = SERVICE.to_string();
+  let mut service_import = SERVICE_IMPORT.to_string();
+  let mut type_export = TYPE_EXPORT.to_string();
   let mut ext = ".js".to_string();
-  let service_import = format!("export * from \"./{name_camel}\";\n");
 
   if is_ts {
     service = SERVICE_TS.to_string();
     ext = ".ts".to_string();
   }
 
-  proptypes = proptypes.replace("NAME_CAMEL", &name_camel);
+  type_export = type_export.replace("NAME", name);
+  
   service = service.replace("NAME_CAMEL", &name_camel);
-
-  proptypes = proptypes.replace("NAME_LOWER", &name_lower);
-  service = service.replace("NAME_LOWER", &name_lower);
-
-  proptypes = proptypes.replace("NAME", name);
+  service = service.replace("NAMESPACE", namespace);
   service = service.replace("NAME", name);
 
+  service_import = service_import.replace("NAME_CAMEL", &name_camel);
+
   let index_path = format!("{path}/index.ts");
-  let instances_path = format!("{path}/instances.ts");
+  let instances_path = format!("{path_instances}/instances.ts");
   let service_path = format!("{path}/{name_camel}{ext}");
+  let proptypes_path = format!("{path_proptypes}/{namespace}{ext}");
 
   let mut service_file = File::create(service_path)?;
+  service_file.write_all(service.as_bytes())?;
+
   match File::open(&index_path) {
-    Ok(index) => {
-      let mut buf_reader = BufReader::new(&index);
+    Ok(index_file) => {
+      let mut buf_reader = BufReader::new(&index_file);
       let mut index_content = String::new();
       buf_reader.read_to_string(&mut index_content)?;
 
@@ -47,9 +56,9 @@ pub fn generate(path: &str, path_proptypes: &str, name: &str, is_ts: bool) -> Re
       new_index.write_all(updated_index.as_bytes())?;
     },
     Err(_) => {
-      let mut index = File::create(&index_path)?;
+      let mut index_file = File::create(&index_path)?;
 
-      index.write_all(service_import.as_bytes())?;
+      index_file.write_all(service_import.as_bytes())?;
     }
   };
 
@@ -61,12 +70,28 @@ pub fn generate(path: &str, path_proptypes: &str, name: &str, is_ts: bool) -> Re
       instances_file.write_all(instances.as_bytes())?;
     }
   }
-  
-  service_file.write_all(service.as_bytes())?;
 
   if is_ts {
-    let mut proptypes_file = File::create(format!("{path_proptypes}/{name_camel}{ext}"))?;
-    proptypes_file.write_all(proptypes.as_bytes())?;
+    match File::open(&proptypes_path) {
+      Ok(proptypes_file) => {
+        let mut buf_reader = BufReader::new(&proptypes_file);
+        let mut proptypes_content = String::new();
+        buf_reader.read_to_string(&mut proptypes_content)?;
+  
+        let mut new_proptypes = File::create(&proptypes_path)?;
+        
+        proptypes_content = proptypes_content.replace("// NEXT_TYPE", &type_export);
+  
+        new_proptypes.write_all(proptypes_content.as_bytes())?;
+      },
+      Err(_) => {
+        let mut proptypes_file = File::create(&proptypes_path)?;
+
+        proptypes = proptypes.replace("// NEXT_TYPE", &format!("{type_export}\n"));
+  
+        proptypes_file.write_all(proptypes.as_bytes())?;
+      }
+    };
   }
 
   Ok(())
