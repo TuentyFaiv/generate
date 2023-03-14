@@ -37,7 +37,11 @@ pub fn make(
   let result = match selected {
     "react" => {
       let path_routes = "./src/logic/routes";
+      let path_i18n_context = "./src/logic/contexts/i18n";
       create_dir_all(path_routes.to_string()).unwrap_or_else(|why| {
+        println!("! {:?}", why.kind());
+      });
+      create_dir_all(path_i18n_context.to_string()).unwrap_or_else(|why| {
         println!("! {:?}", why.kind());
       });
       react::page::generate(
@@ -45,6 +49,7 @@ pub fn make(
         path_proptypes,
         path_locales,
         path_routes,
+        path_i18n_context,
         &name_capitalize.as_str(),
         is_ts
       )?;

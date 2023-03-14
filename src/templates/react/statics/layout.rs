@@ -53,7 +53,7 @@ pub static PROPTYPES: &str = r#"import type { ReactNode } from "react";
 
 export interface NAMEProps {
   children: ReactNode;
-};
+}
 
 // Change for interface if is an object
 export type NAMEState = null;

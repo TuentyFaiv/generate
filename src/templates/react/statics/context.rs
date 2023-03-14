@@ -87,14 +87,14 @@ pub static PROPTYPES: &str = r#"import type { Dispatch, ReactNode } from "react"
 export interface ContextNAME {
   state: ContextNAMEState;
   dispatch: Dispatch<ContextNAMEReducerAction>;
-};
+}
 
 // Change for interface if is an object
 export type ContextNAMEState = null;
 
 export interface ContextNAMEProvider {
   children: ReactNode;
-};
+}
 
 export type ContextNAMEReducerAction = ChangeAction;
 
