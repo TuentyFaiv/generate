@@ -3,7 +3,7 @@ use dialoguer::{theme::ColorfulTheme, Confirm};
 
 use crate::statics::{TOOLS, TOOLS_REACT, TOOLS_SVELTE, TOOLS_WEBCOMPONENTS, TOOLS_BASE};
 use crate::statics::{ARCHS, ARCHS_REACT, ARCHS_SVELTE, ARCHS_TYPE_COMPONENT, ARCHS_VANILLA};
-use crate::utils::format_name;
+use crate::utils::{format_text, format_lower};
 
 use super::{choose_option, Args, input};
 
@@ -144,7 +144,7 @@ pub fn make(args: &Args) -> Result<Answers> {
 	};
 
   if is_component || is_hoc || is_hook || is_context || is_service {
-    name = format_name(&name);
+    name = format_text(&name);
   }
 
 	let path = match args.path.clone() {
@@ -162,9 +162,9 @@ pub fn make(args: &Args) -> Result<Answers> {
       } else if is_hook {
         let full_path = match choose_option("Which type is:", ["global", "internal"].to_vec())?.as_str() {
           "internal" => {
-            let location = input("Where:", path_ui)?;
+            let short_path = input("Where:", path_ui)?;
 
-            format!("./src/ui/{location}/hooks")
+            format!("./src/ui/{short_path}/hooks")
           },
           _ => {
             "./src/logic/hooks".to_string()
@@ -201,11 +201,15 @@ pub fn make(args: &Args) -> Result<Answers> {
         let path_context = format!("./src/logic/contexts/{name_lower}");
         path_context
       } else if is_service {
-        let path_service = "./src/logic/services";
-        path_service.to_string()
+        let mut short_path = input("Where:", path_ui)?;
+        short_path = format_lower(&short_path);
+        let path_service = format!("./src/logic/services/{short_path}");
+        path_service
       } else if is_schema {
-        let path_schema = "./src/logic/schemas";
-        path_schema.to_string()
+        let mut short_path = input("Where:", path_ui)?;
+        short_path = format_lower(&short_path);
+        let path_schema = format!("./src/logic/schemas/{short_path}");
+        path_schema
       } else if is_action {
         input("Choose location:", path_action)?
       } else if is_store {

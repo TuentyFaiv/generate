@@ -16,7 +16,7 @@ pub fn camel(word: &str) -> String {
   word_capitalize
 }
 
-pub fn format_name(name: &String) -> String {
+pub fn format_text(name: &String) -> String {
 	let splitted: Vec<&str> = name.split(&['-', '_', ' '][..]).collect();
 	
 	let mut formatted = String::new();
@@ -30,7 +30,21 @@ pub fn format_name(name: &String) -> String {
 	formatted
 }
 
-pub fn format_dash_name(name: &String) -> String {
+pub fn format_lower(name: &String) -> String {
+	let splitted: Vec<&str> = name.split(&['-', '_', ' '][..]).collect();
+	
+	let mut formatted = String::new();
+
+	for word in splitted {
+		let word_capitalize = word.to_lowercase();
+		
+		formatted = format!("{formatted}{word_capitalize}");
+	}
+
+	formatted
+}
+
+pub fn format_dash(name: &String) -> String {
 	let splitted: Vec<&str> = name.split(&['-', '_', ' '][..]).collect();
 	
 	let mut formatted = String::new();
