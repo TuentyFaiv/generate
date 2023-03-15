@@ -4,7 +4,7 @@ import type {
   HookNAMEConfig,
   HookNAMEState,
   HookNAMEAction,
-  HookNAMEReturn
+  HookNAMEReturn,
 } from "@typing/hooks/useNAME";
 
 export function useNAME(config: HookNAMEConfig = null): HookNAMEReturn {
@@ -31,9 +31,8 @@ export function useNAME(config = null) {
 }
 "#;
 
-pub static PROPTYPES: &str = r#"export interface HookNAMEConfig {
-  option: unknown;
-}
+pub static PROPTYPES: &str = r#"// Change for interface if is an object
+export type HookNAMEConfig = null;
 
 // Change for interface if is an object
 export type HookNAMEState = null;

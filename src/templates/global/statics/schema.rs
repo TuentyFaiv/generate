@@ -3,24 +3,24 @@ pub static SCHEMA_TS: &str = r#"import { object, string } from "yup";
 import type { InferType } from "yup";
 
 export const NAMESchema = object({
-  field: string().required("required")
+  field: string().required("required"),
 });
 
 export type NAMEValues = InferType<typeof NAMESchema>;
 
 export const DEFAULTNAME_DASH_VALUES: NAMEValues = {
-  field: ""
+  field: "",
 };
 "#;
 
 pub static SCHEMA: &str = r#"import { object, string } from "yup";
 
 export const NAMESchema = object({
-  field: string().required("required")
+  field: string().required("required"),
 });
 
 export const DEFAULTNAME_DASH_VALUES = {
-  field: ""
+  field: "",
 };
 "#;
 

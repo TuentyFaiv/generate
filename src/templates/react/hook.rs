@@ -20,7 +20,7 @@ pub fn generate(path: &str, path_proptypes: &str, name: &str, is_ts: bool) -> Re
   hook = hook.replace("NAME", name);
   proptypes = proptypes.replace("NAME", name);
 
-  let full_path = format!("{path}/use{name}{ext}x");
+  let full_path = format!("{path}/use{name}{ext}");
   let index_path = format!("{path}/index.ts");
 
   let mut hook_file = File::create(full_path)?;

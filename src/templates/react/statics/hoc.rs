@@ -46,7 +46,7 @@ export function withNAME(Component) {
 }
 "#;
 
-pub static PROPTYPES: &str = r#"import type { ObjStrCommon } from "./globals.types";
+pub static PROPTYPES: &str = r#"import type { ObjStrCommon } from "@typing/globals/types";
 
 export interface HOCNAME {
   datas: ObjStrCommon;

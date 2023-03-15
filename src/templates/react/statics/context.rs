@@ -6,7 +6,7 @@ import reducer from "./reducer";
 
 const NAMEContext = createContext<ContextNAME>({
   state: null,
-  dispatch: () => {}
+  dispatch: () => {},
 });
 
 export function NAMEProvider({ children }: ContextNAMEProvider) {
@@ -31,11 +31,12 @@ export const useNAMEContext = () => useContext(NAMEContext);
 pub static CONTEXT: &str = r#"import { createContext, useContext, useReducer, useMemo } from "react";
 
 import reducer from "./reducer";
-export { Actions } from "./reducer";
+
+export { NAMEActions } from "./reducer";
 
 const NAMEContext = createContext({
   state: null,
-  dispatch: () => {}
+  dispatch: () => {},
 });
 
 export function NAMEProvider({ children }) {
@@ -57,7 +58,7 @@ export function NAMEProvider({ children }) {
 export const useNAMEContext = () => useContext(NAMEContext);
 "#;
 
-pub static REDUCER_TS: &str = r#"import { Actions } from "@typing/contexts/NAME_LOWER";
+pub static REDUCER_TS: &str = r#"import { NAMEActions } from "@typing/contexts/NAME_LOWER";
 
 import type { ContextNAMEReducerAction, ContextNAMEState } from "@typing/contexts/NAME_LOWER";
 
@@ -69,9 +70,8 @@ export default function reducer(state: ContextNAMEState, action: ContextNAMERedu
 }
 "#;
 
-pub static REDUCER: &str = r#"
-export const Actions = {
-  CHANGE: "CHANGE"
+pub static REDUCER: &str = r#"export const NAMEActions = {
+  CHANGE: "CHANGE",
 };
 
 export default function reducer(state, action) {
@@ -104,6 +104,6 @@ interface ChangeAction {
 }
 
 export enum NAMEActions {
-  CHANGE = "CHANGE"
+  CHANGE = "CHANGE",
 }
 "#;

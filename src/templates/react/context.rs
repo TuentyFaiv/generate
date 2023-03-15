@@ -21,10 +21,12 @@ pub fn generate(path: &str, path_proptypes: &str, name: &str, is_ts: bool) -> Re
   }
 
   proptypes = proptypes.replace("NAME_LOWER", &name_lower);
-  context = context.replace("NAME_LOWER", &name_lower);
-  reducer = reducer.replace("NAME_LOWER", &name_lower);
   proptypes = proptypes.replace("NAME", name);
+
+  context = context.replace("NAME_LOWER", &name_lower);
   context = context.replace("NAME", name);
+
+  reducer = reducer.replace("NAME_LOWER", &name_lower);
   reducer = reducer.replace("NAME", name);
 
   let mut index_path = path.replace(format!("/{name_lower}").as_str(), "");

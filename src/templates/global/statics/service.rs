@@ -2,7 +2,7 @@ pub static SERVICE_TS: &str = r#"import type {
   NAMEBody,
   NAMEParams,
   NAMEConfig,
-  NAMEReturn
+  NAMEReturn,
 } from "@typing/services/NAMESPACE";
 
 import { api } from "@services/general";
@@ -10,7 +10,7 @@ import { api } from "@services/general";
 export async function NAME_CAMEL(config: NAMEConfig) {
   const { payload } = await api.post<NAMEBody, NAMEReturn, NAMEParams>("/", config.body, {
     signal: config.signal,
-    params: config.params
+    params: config.params,
   });
 
   return payload;
@@ -21,7 +21,7 @@ pub static SERVICE: &str = r#"import { api } from "@services/general";
 export async function NAME_CAMEL(config) {
   const { payload } = await api.post("/", config.body, {
     signal: config.signal,
-    params: config.params
+    params: config.params,
   });
 
   return payload;
@@ -54,8 +54,8 @@ import Http from "./http";
 export const api = Http.create(config.api);
 export const registry = Http.create(config.registry_url, {
   params: {
-    key: config.registry_key
-  }
+    key: config.registry_key,
+  },
 });
 
 export function setAuth(token: string) {

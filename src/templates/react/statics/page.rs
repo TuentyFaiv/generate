@@ -30,7 +30,7 @@ import * as Styles from "./NAME.styles";
 
 export default function NAMEPage() {
   const { t } = useTranslation("NAME_LOWER");
-  const { global, dipatch } = useAppContext();
+  const { global, dispatch } = useAppContext();
   const [state, setState] = useState(null);
 
   return (
@@ -88,7 +88,7 @@ export const router = createBrowserRouter([
   {
     path: "*",
     element: <Navigate to="/" replace />
-  }
+  },
 ]);
 "#;
 
@@ -98,7 +98,7 @@ pub static ROUTE: &str = r#"{
           <Suspense fallback={<LoaderPortal />}>
             <NAME />
           </Suspense>
-        )
+        ),
       },
       // NEXT_ROUTE"#;
 
@@ -122,11 +122,11 @@ i18n
     nsSeparator: false,
     load: "currentOnly",
     interpolation: {
-      escapeValue: false
+      escapeValue: false,
     },
     backend: {
-      loadPath: "/locales/{{lng}}/{{ns}}.json"
-    }
+      loadPath: "/locales/{{lng}}/{{ns}}.json",
+    },
   });
 
 export default i18n;
@@ -264,7 +264,7 @@ import eslint from "vite-plugin-eslint";
 export default defineConfig({
   plugins: [react(), eslint()],
   server: {
-    port: 3000
+    port: 3000,
   },
   envPrefix: "PUB_",
   resolve: {
@@ -291,9 +291,9 @@ export default defineConfig({
       "@sharing/organisms": resolve("src/ui/sharing/organisms/index.ts"),
       "@sharing/layout": resolve("src/ui/sharing/+layout.tsx"),
       "@styles": resolve("src/ui/sharing/styles/globals.ts"),
-      "@mixins": resolve("src/ui/sharing/styles/mixins.ts")
-    }
-  }
+      "@mixins": resolve("src/ui/sharing/styles/mixins.ts"),
+    },
+  },
 });
 "#;
 

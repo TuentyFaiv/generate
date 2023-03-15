@@ -24,15 +24,14 @@ ${forsize({ size: "desktop-mid", content: css`
 `;
 "#;
 
-pub static COMPONENT: &str = r#"
-import * as Styles from "./NAME.styles";
+pub static COMPONENT: &str = r#"import * as Styles from "./NAME.styles";
 
 export default function NAME({ children }) {
   return (
     <Styles.NAME>
       {children}
     </Styles.NAME>
-  )
+  );
 }
 "#;
 
@@ -45,6 +44,6 @@ export default function NAME({ children }: Props) {
     <Styles.NAME>
       {children}
     </Styles.NAME>
-  )
+  );
 }
 "#;
