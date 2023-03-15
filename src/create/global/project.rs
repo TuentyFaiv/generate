@@ -50,6 +50,8 @@ pub fn make(
 
   command("git", ["remote", "add", "template", url.as_str()].to_vec(), Some(path), Some("Failed to add remote repository"));
 
+  command("pnpm", ["install"].to_vec(), Some(path), Some("Failed to install dependencies"));
+
   done();
   msg(&format!("{}", style(format!("Mote to {path} and start a new universe")).cyan()));
 }
