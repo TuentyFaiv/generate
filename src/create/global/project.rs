@@ -1,4 +1,7 @@
+use std::time::Duration;
+
 use console::style;
+use indicatif::{ProgressBar, ProgressStyle};
 
 use crate::cli::{command, done, msg};
 
@@ -17,6 +20,11 @@ pub fn make(
   tool: &str,
   arch: &str
 ) {
+  let pb = ProgressBar::new(1000);
+  pb.set_style(ProgressStyle::with_template("\n{spinner:.green} {msg}").unwrap());
+  pb.enable_steady_tick(Duration::from_millis(50));
+  pb.set_message("Creating...");
+
   let repository = *template.get(1).unwrap();
   let commit = format!("🎉 FEAT: Starting project {name}");
   let url = if cfg!(target_os = "windows") {
@@ -35,13 +43,15 @@ pub fn make(
   // if create_library {
   // 	command("git", ["switch", "library"].to_vec(), Some(&path), Some("Failed to switch to library"));
   // }
-    
+
+  pb.set_message("Reseting git...");
   if cfg!(target_os = "windows") {
     in_windons(path);
   } else {
     in_unix(path);
   }
 
+  pb.set_message("Adding initial commint...");
   command("git", ["init", "-b", "main"].to_vec(), Some(path), Some("Failed to restart git"));
 
   command("git", ["add", "."].to_vec(), Some(path), Some("Failed to staging files"));
@@ -50,8 +60,14 @@ pub fn make(
 
   command("git", ["remote", "add", "template", url.as_str()].to_vec(), Some(path), Some("Failed to add remote repository"));
 
+  pb.set_message("Creating env files...");
+  command("cp", [".env.example", ".env.development"].to_vec(), Some(path), Some("Failed to create development env file"));
+  command("cp", [".env.example", ".env.production"].to_vec(), Some(path), Some("Failed to create production env file"));
+
+  pb.set_message("Instaling dependencies...");
   command("pnpm", ["install"].to_vec(), Some(path), Some("Failed to install dependencies"));
+  pb.finish_and_clear();
 
   done();
-  msg(&format!("{}", style(format!("Mote to {path} and start a new universe")).cyan()));
+  msg(&format!("{}", style(format!("Move to {path} and start a new universe")).cyan()));
 }
