@@ -136,6 +136,8 @@ pub fn make(args: &Args) -> Result<Answers> {
         input("Class name:", "some-new class")?
       } else if is_atomic {
         input("Proyect name:", "new-proyect")?
+      } else if is_library {
+        input("Library name:", "new-library")?
       } else {
         String::new()
       }

@@ -3,19 +3,19 @@ use anyhow::Result;
 use console::style;
 
 use crate::statics::OK;
+use crate::cli::questions::Answers;
 use crate::cli::{done, msg};
 use crate::templates::{react};
 use crate::utils::capitalize;
 
-pub fn make(
-  name: &String,
-  tool: &String,
-  tool_type: &String,
-  path: &String
-) -> Result<()> {
-  let selected = tool.as_str();
-  let name_capitalize = capitalize(&name.as_str());
-  let is_ts = tool_type.as_str() == "typescript";
+pub fn make(answers: &Answers) -> Result<()> {
+  let name = answers.name.as_str();
+  let tool = answers.tool.as_str();
+  let tool_type = answers.tool_type.as_str();
+  let path = answers.path.as_str();
+
+  let name_capitalize = capitalize(name);
+  let is_ts = tool_type == "typescript";
   let path_proptypes = "./src/logic/typing/pages";
   let path_locales = "./public/locales";
 
@@ -34,7 +34,7 @@ pub fn make(
     });
   }
 
-  let result = match selected {
+  let result = match tool {
     "react" => {
       let path_routes = "./src/logic/routes";
       let path_i18n_context = "./src/logic/contexts/i18n";
@@ -45,7 +45,7 @@ pub fn make(
         println!("! {:?}", why.kind());
       });
       react::page::generate(
-        &path.as_str(),
+        path,
         path_proptypes,
         path_locales,
         path_routes,

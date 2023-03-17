@@ -3,22 +3,22 @@ use anyhow::Result;
 use console::style;
 
 use crate::statics::OK;
+use crate::cli::questions::Answers;
 use crate::cli::{done, msg};
 use crate::templates::{react};
 use crate::utils::capitalize;
 
-pub fn make(
-  name: &String,
-  tool: &String,
-  tool_type: &String,
-  path: &String
-) -> Result<()> {
-  let selected = tool.as_str();
-  let name_capitalize = capitalize(&name.as_str());
+pub fn make(answers: &Answers) -> Result<()> {
+  let name = answers.name.as_str();
+  let tool = answers.tool.as_str();
+  let tool_type = answers.tool_type.as_str();
+  let path = answers.path.as_str();
+
+  let name_capitalize = capitalize(name);
   let path_proptypes = "./src/logic/typing/contexts";
-  let is_ts = tool_type.as_str() == "typescript";
+  let is_ts = tool_type == "typescript";
   
-  if selected == "react" {
+  if tool == "react" {
     create_dir_all(path).unwrap_or_else(|why| {
       println!("! {:?}", why.kind());
     });
@@ -29,10 +29,10 @@ pub fn make(
     }
   }
 
-  let result = match selected {
+  let result = match tool {
     "react" => {
       react::context::generate(
-        &path.as_str(),
+        path,
         path_proptypes,
         &name_capitalize.as_str(),
         is_ts

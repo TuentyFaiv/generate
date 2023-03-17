@@ -1,4 +1,5 @@
 pub mod questions;
+pub mod actions;
 
 use std::io::{self, Write};
 use std::process::Command;

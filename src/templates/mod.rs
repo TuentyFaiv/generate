@@ -19,7 +19,7 @@ pub fn get_templates<'a>() -> HashMap<&'a str, &'a str>{
 	templates.insert("react-typescript-atomic", "repo-DittoReact");
 	templates.insert("react-javascript-atomic", not_yet);
 	// React library
-	templates.insert("react-typescript-library", not_yet);
+	templates.insert("react-typescript-library", "library-DittoReact");
 	templates.insert("react-javascript-library", not_yet);
 	// React component
 	templates.insert("react-typescript-component", "component-react");
@@ -84,7 +84,7 @@ pub fn get_templates<'a>() -> HashMap<&'a str, &'a str>{
 	templates.insert("vanilla-typescript-atomic", not_yet);
 	templates.insert("vanilla-javascript-atomic", not_yet);
 	// Vanilla library
-	templates.insert("vanilla-typescript-library", not_yet);
+	templates.insert("vanilla-typescript-library", "library-DittoVanilla");
 	templates.insert("vanilla-javascript-library", not_yet);
 	// Vanilla component
 	templates.insert("vanilla-typescript-component", not_yet);

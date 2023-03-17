@@ -3,23 +3,24 @@ use anyhow::Result;
 use console::style;
 
 use crate::statics::OK;
+use crate::cli::questions::Answers;
 use crate::cli::{done, msg};
 use crate::templates::{global};
 use crate::utils::{capitalize, camel};
 
-pub fn make(
-  name: &String,
-  tool_type: &String,
-  path: &String
-) -> Result<()> {
-  let name_capitalize = capitalize(&name.as_str());
+pub fn make(answers: &Answers) -> Result<()> {
+  let name = answers.name.as_str();
+  let path = &answers.path;
+  let tool_type = answers.tool_type.as_str();
+
+  let name_capitalize = capitalize(name);
   let name_camel = camel(&name_capitalize.as_str());
   let path_proptypes = "./src/logic/typing/services";
   let path_splitted: Vec<&str> = path.split('/').collect();
   let namespace = *path_splitted.last().unwrap();
   let mut path_instances = path.clone();
   path_instances = path_instances.replace(&format!("/{namespace}"), "/general");
-  let is_ts = tool_type.as_str() == "typescript";
+  let is_ts = tool_type == "typescript";
   
   create_dir_all(path).unwrap_or_else(|why| {
     println!("! {:?}", why.kind());

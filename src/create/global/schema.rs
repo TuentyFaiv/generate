@@ -3,15 +3,16 @@ use anyhow::Result;
 use console::style;
 
 use crate::statics::OK;
+use crate::cli::questions::Answers;
 use crate::cli::{done, msg};
 use crate::templates::{global};
 use crate::utils::{capitalize, format_dash, format_text, camel};
 
-pub fn make(
-  name: &String,
-  tool_type: &String,
-  path: &String
-) -> Result<()> {
+pub fn make(answers: &Answers) -> Result<()> {
+  let name = &answers.name;
+  let path = &answers.path;
+  let tool_type = answers.tool_type.as_str();
+
   let name_dash = format_dash(name);
   let name_formatted = format_text(name);
   let name_capitalize = capitalize(&name_formatted.as_str());
@@ -19,7 +20,7 @@ pub fn make(
   let path_proptypes = "./src/logic/typing/schemas";
   let path_splitted: Vec<&str> = path.split('/').collect();
   let namespace = *path_splitted.last().unwrap();
-  let is_ts = tool_type.as_str() == "typescript";
+  let is_ts = tool_type == "typescript";
   
   create_dir_all(path).unwrap_or_else(|why| {
     println!("! {:?}", why.kind());

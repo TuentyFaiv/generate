@@ -1,6 +1,5 @@
 use anyhow::{Result};
 use clap::Parser;
-// use indicatif::ProgressBar;
 
 mod utils;
 mod cli;
@@ -14,8 +13,6 @@ use crate::templates::get_templates;
 use crate::create::{global, react};
 
 pub fn main() -> Result<()> {
-	// env_logger::init();
-
 	let args = Args::parse();
 
 	let templates = get_templates();
@@ -38,7 +35,7 @@ pub fn main() -> Result<()> {
 	};
 
 	let create_project = template.contains(&"repo");
-	// let create_library = template.contains(&"library");
+	let create_library = template.contains(&"library");
 	let create_component = template.contains(&"component");
 	let create_hoc = template.contains(&"hoc");
 	let create_hook = template.contains(&"hook");
@@ -54,96 +51,38 @@ pub fn main() -> Result<()> {
 		return Ok(());
 	}
 	
+	// React generation
 	if create_hoc {
-		react::hoc::make(
-			&answers.name,
-			&answers.tool,
-			&answers.tool_type,
-			&answers.path
-		)?;
+		react::hoc::make(&answers)?;
 	}
-
 	if create_hook {
-		react::hook::make(
-			&answers.name,
-			&answers.tool,
-			&answers.tool_type,
-			&answers.path
-		)?;
+		react::hook::make(&answers)?;
 	}
 	if create_context {
-		react::context::make(
-			&answers.name,
-			&answers.tool,
-			&answers.tool_type,
-			&answers.path
-		)?;
+		react::context::make(&answers)?;
 	}
 
+	// Global generation
 	if create_schema {
-		global::schema::make(
-			&answers.name,
-			&answers.tool_type,
-			&answers.path
-		)?;
+		global::schema::make(&answers)?;
 	}
-
 	if create_service {
-		global::service::make(
-			&answers.name,
-			&answers.tool_type,
-			&answers.path
-		)?;
+		global::service::make(&answers)?;
 	}
-
 	if create_page {
-		global::page::make(
-			&answers.name,
-			&answers.tool,
-			&answers.tool_type,
-			&answers.path
-		)?;
+		global::page::make(&answers)?;
 	}
-
 	if create_layout {
-		global::layout::make(
-			&answers.name,
-			&answers.tool,
-			&answers.tool_type,
-			&answers.path
-		)?;
+		global::layout::make(&answers)?;
 	}
-
 	if create_component {
-		global::component::make(
-			&answers.name,
-			&answers.tool,
-			&answers.tool_type,
-			&answers.arch_type,
-			&answers.path
-		)?;
+		global::component::make(&answers)?;
 	}
-
-	if create_project {
-		global::project::make(
-			&template,
-			&answers.name,
-			&answers.path,
-			&answers.tool,
-			&answers.arch
-		);
+	if create_project || create_library {
+		global::project::make(&answers, &template, create_library)?;
 	}
 
 	println!("");
-
-	// let pb = ProgressBar::new(100);
-
-	// for i in 0..100 {
-	// 	pb.println(format!("[+] finished #{}", i));
-	// 	pb.inc(1);
-	// }
-
-	// pb.finish_with_message("Done");
 
 	Ok(())
 }
