@@ -45,10 +45,12 @@ pub fn generate(
 
   command("git", ["remote", "add", "template", url.as_str()].to_vec(), Some(path), Some("Failed to add remote repository"));
 
-  pb.set_message("Creating env files...");
-  cp_envs(path);
-
-  pb.set_message("Instaling dependencies...");
-  install(path);
-  pb.finish_and_clear();
+  if !is_library {
+    pb.set_message("Creating env files...");
+    cp_envs(path);
+  
+    pb.set_message("Instaling dependencies...");
+    install(path);
+    pb.finish_and_clear();
+  }
 }
