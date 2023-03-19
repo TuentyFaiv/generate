@@ -5,7 +5,7 @@ use console::style;
 use crate::statics::OK;
 use crate::cli::questions::Answers;
 use crate::cli::{done, msg};
-use crate::templates::{react};
+use crate::templates::{react, svelte};
 use crate::utils::capitalize;
 
 pub fn make(answers: &Answers) -> Result<()> {
@@ -17,7 +17,7 @@ pub fn make(answers: &Answers) -> Result<()> {
   let name_capitalize = capitalize(name);
   let is_ts = tool_type == "typescript";
   let path_proptypes = "./src/logic/typing/pages";
-  let path_locales = "./public/locales";
+  let path_locales = if tool == "svelte" { "./static/locales" } else { "./public/locales"};
 
 
   create_dir_all(path).unwrap_or_else(|why| {
@@ -27,9 +27,6 @@ pub fn make(answers: &Answers) -> Result<()> {
     println!("! {:?}", why.kind());
   });
   create_dir_all(format!("{path_locales}/es")).unwrap_or_else(|why| {
-    println!("! {:?}", why.kind());
-  });
-  create_dir_all(format!("{path}/styles")).unwrap_or_else(|why| {
     println!("! {:?}", why.kind());
   });
   if is_ts {
@@ -42,6 +39,9 @@ pub fn make(answers: &Answers) -> Result<()> {
     "react" => {
       let path_routes = "./src/logic/routes";
       let path_i18n_context = "./src/logic/contexts/i18n";
+      create_dir_all(format!("{path}/styles")).unwrap_or_else(|why| {
+        println!("! {:?}", why.kind());
+      });
       create_dir_all(path_routes.to_string()).unwrap_or_else(|why| {
         println!("! {:?}", why.kind());
       });
@@ -59,7 +59,32 @@ pub fn make(answers: &Answers) -> Result<()> {
       )?;
       true
     },
-    "svelte" => {false}
+    "svelte" => {
+      let path_routes = "./src/routes";
+      let path_i18n_store = "./src/logic/stores/i18n";
+      let path_ui = format!("./src/ui/{name}").to_lowercase();
+      create_dir_all(format!("{path_ui}/styles")).unwrap_or_else(|why| {
+        println!("! {:?}", why.kind());
+      });
+      create_dir_all(path_routes.to_string()).unwrap_or_else(|why| {
+        println!("! {:?}", why.kind());
+      });
+      create_dir_all(path_i18n_store.to_string()).unwrap_or_else(|why| {
+        println!("! {:?}", why.kind());
+      });
+
+      svelte::page::generate(
+        path,
+        path_proptypes,
+        path_ui.as_str(),
+        path_locales,
+        path_i18n_store,
+        &name_capitalize.as_str(),
+        is_ts
+      )?;
+
+      true
+    }
     "vanilla" => {false}
     _ => {false}
   };
