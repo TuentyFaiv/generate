@@ -65,8 +65,8 @@ pub fn get_templates<'a>() -> HashMap<&'a str, &'a str>{
 	templates.insert("svelte-typescript-page", not_yet);
 	templates.insert("svelte-javascript-page", not_yet);
 	// Svelte layout
-	templates.insert("svelte-typescript-layout", not_yet);
-	templates.insert("svelte-javascript-layout", not_yet);
+	templates.insert("svelte-typescript-layout", "layout-svelte");
+	templates.insert("svelte-javascript-layout", "layout-svelte");
 	// Svelte action
 	templates.insert("svelte-typescript-action", not_yet);
 	templates.insert("svelte-javascript-action", not_yet);
