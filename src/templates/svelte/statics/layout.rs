@@ -5,7 +5,7 @@ pub static LAYOUT_TS: &str = r#"<script lang="ts">
 	import { layout } from "@NAME_LOWER/styles";
 </script>
 
-<div class={layout.main}>
+<div class={layout.NAME_LOWER}>
 	<slot />
 </div>
 "#;
@@ -14,7 +14,7 @@ pub static LAYOUT: &str = r#"<script>
 	import { layout } from "@NAME_LOWER/styles";
 </script>
 
-<div class={layout.main}>
+<div class={layout.NAME_LOWER}>
 	<slot />
 </div>
 "#;
