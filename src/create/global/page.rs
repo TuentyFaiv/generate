@@ -19,6 +19,7 @@ pub fn make(answers: &Answers) -> Result<()> {
   let path_proptypes = "./src/logic/typing/pages";
   let path_locales = "./public/locales";
 
+
   create_dir_all(path).unwrap_or_else(|why| {
     println!("! {:?}", why.kind());
   });
@@ -26,6 +27,9 @@ pub fn make(answers: &Answers) -> Result<()> {
     println!("! {:?}", why.kind());
   });
   create_dir_all(format!("{path_locales}/es")).unwrap_or_else(|why| {
+    println!("! {:?}", why.kind());
+  });
+  create_dir_all(format!("{path}/styles")).unwrap_or_else(|why| {
     println!("! {:?}", why.kind());
   });
   if is_ts {

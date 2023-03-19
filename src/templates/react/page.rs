@@ -3,7 +3,7 @@ use std::fs::File;
 use anyhow::{Result};
 
 use super::statics::page::{PROPTYPES, PAGE_TS, PAGE, STYLES, STYLES_RESPONSIVE};
-use super::statics::page::{ROUTER, ROUTE, PAGE_IMPORT};
+use super::statics::page::{ROUTER, ROUTE, PAGE_IMPORT, STYLES_IMPORT};
 use super::statics::page::{LOCALE, I18N_LOCALE, I18N};
 use super::statics::page::{VITE_CONFIG, VITE_ALIAS, TS_CONFIG, TS_ALIAS};
 
@@ -26,6 +26,7 @@ pub fn generate(
   let mut router = ROUTER.to_string();
   let mut route = ROUTE.to_string();
   let mut page_import = PAGE_IMPORT.to_string();
+  let mut style_import = STYLES_IMPORT.to_string();
 
   let mut locale = LOCALE.to_string();
   let mut i18n = I18N.to_string();
@@ -59,6 +60,7 @@ pub fn generate(
 
   page_import = page_import.replace("NAME_LOWER", &name_lower);
   page_import = page_import.replace("NAME", name);
+  style_import = style_import.replace("NAME", name);
   route = route.replace("NAME_LOWER", &name_lower);
   route = route.replace("NAME", name);
 
@@ -73,11 +75,14 @@ pub fn generate(
 
   let router_path = format!("{path_routes}/router.tsx");
   let page_path = format!("{path}/+page{ext}x");
-  let styles_path = format!("{path}/{name}.styles{ext}");
-  let responsive_path = format!("{path}/{name}.styles.responsive{ext}");
+  let styles_path = format!("{path}/styles/{name}.styles{ext}");
+  let responsive_path = format!("{path}/styles/{name}.styles.responsive{ext}");
   let locale_en_path = format!("{path_locales}/en-US/{name_lower}.json");
   let locale_es_path = format!("{path_locales}/es/{name_lower}.json");
   let i18n_path = format!("{path_i18n_context}/i18n{ext}");
+  let styles_index = format!("{path}/styles/index{ext}");
+  let tsconfig_path = "./tsconfig.json".to_string();
+  let vite_path ="./vite.config.ts".to_string();
 
   let mut page_file = File::create(page_path)?;
   let mut styles_file = File::create(styles_path)?;
@@ -132,20 +137,20 @@ pub fn generate(
   };
 
   // Set new alias to tsconfig.json
-  match File::open("./tsconfig.json".to_string()) {
+  match File::open(&tsconfig_path) {
     Ok(tsconfig_file) => {
       let mut buf_reader = BufReader::new(&tsconfig_file);
       let mut tsconfig_content = String::new();
       buf_reader.read_to_string(&mut tsconfig_content)?;
 
-      let mut new_tsconfig = File::create("./tsconfig.json")?;
+      let mut new_tsconfig = File::create(&tsconfig_path)?;
 
       tsconfig_content = tsconfig_content.replace("// NEXT_ALIAS", &ts_alias);
 
       new_tsconfig.write_all(tsconfig_content.as_bytes())?;
     },
     Err(_) => {
-      let mut tsconfig_file = File::create("./tsconfig.json")?;
+      let mut tsconfig_file = File::create(&tsconfig_path)?;
 
       ts_config = ts_config.replace("// NEXT_ALIAS", &ts_alias);
 
@@ -154,27 +159,49 @@ pub fn generate(
   }
 
   // Set new alias to vite.config.ts
-  match File::open("./vite.config.ts".to_string()) {
+  match File::open(&vite_path) {
     Ok(vite_file) => {
       let mut buf_reader = BufReader::new(&vite_file);
       let mut vite_content = String::new();
       buf_reader.read_to_string(&mut vite_content)?;
 
-      let mut new_vite = File::create("./vite.config.ts")?;
+      let mut new_vite = File::create(&vite_path)?;
 
       vite_content = vite_content.replace("// NEXT_ALIAS", &vite_alias);
 
       new_vite.write_all(vite_content.as_bytes())?;
     },
     Err(_) => {
-      let mut vite_file = File::create("./vite.config.ts")?;
+      let mut vite_file = File::create(&vite_path)?;
 
       vite_config = vite_config.replace("// NEXT_ALIAS", &vite_alias);
 
       vite_file.write_all(vite_config.as_bytes())?;
     }
   }
-  
+
+  // Set style import
+  match File::open(&styles_index) {
+    Ok(index_file) => {
+      let mut buf_reader = BufReader::new(&index_file);
+      let mut index_content = String::new();
+      buf_reader.read_to_string(&mut index_content)?;
+
+      if !index_content.contains("Page") {
+        index_content = [index_content, style_import].join("");
+      }
+
+      let mut new_index = File::create(&styles_index)?;
+
+      new_index.write_all(index_content.as_bytes())?;
+    },
+    Err(_) => {
+      let mut index_file = File::create(&styles_index)?;
+
+      index_file.write_all(style_import.as_bytes())?;
+    }
+  }
+
   page_file.write_all(page.as_bytes())?;
   styles_file.write_all(styles.as_bytes())?;
   responsive_file.write_all(responsive.as_bytes())?;

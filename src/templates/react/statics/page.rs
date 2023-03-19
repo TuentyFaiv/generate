@@ -8,7 +8,7 @@ import { useAppContext } from "@contexts";
 
 import type { NAMEState } from "@typing/pages/NAME_LOWER";
 
-import * as Styles from "./NAME.styles";
+import { Page } from "@NAME_LOWER/styles";
 
 export default function NAMEPage() {
   const { t } = useTranslation("NAME_LOWER");
@@ -16,8 +16,8 @@ export default function NAMEPage() {
   const [state, setState] = useState<NAMEState>(null);
 
   return (
-    <Styles.NAME>
-    </Styles.NAME>
+    <Page.NAME>
+    </Page.NAME>
   );
 }
 "#;
@@ -26,7 +26,7 @@ pub static PAGE: &str = r#"import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useAppContext } from "@contexts";
 
-import * as Styles from "./NAME.styles";
+import { Page } from "@NAME_LOWER/styles";
 
 export default function NAMEPage() {
   const { t } = useTranslation("NAME_LOWER");
@@ -34,10 +34,13 @@ export default function NAMEPage() {
   const [state, setState] = useState(null);
 
   return (
-    <Styles.NAME>
-    </Styles.NAME>
+    <Page.NAME>
+    </Page.NAME>
   );
 }
+"#;
+
+pub static STYLES_IMPORT: &str = r#"export * as Page from "./NAME.styles";
 "#;
 
 pub static STYLES: &str = r#"import styled from "@emotion/styled";
@@ -246,6 +249,9 @@ pub static TS_ALIAS: &str = r#"// UI NAME
       "@NAME_LOWER/organisms": [
         "src/ui/NAME_LOWER/organisms/index.ts"
       ],
+      "@NAME_LOWER/styles": [
+        "src/ui/NAME_LOWER/styles/index.ts"
+      ],
       "@NAME_LOWER/page": [
         "src/ui/NAME_LOWER/+page.tsx"
       ],
@@ -302,6 +308,7 @@ pub static VITE_ALIAS: &str = r#"// UI NAME
       "@NAME_LOWER/atoms": resolve("src/ui/NAME_LOWER/atoms/index.ts"),
       "@NAME_LOWER/molecules": resolve("src/ui/NAME_LOWER/molecules/index.ts"),
       "@NAME_LOWER/organisms": resolve("src/ui/NAME_LOWER/organisms/index.ts"),
+      "@NAME_LOWER/styles": resolve("src/ui/NAME_LOWER/styles/index.ts"),
       "@NAME_LOWER/page": resolve("src/ui/NAME_LOWER/+page.tsx"),
       "@NAME_LOWER/layout": resolve("src/ui/NAME_LOWER/+layout.tsx"),
       // NEXT_ALIAS
