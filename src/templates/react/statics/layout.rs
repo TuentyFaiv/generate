@@ -1,17 +1,17 @@
 pub static LAYOUT_TS: &str = r#"import { useState } from "react";
 import { Outlet } from "react-router-dom";
 
-import type { NAMEState } from "@typing/layouts/NAME_LOWER";
+import type { NAMELayoutState } from "@typing/layouts/NAME_LOWER";
 
-import * as Styles from "./NAMELayout.styles";
+import { Layout } from "@NAME_LOWER/styles";
 
-export default function NAMEPage() {
-  const [state, setState] = useState<NAMEState>(null);
+export default function NAMELayout() {
+  const [state, setState] = useState<NAMELayoutState>(null);
 
   return (
-    <Styles.NAME>
+    <Layout.NAME>
       <Outlet />
-    </Styles.NAME>
+    </Layout.NAME>
   );
 }
 "#;
@@ -19,17 +19,20 @@ export default function NAMEPage() {
 pub static LAYOUT: &str = r#"import { useState } from "react";
 import { Outlet } from "react-router-dom";
 
-import * as Styles from "./NAMELayout.styles";
+import { Layout } from "@NAME_LOWER/styles";
 
-export default function NAMEPage() {
+export default function NAMELayout() {
   const [state, setState] = useState(null);
 
   return (
-    <Styles.NAME>
+    <Layout.NAME>
       <Outlet />
-    </Styles.NAME>
+    </Layout.NAME>
   );
 }
+"#;
+
+pub static STYLES_IMPORT: &str = r#"export * as Layout from "./NAMELayout.styles";
 "#;
 
 pub static STYLES: &str = r#"import styled from "@emotion/styled";
@@ -52,5 +55,5 @@ ${forsize({ size: "desktop-mid", content: css`
 "#;
 
 pub static PROPTYPES: &str = r#"// Change for interface if is an object
-export type NAMEState = null;
+export type NAMELayoutState = null;
 "#;

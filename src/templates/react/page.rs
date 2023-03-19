@@ -1,4 +1,4 @@
-use std::io::{Write, BufReader, Read};
+use std::io::{Write, Read, BufReader};
 use std::fs::File;
 use anyhow::{Result};
 
@@ -189,11 +189,11 @@ pub fn generate(
 
       if !index_content.contains("Page") {
         index_content = [index_content, style_import].join("");
+
+        let mut new_index = File::create(&styles_index)?;
+  
+        new_index.write_all(index_content.as_bytes())?;
       }
-
-      let mut new_index = File::create(&styles_index)?;
-
-      new_index.write_all(index_content.as_bytes())?;
     },
     Err(_) => {
       let mut index_file = File::create(&styles_index)?;

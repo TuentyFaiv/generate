@@ -21,6 +21,9 @@ pub fn make(answers: &Answers) -> Result<()> {
   create_dir_all(path).unwrap_or_else(|why| {
     println!("! {:?}", why.kind());
   });
+  create_dir_all(format!("{path}/styles")).unwrap_or_else(|why| {
+    println!("! {:?}", why.kind());
+  });
   if is_ts {
     create_dir_all(path_proptypes.to_string()).unwrap_or_else(|why| {
       println!("! {:?}", why.kind());
