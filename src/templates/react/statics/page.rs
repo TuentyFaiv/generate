@@ -12,11 +12,12 @@ import { Page } from "@NAME_LOWER/styles";
 
 export default function NAMEPage() {
   const { t } = useTranslation("NAME_LOWER");
-  const { global, dipatch } = useAppContext();
+  const { global, dispatch } = useAppContext();
   const [state, setState] = useState<NAMEState>(null);
 
   return (
     <Page.NAME>
+      {t("seo-title")}
     </Page.NAME>
   );
 }
@@ -35,6 +36,7 @@ export default function NAMEPage() {
 
   return (
     <Page.NAME>
+      {t("seo-title")}
     </Page.NAME>
   );
 }
