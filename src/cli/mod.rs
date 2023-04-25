@@ -1,5 +1,6 @@
 pub mod questions;
 pub mod actions;
+pub mod enums;
 
 use std::io::{self, Write};
 use std::process::Command;
@@ -25,6 +26,21 @@ pub struct Args {
 	/// Path to generate template
   #[arg(short, long)]
 	pub path: Option<String>
+}
+
+pub fn arg_or(prompt: &str, arg: Option<String>, options: Vec<&str>) -> Result<String> {
+	let value = match arg {
+		None => choose_option(prompt, options)?,
+		Some(exist) => {
+			if !options.contains(&exist.as_str()) {
+				choose_option(prompt, options)?
+			} else {
+				exist
+			}
+		}
+	};
+
+	Ok(value)
 }
 
 pub fn choose_option(prompt: &str, options: Vec<&str>) -> Result<String> {

@@ -6,6 +6,7 @@ mod cli;
 mod statics;
 mod templates;
 mod create;
+mod config;
 
 use crate::cli::{questions, Args, msg};
 use crate::statics::{NOT_IMPLEMENTED};
@@ -24,14 +25,8 @@ pub fn main() -> Result<()> {
 	let templates = get_templates();
 
 	let template = match templates.get(&answers.template.as_str()) {
-		None => {
-			[].to_vec()
-		},
-		Some(&option) => {
-			let options: Vec<&str> = option.split('-').collect();
-
-			options
-		}
+		None => [].to_vec(),
+		Some(&option) => option.split('-').collect()
 	};
 
 	let create_project = template.contains(&"repo");

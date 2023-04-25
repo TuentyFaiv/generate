@@ -1,11 +1,13 @@
 use anyhow::{Result};
 use dialoguer::{theme::ColorfulTheme, Confirm};
 
+use crate::config::get_config;
 use crate::statics::{TOOLS, TOOLS_REACT, TOOLS_SVELTE, TOOLS_WEBCOMPONENTS, TOOLS_BASE};
 use crate::statics::{ARCHS, ARCHS_REACT, ARCHS_SVELTE, ARCHS_TYPE_COMPONENT, ARCHS_VANILLA};
 use crate::utils::{transform};
 
-use super::{choose_option, Args, input};
+use super::{Args, input, choose_option, arg_or};
+use super::{enums::{ArchType}};
 
 #[derive(Debug)]
 pub struct Answers {
@@ -32,16 +34,7 @@ pub fn make(args: &Args) -> Result<Answers> {
   let archs_vanilla = ARCHS_VANILLA.to_vec();
 	let archs_types_components = ARCHS_TYPE_COMPONENT.to_vec();
 
-  let tool = match args.tool.clone() {
-		None => choose_option("Choose a tool:", tools)?,
-		Some(exist) => {
-			if !tools.contains(&exist.as_str()) {
-				choose_option("Choose a tool:", tools)?
-			} else {
-				exist
-			}
-		}
-	};
+  let tool = arg_or("Choose a tool:", args.tool.clone(), tools)?;
 
   let mut options_archs = match tool.as_str() {
     "react" => [archs, archs_react].concat(),
@@ -51,38 +44,29 @@ pub fn make(args: &Args) -> Result<Answers> {
   };
   options_archs.sort();
 
-	let arch = match args.arch.clone() {
-		None => {
-      choose_option("Choose an architecture:", options_archs)?
-		}
-		Some(exist) => {
-			if !options_archs.contains(&exist.as_str()) {
-				choose_option("Choose an architecture:", options_archs)?
-			} else {
-				exist
-			}
-		}
-	};
+  let arch = arg_or("Choose an architecture:", args.arch.clone(), options_archs)?;
 
-	let is_atomic = arch.as_str() == "atomic";
-	let is_library = arch.as_str() == "library";
-	let is_component = arch.as_str() == "component";
-	let is_hoc = arch.as_str() == "hoc";
-	let is_hook = arch.as_str() == "hook";
-	let is_context = arch.as_str() == "context";
-	let is_layout = arch.as_str() == "layout";
-	let is_page = arch.as_str() == "page";
-	let is_service = arch.as_str() == "service";
-	let is_schema = arch.as_str() == "schema";
-	let is_action = arch.as_str() == "action";
-	let is_store = arch.as_str() == "store";
-	let is_class = arch.as_str() == "class";
+  let arch_selected = match arch.as_str() {
+    "atomic" => ArchType::Atomic,
+    "library" => ArchType::Library,
+    "component" => ArchType::Component,
+    "hoc" => ArchType::Hoc,
+    "hook" => ArchType::Hook,
+    "context" => ArchType::Context,
+    "layout" => ArchType::Layout,
+    "page" => ArchType::Page,
+    "service" => ArchType::Service,
+    "schema" => ArchType::Schema,
+    "action" => ArchType::Action,
+    "store" => ArchType::Store,
+    "class" => ArchType::Class,
+    _ => ArchType::Atomic
+  };
 
-	let mut arch_type = String::new();
-
-	if is_component {
-		arch_type = choose_option("Choose type:", archs_types_components)?;
-	}
+	let arch_type = match arch_selected {
+    ArchType::Component => choose_option("Choose type:", archs_types_components)?,
+    _ => String::new()
+  };
 
 	let tool_type = match format!("{tool}-{arch}").as_str() {
 		"react-atomic" => {
@@ -100,112 +84,80 @@ pub fn make(args: &Args) -> Result<Answers> {
 	};
 
   let mut name = match args.name.clone() {
-		None => {
-      if is_component {
-        input("Component name:", "component")?
-      } else if is_hoc {
-        input("Hoc name:", "hoc")?
-      } else if is_hook {
-        input("Hook name:", "hook")?
-      } else if is_context {
-        input("Context name:", "context")?
-      } else if is_service {
-        input("Service name:", "service")?
-      } else if is_schema {
-        input("Schema name:", "schema")?
-      } else if is_action {
-        input("Action name:", "action")?
-      } else if is_store {
-        input("Store name:", "store")?
-      } else if is_class {
-        input("Class name:", "some-new class")?
-      } else if is_atomic {
-        input("Proyect name:", "new-proyect")?
-      } else if is_library {
-        input("Library name:", "new-library")?
-      } else {
-        String::new()
-      }
+		None => match arch_selected {
+      ArchType::Component => input("Component name:", "component")?,
+      ArchType::Hoc => input("Hoc name:", "hoc")?,
+      ArchType::Hook => input("Hook name:", "hook")?,
+      ArchType::Context => input("Context name:", "context")?,
+      ArchType::Service => input("Service name:", "service")?,
+      ArchType::Schema => input("Schema name:", "schema")?,
+      ArchType::Action => input("Action name:", "action")?,
+      ArchType::Store => input("Store name:", "store")?,
+      ArchType::Class => input("Class name:", "some-new class")?,
+      ArchType::Atomic => input("Atomic name:", "atomic")?,
+      ArchType::Library => input("Library name:", "library")?,
+      _ => String::new()
 		}
 		Some(exist) => exist
 	};
 
-  if is_component || is_hoc || is_hook || is_context || is_service {
+  if arch_selected == ArchType::Component
+    || arch_selected == ArchType::Hoc
+    || arch_selected == ArchType::Hook
+    || arch_selected == ArchType::Context
+    || arch_selected == ArchType::Service {
     name = transform(&name, None);
   }
 
+  let config = get_config();
+
+  let name_lower = name.to_lowercase();
+  let namespace: &str = "sharing";
+  let path_name = format!("./{name}");
 	let path = match args.path.clone() {
-		None => {
-      let name_lower = name.to_lowercase();
-      let path_name = format!("./{name}");
-      let path_ui = "sharing";
-      let path_action = "./src/logic/actions";
-      let path_store = "./src/logic/stores";
-      let path_class = format!("./src/logic/classes/{name_lower}");
+		None => match arch_selected {
+      ArchType::Hoc => config.paths.hoc,
+      ArchType::Hook =>  match choose_option("Which type is:", ["global", "internal"].to_vec())?.as_str() {
+        "internal" => {
+          let short_path = input("Where:", namespace)?; 
 
-      if is_hoc {
-        let path_hoc = "./src/logic/hocs";
-        path_hoc.to_string()
-      } else if is_hook {
-        let full_path = match choose_option("Which type is:", ["global", "internal"].to_vec())?.as_str() {
-          "internal" => {
-            let short_path = input("Where:", path_ui)?;
-
-            format!("./src/ui/{short_path}/hooks")
-          },
-          _ => {
-            "./src/logic/hooks".to_string()
-          }
-        };
-
-        full_path
-      } else if is_page || is_layout {
-        let short_path = input("Where:", path_ui)?;
-        name = short_path.clone();
+          format!("{}/{}/hooks", config.paths.ui, short_path)
+        },
+        _ => config.paths.hook
+      },
+      ArchType::Page | ArchType::Layout => {
+        let short_path = input("Where:", namespace)?;
+        name = short_path;
 
         let full_path = match tool.as_str() {
           "svelte" => {
-            if short_path.as_str() == "home" || short_path.as_str() == "index" {
-              format!("./src/routes")
+            if name.as_str() == "home" || name.as_str() == "index" {
+              config.paths.page
             } else {
-              format!("./src/routes/{short_path}")
+              format!("{}/{}", config.paths.page, name)
             }
           },
-          _ => {
-            format!("./src/ui/{short_path}")
-          }
+          _ => format!("{}/{}", config.paths.ui, name)
         };
 
         full_path
-      } else if is_component {
-        let short_path = input("Where:", path_ui)?;
-        let full_path = format!("./src/ui/{short_path}");
-
-        full_path
-      } else if is_atomic || is_library {
-        input("Proyect path:", &path_name.as_str())?
-      } else if is_context {
-        let path_context = format!("./src/logic/contexts/{name_lower}");
-        path_context
-      } else if is_service {
-        let mut short_path = input("Where:", path_ui)?;
-        short_path = transform(&short_path, Some("lower"));
-        let path_service = format!("./src/logic/services/{short_path}");
-        path_service
-      } else if is_schema {
-        let mut short_path = input("Where:", path_ui)?;
-        short_path = transform(&short_path, Some("lower"));
-        let path_schema = format!("./src/logic/schemas/{short_path}");
-        path_schema
-      } else if is_action {
-        input("Choose location:", path_action)?
-      } else if is_store {
-        input("Choose location:", path_store)?
-      } else if is_class {
-        input("Choose location:", &path_class.as_str())?
-      } else {
-        input("Proyect path:", &path_name.as_str())?
       }
+      ArchType::Component => {
+        let short_path = input("Where:", namespace)?;
+
+        format!("{}/{}", config.paths.ui, short_path)
+      },
+      ArchType::Atomic | ArchType::Library => input("Proyect path:", &path_name.as_str())?,
+      ArchType::Context => format!("{}/{}", config.paths.context, name_lower),
+      ArchType::Service | ArchType::Schema => {
+        let mut short_path = input("Where:", namespace)?;
+        short_path = transform(&short_path, Some("lower"));
+        let to = if arch_selected == ArchType::Service { config.paths.service } else { config.paths.schema };
+        format!("{}/{}", to, short_path)
+      },
+      ArchType::Action => input("Choose location:", &config.paths.action)?,
+      ArchType::Store => input("Choose location:", &config.paths.store)?,
+      ArchType::Class => input("Choose location:", format!("{}/{}", config.paths.class, name_lower).as_str())?,
 		}
 		Some(exist) => exist
 	};
@@ -217,7 +169,7 @@ pub fn make(args: &Args) -> Result<Answers> {
 
   let template = format!("{tool}-{tool_type}-{arch}");
 
-  let answers = Answers {
+  Ok(Answers {
     name,
     path,
     tool,
@@ -226,7 +178,5 @@ pub fn make(args: &Args) -> Result<Answers> {
     arch_type,
     accept,
     template
-  };
-
-  Ok(answers)
+  })
 }
