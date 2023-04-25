@@ -2,7 +2,7 @@ use std::io::{Write, Read, BufReader};
 use std::fs::File;
 use anyhow::{Result};
 
-use crate::utils::{camel};
+use crate::utils::{change_case};
 
 use super::statics::service::{PROPTYPES, SERVICE, SERVICE_TS};
 use super::statics::service::{SERVICE_IMPORT, TYPE_EXPORT, INSTANCES};
@@ -16,7 +16,7 @@ pub fn generate(
   is_ts: bool
 ) -> Result<()> {
   let instances = INSTANCES.to_string();
-  let name_camel = camel(name);
+  let name_camel = change_case(name, Some("camel"));
   
   let mut proptypes = PROPTYPES.to_string();
   let mut service = SERVICE.to_string();

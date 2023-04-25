@@ -3,6 +3,7 @@ pub mod actions;
 
 use std::io::{self, Write};
 use std::process::Command;
+
 use anyhow::{Result};
 use clap::Parser;
 use console::style;
@@ -34,12 +35,9 @@ pub fn choose_option(prompt: &str, options: Vec<&str>) -> Result<String> {
 		.interact_on_opt(&Term::stderr())?;
 
 	let option = match selection {
-		Some(index) => {
-			options[index].to_string()
-		},
-		None => "Not valid option".to_string()
-
-	};
+		Some(index) => options[index],
+		None => "Not valid option"
+	}.to_string();
 
 	Ok(option)
 }
@@ -67,7 +65,7 @@ pub fn msg(content: &String) {
 	let mut handle = io::BufWriter::new(stdout.lock());
 
 	writeln!(handle, "").unwrap();
-	writeln!(handle, "{}",content).unwrap();
+	writeln!(handle, "{}", content).unwrap();
 }
 
 pub fn done() {

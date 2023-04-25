@@ -3,7 +3,7 @@ use dialoguer::{theme::ColorfulTheme, Confirm};
 
 use crate::statics::{TOOLS, TOOLS_REACT, TOOLS_SVELTE, TOOLS_WEBCOMPONENTS, TOOLS_BASE};
 use crate::statics::{ARCHS, ARCHS_REACT, ARCHS_SVELTE, ARCHS_TYPE_COMPONENT, ARCHS_VANILLA};
-use crate::utils::{format_text, format_lower};
+use crate::utils::{transform};
 
 use super::{choose_option, Args, input};
 
@@ -33,9 +33,7 @@ pub fn make(args: &Args) -> Result<Answers> {
 	let archs_types_components = ARCHS_TYPE_COMPONENT.to_vec();
 
   let tool = match args.tool.clone() {
-		None => {
-			choose_option("Choose a tool:", tools)?
-		}
+		None => choose_option("Choose a tool:", tools)?,
 		Some(exist) => {
 			if !tools.contains(&exist.as_str()) {
 				choose_option("Choose a tool:", tools)?
@@ -45,26 +43,13 @@ pub fn make(args: &Args) -> Result<Answers> {
 		}
 	};
 
-  let options_archs = match tool.as_str() {
-    "react" => {
-      let mut options = [archs.clone(), archs_react].concat();
-      options.sort();
-      options
-    },
-    "svelte" => {
-      let mut options = [archs.clone(), archs_svelte].concat();
-      options.sort();
-      options
-    },
-    "vanilla" => {
-      let mut options = [archs.clone(), archs_vanilla].concat();
-      options.sort();
-      options
-    },
-    _ => {
-      archs.clone()
-    }
+  let mut options_archs = match tool.as_str() {
+    "react" => [archs, archs_react].concat(),
+    "svelte" => [archs, archs_svelte].concat(),
+    "vanilla" => [archs, archs_vanilla].concat(),
+    _ => archs
   };
+  options_archs.sort();
 
 	let arch = match args.arch.clone() {
 		None => {
@@ -146,7 +131,7 @@ pub fn make(args: &Args) -> Result<Answers> {
 	};
 
   if is_component || is_hoc || is_hook || is_context || is_service {
-    name = format_text(&name);
+    name = transform(&name, None);
   }
 
 	let path = match args.path.clone() {
@@ -204,12 +189,12 @@ pub fn make(args: &Args) -> Result<Answers> {
         path_context
       } else if is_service {
         let mut short_path = input("Where:", path_ui)?;
-        short_path = format_lower(&short_path);
+        short_path = transform(&short_path, Some("lower"));
         let path_service = format!("./src/logic/services/{short_path}");
         path_service
       } else if is_schema {
         let mut short_path = input("Where:", path_ui)?;
-        short_path = format_lower(&short_path);
+        short_path = transform(&short_path, Some("lower"));
         let path_schema = format!("./src/logic/schemas/{short_path}");
         path_schema
       } else if is_action {

@@ -15,13 +15,13 @@ use crate::create::{global, react};
 pub fn main() -> Result<()> {
 	let args = Args::parse();
 
-	let templates = get_templates();
-
-	let answers = questions::make(&args)?;
-
+	let answers = questions::make(&args)?;	
+	
 	if !answers.accept {
 		return Ok(());
 	}
+
+	let templates = get_templates();
 
 	let template = match templates.get(&answers.template.as_str()) {
 		None => {

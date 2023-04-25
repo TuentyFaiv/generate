@@ -6,7 +6,7 @@ use crate::statics::OK;
 use crate::cli::questions::Answers;
 use crate::cli::{done, msg};
 use crate::templates::{react};
-use crate::utils::capitalize;
+use crate::utils::{change_case};
 
 pub fn make(answers: &Answers) -> Result<()> {
   let name = answers.name.as_str();
@@ -14,7 +14,7 @@ pub fn make(answers: &Answers) -> Result<()> {
   let tool = answers.tool.as_str();
   let tool_type = answers.tool_type.as_str();
 
-  let name_capitalize = capitalize(name);
+  let name_capitalize = change_case(name, None);
   let path_proptypes = "./src/logic/typing/hocs";
   let is_ts = tool_type == "typescript";
   

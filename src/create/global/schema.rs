@@ -6,17 +6,17 @@ use crate::statics::OK;
 use crate::cli::questions::Answers;
 use crate::cli::{done, msg};
 use crate::templates::{global};
-use crate::utils::{capitalize, format_dash, format_text, camel};
+use crate::utils::{change_case, transform};
 
 pub fn make(answers: &Answers) -> Result<()> {
   let name = &answers.name;
   let path = &answers.path;
   let tool_type = answers.tool_type.as_str();
 
-  let name_dash = format_dash(name);
-  let name_formatted = format_text(name);
-  let name_capitalize = capitalize(&name_formatted.as_str());
-  let name_camel = camel(&name_capitalize.as_str());
+  let name_dash = transform(name, Some("dash"));
+  let name_formatted = transform(name, None);
+  let name_capitalize = change_case(&name_formatted.as_str(), None);
+  let name_camel = change_case(&name_capitalize.as_str(), Some("camel"));
   let path_proptypes = "./src/logic/typing/schemas";
   let path_splitted: Vec<&str> = path.split('/').collect();
   let namespace = *path_splitted.last().unwrap();
