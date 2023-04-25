@@ -2,13 +2,14 @@ use std::fs::create_dir_all;
 use anyhow::Result;
 use console::style;
 
+use crate::config::{Config};
 use crate::statics::OK;
 use crate::cli::questions::Answers;
 use crate::cli::{done, msg};
 use crate::templates::{react, svelte};
 use crate::utils::{change_case};
 
-pub fn make(answers: &Answers) -> Result<()> {
+pub fn make(answers: &Answers, config: Config) -> Result<()> {
   let name = answers.name.as_str();
   let path = answers.path.as_str();
   let tool = answers.tool.as_str();
@@ -16,13 +17,13 @@ pub fn make(answers: &Answers) -> Result<()> {
 
   let name_capitalize = change_case(name, None);
   let is_ts = tool_type == "typescript";
-  let path_proptypes = "./src/logic/typing/layouts";
+  let path_typing =  format!("{}/layouts", config.paths.types);
 
   create_dir_all(path).unwrap_or_else(|why| {
     println!("! {:?}", why.kind());
   });
   if is_ts {
-    create_dir_all(path_proptypes.to_string()).unwrap_or_else(|why| {
+    create_dir_all(path_typing.clone()).unwrap_or_else(|why| {
       println!("! {:?}", why.kind());
     });
   }
@@ -32,19 +33,19 @@ pub fn make(answers: &Answers) -> Result<()> {
       create_dir_all(format!("{path}/styles")).unwrap_or_else(|why| {
         println!("! {:?}", why.kind());
       });
-      react::layout::generate(path, path_proptypes, name_capitalize.as_str(), is_ts)?;
+      react::layout::generate(path, path_typing.as_str(), name_capitalize.as_str(), is_ts)?;
       true
     },
     "svelte" => {
-      let path_ui = format!("./src/ui/{name}").to_lowercase();
+      let path_ui = format!("{}/{}", config.paths.ui, name).to_lowercase();
       create_dir_all(format!("{path_ui}/styles")).unwrap_or_else(|why| {
         println!("! {:?}", why.kind());
       });
-      svelte::layout::generate(path, path_proptypes, path_ui.as_str(), name, is_ts)?;
+      svelte::layout::generate(path, path_typing.as_str(), path_ui.as_str(), name, is_ts)?;
       true
     }
-    "vanilla" => {false}
-    _ => {false}
+    "vanilla" => false,
+    _ => false
   };
 
   if result {

@@ -15,12 +15,8 @@ pub fn make(answers: &Answers) -> Result<()> {
   let arch_type = answers.arch_type.as_str();
 
   let full_path = match arch_type {
-    "normal" => {
-      format!("{path}/components/{name}")
-    },
-    _ => {
-      format!("{path}/{arch_type}/{name}")
-    }
+    "normal" => format!("{path}/components/{name}"),
+    _ => format!("{path}/{arch_type}/{name}")
   };
   
   if tool == "react" || tool == "svelte" || tool == "vanilla" {
@@ -38,11 +34,8 @@ pub fn make(answers: &Answers) -> Result<()> {
       svelte::component::generate(&full_path, &name, &tool_type)?;
       true
     },
-    "vanilla" => {
-      println!("Vanilla component");
-      true
-    },
-    _ => {false}
+    "vanilla" => false,
+    _ => false
   };
 
   if result {

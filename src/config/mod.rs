@@ -10,6 +10,7 @@ pub struct Paths {
   pub context: String,
   pub service: String,
   pub schema: String,
+  pub types: String,
 }
 
 pub struct Config {
@@ -29,6 +30,7 @@ pub fn get_config() -> Config {
     context: "./src/logic/contexts".to_string(),
     service: "./src/logic/services".to_string(),
     schema: "./src/logic/schemas".to_string(),
+    types: "./src/logic/typing".to_string(),
   };
 
   let config = Config {

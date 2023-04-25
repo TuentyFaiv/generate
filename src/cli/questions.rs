@@ -1,7 +1,7 @@
 use anyhow::{Result};
 use dialoguer::{theme::ColorfulTheme, Confirm};
 
-use crate::config::get_config;
+use crate::config::{Config};
 use crate::statics::{TOOLS, TOOLS_REACT, TOOLS_SVELTE, TOOLS_WEBCOMPONENTS, TOOLS_BASE};
 use crate::statics::{ARCHS, ARCHS_REACT, ARCHS_SVELTE, ARCHS_TYPE_COMPONENT, ARCHS_VANILLA};
 use crate::utils::{transform};
@@ -21,7 +21,7 @@ pub struct Answers {
   pub accept: bool
 }
 
-pub fn make(args: &Args) -> Result<Answers> {
+pub fn make(args: &Args, config: Config) -> Result<Answers> {
   let tools = TOOLS.to_vec();
 	let tools_react = TOOLS_REACT.to_vec();
 	let tools_svelte = TOOLS_SVELTE.to_vec();
@@ -108,8 +108,6 @@ pub fn make(args: &Args) -> Result<Answers> {
     || arch_selected == ArchType::Service {
     name = transform(&name, None);
   }
-
-  let config = get_config();
 
   let name_lower = name.to_lowercase();
   let namespace: &str = "sharing";

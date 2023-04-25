@@ -85,8 +85,8 @@ pub fn make(answers: &Answers) -> Result<()> {
 
       true
     }
-    "vanilla" => {false}
-    _ => {false}
+    "vanilla" => false,
+    _ => false
   };
 
   if result {

@@ -9,6 +9,7 @@ mod create;
 mod config;
 
 use crate::cli::{questions, Args, msg};
+use crate::config::get_config;
 use crate::statics::{NOT_IMPLEMENTED};
 use crate::templates::get_templates;
 use crate::create::{global, react};
@@ -16,7 +17,7 @@ use crate::create::{global, react};
 pub fn main() -> Result<()> {
 	let args = Args::parse();
 
-	let answers = questions::make(&args)?;	
+	let answers = questions::make(&args, get_config())?;
 	
 	if !answers.accept {
 		return Ok(());
@@ -68,7 +69,7 @@ pub fn main() -> Result<()> {
 		global::page::make(&answers)?;
 	}
 	if create_layout {
-		global::layout::make(&answers)?;
+		global::layout::make(&answers, get_config())?;
 	}
 	if create_component {
 		global::component::make(&answers)?;
