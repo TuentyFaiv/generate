@@ -7,10 +7,10 @@ use std::process::Command;
 
 use anyhow::{Result};
 use clap::Parser;
-use console::style;
+use dialoguer::Confirm;
 use dialoguer::{Select, console::Term, theme::ColorfulTheme, Input};
 
-use crate::statics::DONE;
+// use crate::statics::DONE;
 
 #[derive(Parser, Debug)]
 #[command(author, version, about)]
@@ -28,11 +28,19 @@ pub struct Args {
 	pub path: Option<String>
 }
 
-pub fn arg_or(prompt: &str, arg: Option<String>, options: Vec<&str>) -> Result<String> {
+pub fn sure() -> Result<bool> {
+	let accept = Confirm::with_theme(&ColorfulTheme::default())
+		.with_prompt("Are you sure?")
+		.default(true)
+		.interact()?;
+	Ok(accept)
+}
+
+pub fn arg_or(prompt: &str, arg: Option<String>, options: &Vec<String>) -> Result<String> {
 	let value = match arg {
 		None => choose_option(prompt, options)?,
 		Some(exist) => {
-			if !options.contains(&exist.as_str()) {
+			if !options.contains(&exist) {
 				choose_option(prompt, options)?
 			} else {
 				exist
@@ -43,26 +51,26 @@ pub fn arg_or(prompt: &str, arg: Option<String>, options: Vec<&str>) -> Result<S
 	Ok(value)
 }
 
-pub fn choose_option(prompt: &str, options: Vec<&str>) -> Result<String> {
+pub fn choose_option(prompt: &str, options: &Vec<String>) -> Result<String> {
 	let selection = Select::with_theme(&ColorfulTheme::default())
 		.with_prompt(prompt)
 		.items(&options)
 		.default(0)
-		.interact_on_opt(&Term::stderr())?;
+		.interact_on_opt(&Term::stdout())?;
 
 	let option = match selection {
-		Some(index) => options[index],
-		None => "Not valid option"
-	}.to_string();
+		Some(index) => options[index].clone(),
+		None => "Not valid option".to_string()
+	};
 
 	Ok(option)
 }
 
 pub fn input(prompt: &str, default: &str) -> Result<String> {
-	let value = Input::with_theme(&ColorfulTheme::default())
+	let value = Input::<String>::with_theme(&ColorfulTheme::default())
     .with_prompt(prompt)
     .default(default.into())
-    .interact_text()?;
+    .interact_text_on(&Term::stdout())?;
 
 	Ok(value)
 }
@@ -85,5 +93,5 @@ pub fn msg(content: &String) {
 }
 
 pub fn done() {
-	msg(&format!("{} {}", DONE, style("All done").cyan()));
+	// msg(&format!("{} {}", DONE, style("All done").cyan()));
 }

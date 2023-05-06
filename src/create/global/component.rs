@@ -14,10 +14,7 @@ pub fn make(answers: &Answers) -> Result<()> {
   let tool_type = &answers.tool_type;
   let arch_type = answers.arch_type.as_str();
 
-  let full_path = match arch_type {
-    "normal" => format!("{path}/components/{name}"),
-    _ => format!("{path}/{arch_type}/{name}")
-  };
+  let full_path = format!("{path}/{arch_type}/{name}");
   
   if tool == "react" || tool == "svelte" || tool == "vanilla" {
     create_dir_all(&full_path).unwrap_or_else(|why| {

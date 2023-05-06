@@ -23,7 +23,7 @@ pub fn make(answers: &Answers, config: Config) -> Result<()> {
     println!("! {:?}", why.kind());
   });
   if is_ts {
-    create_dir_all(path_typing.clone()).unwrap_or_else(|why| {
+    create_dir_all(&path_typing).unwrap_or_else(|why| {
       println!("! {:?}", why.kind());
     });
   }
@@ -33,7 +33,12 @@ pub fn make(answers: &Answers, config: Config) -> Result<()> {
       create_dir_all(format!("{path}/styles")).unwrap_or_else(|why| {
         println!("! {:?}", why.kind());
       });
-      react::layout::generate(path, path_typing.as_str(), name_capitalize.as_str(), is_ts)?;
+      react::layout::generate(
+        path,
+        path_typing.as_str(),
+        name_capitalize.as_str(),
+        is_ts
+      )?;
       true
     },
     "svelte" => {
@@ -41,7 +46,13 @@ pub fn make(answers: &Answers, config: Config) -> Result<()> {
       create_dir_all(format!("{path_ui}/styles")).unwrap_or_else(|why| {
         println!("! {:?}", why.kind());
       });
-      svelte::layout::generate(path, path_typing.as_str(), path_ui.as_str(), name, is_ts)?;
+      svelte::layout::generate(
+        path,
+        path_typing.as_str(),
+        path_ui.as_str(),
+        name,
+        is_ts
+      )?;
       true
     }
     "vanilla" => false,

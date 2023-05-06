@@ -10,7 +10,7 @@ pub static ARCHS: &[&str] = &["atomic", "library", "component", "service", "sche
 pub static ARCHS_REACT: &[&str] = &["hoc", "hook", "context"];
 pub static ARCHS_SVELTE: &[&str] = &["action", "store"];
 pub static ARCHS_VANILLA: &[&str] = &["class"];
-pub static ARCHS_TYPE_COMPONENT: &[&str] = &["atoms", "molecules", "organisms", "normal"];
+pub static ARCHS_TYPE_COMPONENT: &[&str] = &["atoms", "molecules", "organisms", "custom"];
 
 pub static NOT_IMPLEMENTED: Emoji<'_, '_> = Emoji("👻 ", "");
 pub static DONE: Emoji<'_, '_> = Emoji("😎 ", "");
