@@ -24,7 +24,7 @@ pub fn generate(
 
   command(
     "git",
-    ["clone", url.as_str(), path].to_vec(),
+    ["clone", url.as_ref(), path].to_vec(),
     None,
     Some(format!("Failed to generate {tool} with {arch}").as_str())
   );
@@ -43,7 +43,7 @@ pub fn generate(
 
   command("git", ["commit", "-m", commit.as_str(), "-m", "\"\"", "--no-gpg-sign"].to_vec(), Some(path), Some("Failed to commit"));
 
-  command("git", ["remote", "add", "template", url.as_str()].to_vec(), Some(path), Some("Failed to add remote repository"));
+  command("git", ["remote", "add", "template", url.as_ref()].to_vec(), Some(path), Some("Failed to add remote repository"));
 
   if !is_library {
     pb.set_message("Creating env files...");

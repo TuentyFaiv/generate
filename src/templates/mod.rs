@@ -7,133 +7,102 @@ use std::collections::HashMap;
 use anyhow::{Result, anyhow};
 
 use crate::statics::NOT_IMPLEMENTED;
-use crate::config::Config;
-use crate::cli::msg;
-use crate::cli::{enums::ArchType, questions::Answers};
+use crate::utils::to_vec;
+use crate::config::CLIConfig;
+use crate::cli::enums::Tool;
+use crate::cli::{enums::ArchType, structs::Answers};
 use crate::create::global::CLIGlobalCreation;
 use crate::create::react::CLIReactCreation;
+use crate::create::svelte::CLISvelteCreation;
 
-pub struct CLITemplates<'a, C: Config> {
+pub struct CLITemplates {
 	answers: Answers,
-	config: &'a C,
+	config: CLIConfig,
+	global_creation: CLIGlobalCreation,
+	react_creation: CLIReactCreation,
+	svelte_creation: CLISvelteCreation,
+	pub error: String,
 }
 
-impl <'a, C: Config> CLITemplates<'a, C> {
-	pub fn new(config: &'a C, answers: Answers) -> Self {
-		Self { config, answers }
+impl CLITemplates {
+	pub fn new(config: CLIConfig, answers: Answers) -> Self {
+		let error = format!("{} Option not implemented yet", NOT_IMPLEMENTED);
+		let global_creation = CLIGlobalCreation::new(
+			config.clone(),
+			answers.clone(),
+			error.clone()
+		);
+		let react_creation = CLIReactCreation::new(
+			config.clone(),
+			answers.clone(),
+			error.clone()
+		);
+		let svelte_creation = CLISvelteCreation::new(
+			config.clone(),
+			answers.clone(),
+			error.clone()
+		);
+
+		Self {
+			config,
+			answers,
+			error,
+			global_creation,
+			react_creation,
+			svelte_creation,
+		}
 	}
-	pub fn create(&self) -> Result<()> {
-		let created = match self.get_template() {
-			None => Err(anyhow!("Option not implemented yet")),
-			Some(template_type) => {
-				let create_global = CLIGlobalCreation::new(
-					self.config,
-					self.answers.clone()
-				);
-    		let create_react = CLIReactCreation::new(
-					self.config,
-					self.answers.clone()
-				);
+	pub fn create(&self) -> Result<String> {
+		let template_type = self.get_template()?;
+		let create_global = &self.global_creation;
+		let create_react = &self.react_creation;
+		let create_svelte = &self.svelte_creation;
 
-				match template_type {
-					ArchType::Atomic | ArchType::Library => create_global.make_project(),
-					ArchType::Component => create_global.make_component(),
-					ArchType::Page => create_global.make_page(),
-					ArchType::Layout => create_global.make_layout(),
-					ArchType::Schema => create_global.make_schema(),
-					ArchType::Service => create_global.make_service(),
-					ArchType::Hoc => create_react.make_hoc(),
-					ArchType::Hook => create_react.make_hook(),
-					ArchType::Context => create_react.make_context(), // Change to global
-					// ArchType::Action => create_svelte.make_action(),
-					// ArchType::Store => create_svelte.make_store(),
-					_ => Err(anyhow!("Option not implemented yet"))
-				}
-			}
-		};
-
-		Ok(match created {
-			Err(error) => msg(&format!("{} {}", NOT_IMPLEMENTED, error)),
-			_ => ()
-		})
+		match template_type {
+			ArchType::Project | ArchType::Library => create_global.make_project(),
+			ArchType::Component => create_global.make_component(),
+			ArchType::Page => create_global.make_page(),
+			ArchType::Layout => create_global.make_layout(),
+			ArchType::Schema => create_global.make_schema(),
+			ArchType::Service => create_global.make_service(),
+			ArchType::Context => create_global.make_context(),
+			ArchType::Hoc => create_react.make_hoc(),
+			ArchType::Hook => create_react.make_hook(),
+			ArchType::Action => create_svelte.make_action(),
+			ArchType::Store => create_svelte.make_store(),
+			_ => Err(anyhow!(self.error.clone()))
+		}
 	}
-	fn get_template(&self) -> Option<&ArchType> {
-		let mut templates = HashMap::<ArchType, &[&str]>::new();
+	fn get_template(&self) -> Result<&ArchType> {
+		let tools = self.config.get_tools();
+		let react_options = self.config.projects_options(&Tool::React);
+		let svelte_options = self.config.projects_options(&Tool::Svelte);
+		let vanilla_options = self.config.projects_options(&Tool::Vanilla);
+		let project_options = [react_options, svelte_options, vanilla_options].concat();
+		let react_lib_options = self.config.library_options(&Tool::React);
+		let svelte_lib_options = self.config.library_options(&Tool::Svelte);
+		let vanilla_lib_options = self.config.library_options(&Tool::Vanilla);
+		let library_options = [react_lib_options, svelte_lib_options, vanilla_lib_options, tools.webcomponents.clone()].concat();
+		let mut templates = HashMap::<ArchType, &Vec<String>>::new();
 
-		let only_react: &[&str] = &["react", "typescript", "javascript"];
-		let only_svelte: &[&str] = &[
-			// "svelte",
-			"typescript",
-			"javascript"
-		];
-		let only_svelte_and_react: &[&str] = &[
-			"react",
-			// "svelte",
-			"typescript",
-			"javascript"
-		];
-		let only_vanilla: &[&str] = &[
-			// "vanilla",
-			"typescript",
-			"javascript"
-		];
-		let all_without_vanilla: &[&str] = &[
-			"react",
-			"svelte",
-			// "vanilla",
-			"typescript",
-			"javascript",
-		];
-		let all_globals: &[&str] = &[
-			"react",
-			"svelte",
-			"vanilla",
-			"typescript",
-			"javascript",
-		];
+		let only_react: Vec<String> = to_vec(&["react"]);
+		let only_svelte: Vec<String> = to_vec(&["svelte"]);
+		let only_vanilla: Vec<String> = to_vec(&["vanilla"]);
+		let only_svelte_and_react: Vec<String> = [only_react.clone(), only_svelte.clone()].concat();
 
-		templates.insert(ArchType::Atomic, &[
-			"react",
-			"react-typescript",
-			// "react-javascript",
-			"next-ts",
-			// "next",
-			// "remix-ts",
-			// "remix",
-			// "native-ts",
-			// "native",
-			"svelte",
-			"sveltekit-ts",
-			// "sveltekit",
-			// "svelte-typescript",
-			// "svelte-javascript",
-			// "vanilla-typescript",
-			// "vanilla-javascript",
-		]);
-		templates.insert(ArchType::Library, &[
-			"react-typescript",
-			// "react-javascript",
-			"svelte",
-			// "sveltekit-ts",
-			// "sveltekit",
-			// "webcomponent-ts",
-			// "webcomponent",
-			// "svelte-typescript",
-			// "svelte-javascript",
-			"vanilla-typescript",
-			// "vanilla-javascript",
-		]);
-		templates.insert(ArchType::Component, all_without_vanilla);
-		templates.insert(ArchType::Hoc, only_react);
-		templates.insert(ArchType::Hook, only_react);
-		templates.insert(ArchType::Context, only_svelte_and_react);
-		templates.insert(ArchType::Action, only_svelte);
-		templates.insert(ArchType::Store, only_svelte);
-		templates.insert(ArchType::Class, only_vanilla);
-		templates.insert(ArchType::Page, all_without_vanilla);
-		templates.insert(ArchType::Layout, all_without_vanilla);
-		templates.insert(ArchType::Service, all_globals);
-		templates.insert(ArchType::Schema, all_globals);
+		templates.insert(ArchType::Project, &project_options);
+		templates.insert(ArchType::Library, &library_options);
+		templates.insert(ArchType::Component, &tools.globals);
+		templates.insert(ArchType::Hoc, &only_react);
+		templates.insert(ArchType::Hook, &only_react);
+		templates.insert(ArchType::Context, &only_svelte_and_react);
+		templates.insert(ArchType::Action, &only_svelte);
+		templates.insert(ArchType::Store, &only_svelte);
+		templates.insert(ArchType::Class, &only_vanilla);
+		templates.insert(ArchType::Page, &tools.globals);
+		templates.insert(ArchType::Layout, &tools.globals);
+		templates.insert(ArchType::Service, &tools.globals);
+		templates.insert(ArchType::Schema, &tools.globals);
 
 		let arch = &self.answers.arch;
 		let tool = &self.answers.tool;
@@ -141,15 +110,18 @@ impl <'a, C: Config> CLITemplates<'a, C> {
 		let arch_exist = templates.get(&arch);
 
 		match arch_exist {
-			None => None,
+			None => Err(anyhow!(self.error.clone())),
 			Some(template) => {
-				let to_search = format!("{}-{}", tool, tool_type);
-
-				if template.contains(&to_search.as_str())
-					|| (template.contains(&tool.as_str()) && template.contains(&tool_type.as_str())) {
-					return Some(arch);
+				if let Some(tool_type) = tool_type {
+					if template.contains(&tool_type) {
+						return Ok(arch);
+					}
 				}
-				return None;
+				if template.contains(&tool.to_string()) {
+					return Ok(arch);
+				}
+
+				Err(anyhow!(self.error.clone()))
 			}
 		}
 	}
