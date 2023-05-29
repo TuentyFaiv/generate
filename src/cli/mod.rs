@@ -1,37 +1,23 @@
 pub mod questions;
 pub mod actions;
 pub mod enums;
+pub mod structs;
 
 use std::io::{self, Write};
 use std::process::Command;
 
-use anyhow::{Result};
-use clap::Parser;
-use dialoguer::Confirm;
-use dialoguer::{Select, console::Term, theme::ColorfulTheme, Input};
+use anyhow::Result;
+use console::style;
+use dialoguer::{Confirm, Select, Input};
+use dialoguer::{console::Term, theme::ColorfulTheme};
 
-// use crate::statics::DONE;
-
-#[derive(Parser, Debug)]
-#[command(author, version, about)]
-pub struct Args {
-	/// Project name
-	pub name: Option<String>,
-	/// Tool to generate template
-	#[arg(short, long)]
-	pub tool: Option<String>,
-	/// Frontend architecture
-  #[arg(short, long)]
-	pub arch: Option<String>,
-	/// Path to generate template
-  #[arg(short, long)]
-	pub path: Option<String>
-}
+use crate::statics::DONE;
 
 pub fn sure() -> Result<bool> {
 	let accept = Confirm::with_theme(&ColorfulTheme::default())
 		.with_prompt("Are you sure?")
 		.default(true)
+		.wait_for_newline(true)
 		.interact()?;
 	Ok(accept)
 }
@@ -60,7 +46,7 @@ pub fn choose_option(prompt: &str, options: &Vec<String>) -> Result<String> {
 
 	let option = match selection {
 		Some(index) => options[index].clone(),
-		None => "Not valid option".to_string()
+		None => "Not valid option".to_string(),
 	};
 
 	Ok(option)
@@ -93,5 +79,5 @@ pub fn msg(content: &String) {
 }
 
 pub fn done() {
-	// msg(&format!("{} {}", DONE, style("All done").cyan()));
+	msg(&format!("{} {}", DONE, style("All done").cyan()));
 }

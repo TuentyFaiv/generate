@@ -9,25 +9,25 @@ use anyhow::{Result};
 use clap::Parser;
 
 use config::CLIConfig;
-use cli::questions::Questions;
-use cli::Args;
-use cli::questions::CLIQuestions;
+use cli::structs::Args;
+use cli::questions::{Questions, CLIQuestions};
 use templates::CLITemplates;
+
+use crate::cli::msg;
 
 pub fn main() -> Result<()> {
 	let args = Args::parse();
 
-	let cli_config = CLIConfig::new();
+	let cli_config = CLIConfig::new(args.clone());
 
-	let questions = CLIQuestions::new(&cli_config, args);
-
+	let questions = CLIQuestions::new(cli_config.clone(), args);
 	let answers = questions.ask()?;
+
+	println!("{:?}", answers.clone());
 	
 	if !answers.accept { return Ok(()); }
 
-	let cli_templates = CLITemplates::new(&cli_config, answers);
-
-	cli_templates.create()?;
+	msg(&CLITemplates::new(cli_config, answers).create()?);
 
 	Ok(())
 }

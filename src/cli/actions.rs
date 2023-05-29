@@ -1,11 +1,13 @@
+use std::borrow::Cow;
+
 use crate::cli::command;
 
-pub fn create_url(repository: &str) -> String {
+pub fn create_url<'a>(repository: &'a str) -> Cow<'a, str> {
   if cfg!(target_os = "windows") {
-    format!("https://github.com/Platimex/{repository}.git")
-  } else {
-    format!("git@github.com:Platimex/{repository}.git")
+    let repo_win = repository.replace("git@", "https://");
+    return Cow::Owned(repo_win)
   }
+  Cow::Borrowed(repository)
 }
 
 pub fn rm_git(path: &str) {
