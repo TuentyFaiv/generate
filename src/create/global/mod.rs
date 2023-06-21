@@ -80,7 +80,6 @@ impl CLIGlobalCreation {
       &paths.react_locales
     };
 
-
     create_dir_all(path).unwrap_or_else(|why| {
       println!("! {:?}", why.kind());
     });

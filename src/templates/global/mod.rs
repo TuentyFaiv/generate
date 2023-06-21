@@ -35,7 +35,6 @@ impl CLIGlobalTemplates {
           let repository = self.config.get_repository(&repo.name.unwrap_or(String::new()));
           let url = create_url(&repository);
 
-          // let is_ts = language == "typescript";
           let is_library = arch == ArchType::Library;
           let arch = arch.to_string();
 
@@ -78,11 +77,10 @@ impl CLIGlobalTemplates {
           if !is_library {
             pb.set_message("Creating env files...");
             cp_envs(&path);
-          
-            pb.set_message("Instaling dependencies...");
-            install(&path);
-            pb.finish_and_clear();
           }
+          pb.set_message("Instaling dependencies...");
+          install(&path);
+          pb.finish_and_clear();
           Ok(())
         },
         None => Err(anyhow!(self.error.clone()))

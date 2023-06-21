@@ -1,11 +1,11 @@
-pub static COMP_PROPTYPES: &str = r#"import type { ReactNode } from "react";
+pub static PROPTYPES: &str = r#"import type { ReactNode } from "react";
 
 export interface Props {
   children: ReactNode;
 }
 "#;
 
-pub static COMP_STYLES: &str = r#"import styled from "@emotion/styled";
+pub static STYLES: &str = r#"import styled from "@emotion/styled";
 
 import * as responsive from "./NAME.styles.responsive";
 
@@ -14,7 +14,7 @@ export const NAME = styled.div`
 `;
 "#;
 
-pub static COMP_STYLES_RESPONSIVE: &str = r#"import { css } from "@emotion/react";
+pub static STYLES_RESPONSIVE: &str = r#"import { css } from "@emotion/react";
 import { forsize } from "@mixins";
 
 export const NAME_LOWER = forsize({

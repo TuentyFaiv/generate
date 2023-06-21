@@ -7,8 +7,6 @@ use anyhow::Result;
 use crate::config::CLIConfig;
 use crate::cli::structs::Answers;
 
-use self::statics::component::{COMP_PROPTYPES, COMP_STYLES, COMP_STYLES_RESPONSIVE, COMPONENT, SCRIPT_TS, SCRIPT};
-
 pub struct CLISvelteTemplates {
   answers: Answers,
   config: CLIConfig,
@@ -27,12 +25,14 @@ impl CLISvelteTemplates {
     Ok(())
   }
   pub fn generate_component(&self, path: &String) -> Result<()> {
+    use self::statics::component::{PROPTYPES, STYLES, STYLES_RESPONSIVE, COMPONENT, SCRIPT_TS, SCRIPT};
+
     let is_ts = self.answers.language.as_str() == "typescript";
     let name = self.answers.name.as_str();
 
-    let proptypes = COMP_PROPTYPES.to_string();
-    let mut styles = COMP_STYLES.to_string();
-    let mut responsive = COMP_STYLES_RESPONSIVE.to_string();
+    let proptypes = PROPTYPES.to_string();
+    let mut styles = STYLES.to_string();
+    let mut responsive = STYLES_RESPONSIVE.to_string();
     
     let mut component = COMPONENT.to_string();
     let mut ext = ".js".to_string();
