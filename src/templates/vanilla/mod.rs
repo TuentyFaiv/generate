@@ -22,8 +22,4 @@ impl CLIVanillaTemplates {
     println!("generate_layout");
     Ok(())
   }
-  pub fn generate_component(&self) -> Result<()> {
-    println!("generate_component");
-    Ok(())
-  }
 }

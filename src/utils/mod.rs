@@ -1,4 +1,5 @@
 use std::{option::Option, fs::File, io::{BufReader, Read}};
+use dirs_next::home_dir;
 
 pub fn to_vec(arr: &[&str]) -> Vec<String> {
 	arr.iter().map(|&s| s.to_string()).collect::<Vec<String>>()
@@ -41,20 +42,45 @@ pub fn transform(name: &str, to: Option<&str>) -> String {
 }
 
 pub fn read_path(root: &Option<String>, template: String, default: String) -> String {
-	match root {
-		Some(path) => match File::open(format!("{path}{template}")) {
-			Ok(file) => {
-				let mut buf_reader = BufReader::new(&file);
-				let mut content = String::new();
-				match buf_reader.read_to_string(&mut content) {
-					Ok(_) => {},
-					Err(_) => return default
-				};
+	println!("Template dir: {}\nTemplate file: {template}", root.clone().unwrap_or("".to_string()));
 
-				content
+	match home_dir() {
+		None => default,
+		Some(mut home) => match root {
+			Some(path) => {
+				let template_path = format!("{path}{template}");
+				home.push(template_path.as_str());
+
+				println!("Template path: {:?}", home.to_str());
+				match home.to_str() {
+					None => default,
+					Some(full_path) => match File::open(full_path) {
+						Ok(file) => {
+							let mut buf_reader = BufReader::new(&file);
+							let mut content = String::new();
+							match buf_reader.read_to_string(&mut content) {
+								Ok(readed) => {
+									println!("{readed}");
+								},
+								Err(error) => {
+									println!("{error}");
+									return default
+								}
+							};
+
+							println!("Content: {content}");
+
+							content
+						},
+						Err(error) => {
+							println!("{error}");
+
+							default
+						}
+					}
+				}
 			},
-			Err(_) => default
-		},
-		None => default
+			None => default
+		}
 	}
 }

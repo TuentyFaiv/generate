@@ -32,3 +32,24 @@ pub struct Answers {
   pub arch: ArchType,
   pub accept: bool,
 }
+
+pub struct AnswersName {
+  pub name: String,
+  pub namespace: String,
+  pub name_lower: String,
+}
+
+pub struct AnswersToolType {
+  pub tool_type: Option<String>,
+  pub language: String,
+}
+
+pub struct AnswersPath {
+  pub path: String,
+  pub name: String,
+}
+
+pub struct QuestionToolType<'a> {
+  pub prompt: &'a str,
+  pub tools: Vec<String>,
+}

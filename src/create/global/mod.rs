@@ -3,12 +3,15 @@ use anyhow::{Result, anyhow};
 use console::style;
 
 use crate::statics::OK;
+use crate::templates;
 use crate::utils::{change_case, transform};
 use crate::config::CLIConfig;
-use crate::cli::{done, enums::Tool, structs::Answers};
+use crate::cli::{utils::done, enums::Tool, structs::Answers};
 use crate::templates::global::CLIGlobalTemplates;
 use crate::templates::react::CLIReactTemplates;
 use crate::templates::svelte::CLISvelteTemplates;
+
+use super::structs::{ComponentCreation, ComponentCreationPaths, ComponentExports};
 
 pub struct CLIGlobalCreation {
   answers: Answers,
@@ -28,7 +31,9 @@ impl CLIGlobalCreation {
     Self { config, answers, global, react, svelte, error }
   }
   pub fn make_component(&self) -> Result<String> {
-    let Answers { name, path, tool, tool_type, .. } = &self.answers;
+    let Answers { name, path, tool, tool_type, language, .. } = &self.answers;
+    let is_ts = language.as_str() == "typescript";
+    let ext = if is_ts { ".ts".to_string() } else { ".js".to_string() };
 
     let full_path = match tool_type {
       Some(tool_type) => format!("{path}/{tool_type}/{name}"),
@@ -41,20 +46,101 @@ impl CLIGlobalCreation {
       });
     }
 
-    let result = match tool {
+    let component = match tool {
       Tool::React => {
-        self.react.generate_component(&full_path)
+        use templates::react::statics::component::{
+          COMPONENT,
+          COMPONENT_TS,
+          PROPTYPES,
+          STYLES,
+          STYLES_RESPONSIVE,
+        };
+        
+        let proptypes = if is_ts {
+          Some(ComponentCreationPaths {
+            template: format!("/proptypes{ext}"),
+            default: PROPTYPES.to_string(),
+          })
+        } else { None };
+
+        Ok(ComponentCreation::new(
+          &self.config.templates,
+          format!("export {{ default as {name} }} from \"./{name}/{name}\";\n"),
+          ComponentCreationPaths {
+            template: format!("/styles{ext}"),
+            default: STYLES.to_string(),
+          },
+          ComponentCreationPaths {
+            template: format!("/component{ext}x"),
+            default: if is_ts { COMPONENT_TS.to_string() } else { COMPONENT.to_string() },
+          },
+          ComponentCreationPaths {
+            template: format!("/styles.responsive{ext}"),
+            default: STYLES_RESPONSIVE.to_string(),
+          },
+          proptypes,
+          None,
+          ComponentExports {
+            component: format!("{full_path}/{name}{ext}x"),
+            styles: format!("{full_path}/{name}.styles{ext}"),
+            responsive: format!("{full_path}/{name}.styles.responsive{ext}"),
+            proptypes: if is_ts { Some(format!("{full_path}/{name}.proptypes{ext}")) } else { None },
+          }
+        ))
       },
       Tool::Svelte => {
-        self.svelte.generate_component(&full_path)
+        use templates::svelte::statics::component::{
+          COMPONENT,
+          PROPTYPES,
+          SCRIPT,
+          SCRIPT_TS,
+          STYLES,
+          STYLES_RESPONSIVE,
+        };
+
+        let proptypes = if is_ts {
+          Some(ComponentCreationPaths {
+            template: format!("/proptypes{ext}"),
+            default: PROPTYPES.to_string(),
+          })
+        } else { None };
+        let script = Some(ComponentCreationPaths {
+          template: format!("/script{ext}.svelte"),
+          default: if is_ts { SCRIPT_TS.to_string() } else { SCRIPT.to_string() }
+        });
+
+        Ok(ComponentCreation::new(
+          &self.config.templates,
+          format!("export {{ default as {name} }} from \"./{name}/{name}.svelte\";\n"),
+          ComponentCreationPaths {
+            template: format!("/styles{ext}"),
+            default: STYLES.to_string(),
+          },
+          ComponentCreationPaths {
+            template: "/component.svelte".to_string(),
+            default: COMPONENT.to_string(),
+          },
+          ComponentCreationPaths {
+            template: format!("/styles.responsive{ext}"),
+            default: STYLES_RESPONSIVE.to_string(),
+          },
+          proptypes,
+          script,
+          ComponentExports {
+            component: format!("{full_path}/{name}.svelte"),
+            styles: format!("{full_path}/{name}.styles{ext}"),
+            responsive: format!("{full_path}/{name}.styles.responsive{ext}"),
+            proptypes: if is_ts { Some(format!("{full_path}/{name}.proptypes{ext}")) } else { None },
+          }
+        ))
       },
       Tool::Vanilla => Err(anyhow!(self.error.clone())),
     };
 
-    match result {
+    match self.global.generate_component(&full_path, component?, tool) {
       Ok(_) => {
         done();
-        Ok(format!("{} {}", OK, style(format!("Component {name} created at {path}")).cyan()))
+        Ok(format!("{} {}", OK, style(format!("Component {name} created at {full_path}")).cyan()))
       },
       Err(error) => Err(error)
     }

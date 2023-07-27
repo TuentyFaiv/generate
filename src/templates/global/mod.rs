@@ -7,9 +7,11 @@ use anyhow::{Result, anyhow};
 use indicatif::{ProgressBar, ProgressStyle};
 
 use crate::statics::NOT_IMPLEMENTED;
-use crate::utils::change_case;
+use crate::utils::{change_case, read_path};
+use crate::cli::enums::{Tool, ArchType};
+use crate::cli::structs::Answers;
+use crate::create::structs::ComponentCreation;
 use crate::config::CLIConfig;
-use crate::cli::{enums::ArchType, structs::Answers};
 
 pub struct CLIGlobalTemplates {
   answers: Answers,
@@ -22,9 +24,98 @@ impl CLIGlobalTemplates {
     let error = format!("{} Repository not found", NOT_IMPLEMENTED);
     Self { config, answers, error }
   }
+  pub fn generate_component(&self, path: &String, templates: ComponentCreation, tool: &Tool) -> Result<()> {
+    let name = self.answers.name.as_str();
+
+    let template_path = match tool {
+      Tool::React => templates.react_path(),
+      Tool::Svelte => templates.svelte_path(),
+      Tool::Vanilla => templates.vanilla_path(),
+    };
+
+    let mut styles = read_path(
+      &template_path,
+      templates.styles.template,
+      templates.styles.default
+    );
+    let mut responsive = read_path(
+      &template_path,
+      templates.responsive.template,
+      templates.responsive.default
+    );
+    let mut component = read_path(
+      &template_path,
+      templates.component.template,
+      templates.component.default
+    );
+    if let Some(template_script) = templates.script {
+      let script = read_path(
+        &template_path,
+        template_script.template,
+        template_script.default,
+      );
+      component = component.replace("SCRIPT", &script);
+    }
+    let component_import = templates.import;
+
+    component = component.replace("NAME_LOWER", &name.to_lowercase());
+    styles = styles.replace("NAME_LOWER", &name.to_lowercase());
+    responsive = responsive.replace("NAME_LOWER", &name.to_lowercase());
+    component = component.replace("NAME", name);
+    styles = styles.replace("NAME", name);
+    responsive = responsive.replace("NAME", name);
+
+    let mut component_file = File::create(templates.exports.component)?;
+    let mut styles_file = File::create(templates.exports.styles)?;
+    let mut responsive_file = File::create(templates.exports.responsive)?;
+
+    if let Some(template_props) = templates.proptypes {
+      let mut proptypes = read_path(
+        &template_path,
+        template_props.template,
+        template_props.default,
+      );
+      proptypes = proptypes.replace("NAME_LOWER", &name.to_lowercase());
+      proptypes = proptypes.replace("NAME", name);
+      if let Some(export_props) = templates.exports.proptypes {
+        let mut proptypes_file = File::create(export_props)?;
+        proptypes_file.write_all(proptypes.as_bytes())?;
+      }
+    }
+    
+    component_file.write_all(component.as_bytes())?;
+    styles_file.write_all(styles.as_bytes())?;
+    responsive_file.write_all(responsive.as_bytes())?;
+
+    let mut index_path = path.replace(format!("/{name}").as_str(), "");
+    index_path = format!("{index_path}/index.ts");
+
+    match File::open(&index_path) {
+      Ok(index) => {
+        let mut buf_reader = BufReader::new(&index);
+        let mut index_content = String::new();
+        buf_reader.read_to_string(&mut index_content)?;
+
+        if index_content.contains("export {};") {
+          index_content = index_content.replace("export {};", "");
+        }
+
+        let mut new_index = File::create(&index_path)?;
+        let updated_index = [index_content.as_str(), component_import.as_str()].concat();
+
+        new_index.write_all(updated_index.as_bytes())?;
+      },
+      Err(_) => {
+        let mut index = File::create(&index_path)?;
+
+        index.write_all(component_import.as_bytes())?;
+      }
+    }
+
+    Ok(())
+  }
   pub fn generate_project(&self) -> Result<()> {
-    // For project generation
-    use crate::cli::command;
+    use crate::cli::utils::command;
     use crate::cli::actions::{create_url, rm_git, cp_envs, install};
 
     let Answers { name, path, tool, tool_type, arch, .. } = self.answers.clone();

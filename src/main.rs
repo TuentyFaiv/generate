@@ -10,10 +10,10 @@ use clap::Parser;
 
 use config::CLIConfig;
 use cli::structs::Args;
-use cli::questions::{Questions, CLIQuestions};
-use templates::CLITemplates;
+use cli::{Questions, CLIQuestions};
+use cli::utils::msg;
+use create::CLICreation;
 
-use crate::cli::msg;
 
 pub fn main() -> Result<()> {
 	let args = Args::parse();
@@ -27,7 +27,7 @@ pub fn main() -> Result<()> {
 	
 	if !answers.accept { return Ok(()); }
 
-	msg(&CLITemplates::new(cli_config, answers).create()?);
+	msg(&CLICreation::new(cli_config, answers).create()?);
 
 	Ok(())
 }

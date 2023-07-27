@@ -1,4 +1,4 @@
-use crate::cli::command;
+use crate::cli::utils::command;
 
 pub fn create_url(repository: &str) -> String {
   if cfg!(target_os = "windows") {
