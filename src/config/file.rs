@@ -19,34 +19,40 @@ pub struct ConfigPaths {
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct ConfigGlobalPaths {
-  pub service: Option<String>,
-  pub schema: Option<String>,
-  pub context: Option<String>,
+  pub services: Option<String>,
+  pub schemas: Option<String>,
+  pub contexts: Option<String>,
   pub types: Option<String>,
   pub ui: Option<String>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct ConfigReactPaths {
-  pub hoc: Option<String>,
-  pub hook: Option<String>,
+  pub hocs: Option<String>,
+  pub hooks: Option<ConfigReactHooksPaths>,
   pub locales: Option<String>,
   pub routes: Option<String>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
+pub struct ConfigReactHooksPaths {
+  pub global: Option<String>,
+  pub internal: Option<String>,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
 pub struct ConfigSveltePaths {
-  pub action: Option<String>,
-  pub store: Option<String>,
-  pub page: Option<String>,
-  pub layout: Option<String>,
+  pub actions: Option<String>,
+  pub stores: Option<String>,
+  pub pages: Option<String>,
+  pub layouts: Option<String>,
   pub locales: Option<String>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct ConfigVanillaPaths {
-  pub class: Option<String>,
-  pub function: Option<String>,
+  pub classes: Option<String>,
+  pub functions: Option<String>,
 }
 
 #[derive(Clone, Debug)]
@@ -77,14 +83,14 @@ pub struct ConfigFileToolsType {
   pub vanilla: Option<Vec<(String, Option<ConfigRepositoryTool>)>>,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct ConfigTemplates {
   pub react: Option<ConfigReactTemplates>,
   pub svelte: Option<ConfigSvelteTemplates>,
   pub vanilla: Option<ConfigVanillaTemplates>,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct ConfigReactTemplates {
   pub service: Option<String>,
   pub schema: Option<String>,
@@ -96,7 +102,7 @@ pub struct ConfigReactTemplates {
   pub component: Option<String>,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct ConfigSvelteTemplates {
   pub service: Option<String>,
   pub schema: Option<String>,
@@ -108,7 +114,7 @@ pub struct ConfigSvelteTemplates {
   pub component: Option<String>,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct ConfigVanillaTemplates {
   pub service: Option<String>,
   pub schema: Option<String>,

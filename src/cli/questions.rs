@@ -42,7 +42,7 @@ impl CLIQuestions {
     Self { args, config }
   }
   fn ask_arch(&self, tool: &Tool) -> Result<ArchType> {
-    let archs = self.config.get_archs().clone();
+    let archs = self.config.archs.clone();
     let mut options_archs = match tool {
       Tool::React => [archs.globals, archs.react].concat(),
       Tool::Svelte => [archs.globals, archs.svelte].concat(),
@@ -59,8 +59,8 @@ impl CLIQuestions {
     Ok(arch)
   }
   fn ask_tool_type(&self, arch: &ArchType, tool: &Tool) -> Result<AnswersToolType> {
-    let tools = self.config.get_tools().clone();
-    let lang_question = QuestionToolType { prompt: "Choose language:", tools: self.config.get_langs().clone() };
+    let tools = self.config.tools.clone();
+    let lang_question = QuestionToolType { prompt: "Choose language:", tools: self.config.langs.clone() };
 
     let tool_question = match arch {
       ArchType::Project => match tool {
@@ -135,14 +135,14 @@ impl CLIQuestions {
         ArchType::Schema => input("Schema name:", "schema")?,
         ArchType::Action => input("Action name:", "action")?,
         ArchType::Store => input("Store name:", "store")?,
-        ArchType::Class => input("Class name:", "SomeNewClass")?,
+        ArchType::Class => input("Class name:", "class")?,
         ArchType::Project => input("Project name:", "demo")?,
         ArchType::Library => input("Library name:", "library")?,
         _ =>"".to_string()
       }
       Some(exist) => exist.clone()
     };
-    let mut name = name.to_string();
+    let mut name = name;
 
     match arch {
       ArchType::Component
@@ -165,30 +165,30 @@ impl CLIQuestions {
     })
   }
   fn ask_path(&self, arch: &ArchType, tool: &Tool, AnswersName { name, namespace, name_lower }: AnswersName) -> Result<AnswersPath> {
-    let paths = self.config.get_paths().clone();
+    let paths = self.config.paths.clone();
     let mut name = name;
     let namespace = namespace.as_str();
 
     let path = match &self.args.path {
       None => match arch {
-        ArchType::Hoc => paths.hoc,
+        ArchType::Hoc => paths.hocs,
         ArchType::Hook =>  match choose_option("Which type is:", &to_vec(&["global", "internal"]))?.as_str() {
           "internal" => {
-            let short_path = input("Where:", namespace)?; 
-            format!("{}/{}/hooks", paths.ui, short_path)
+            let short_path = input("Namespace:", namespace)?; 
+            format!("{}/{}/{}", paths.ui, short_path, paths.hooks.internal)
           },
-          _ => paths.hook
+          _ => paths.hooks.global
         },
         ArchType::Page | ArchType::Layout => {
-          let short_path = input("Where:", namespace)?.to_string();
+          let short_path = input("Namespace:", namespace)?.to_string();
           name = short_path;
 
           let full_path = match tool {
             Tool::Svelte => {
               if name == "home" || name == "index" {
-                paths.page
+                paths.pages
               } else {
-                format!("{}/{}", paths.page, name)
+                format!("{}/{}", paths.pages, name)
               }
             },
             _ => format!("{}/{}", paths.ui, name)
@@ -197,21 +197,21 @@ impl CLIQuestions {
           full_path
         }
         ArchType::Component => {
-          let short_path = input("Where:", namespace)?;
+          let short_path = input("Namespace:", namespace)?;
 
           format!("{}/{}", paths.ui, short_path)
         },
         ArchType::Project | ArchType::Library => input("Proyect path:", &paths.get_root(&name))?,
-        ArchType::Context => format!("{}/{}", paths.context, name_lower),
+        ArchType::Context => format!("{}/{}", paths.contexts, name_lower),
         ArchType::Service | ArchType::Schema => {
-          let mut short_path = input("Where:", namespace)?;
+          let mut short_path = input("Namespace:", namespace)?;
           short_path = transform(&short_path, Some("lower"));
-          let to = if *arch == ArchType::Service { paths.service } else { paths.schema };
+          let to = if *arch == ArchType::Service { paths.services } else { paths.schemas };
           format!("{}/{}", to, short_path)
         },
-        ArchType::Action => input("Choose location:", &paths.action)?,
-        ArchType::Store => input("Choose location:", &paths.store)?,
-        ArchType::Class => input("Choose location:", format!("{}/{}", paths.class, name_lower).as_str())?,
+        ArchType::Action => input("Choose location:", &paths.actions)?,
+        ArchType::Store => input("Choose location:", &paths.stores)?,
+        ArchType::Class => input("Choose location:", format!("{}/{}", paths.classes, name_lower).as_str())?,
       }
       Some(exist) => exist.clone()
     };
@@ -224,7 +224,7 @@ impl CLIQuestions {
 
 impl Questions for CLIQuestions {
   fn ask(&self) -> Result<Answers> {
-    let tools = self.config.get_tools().clone();
+    let tools = &self.config.tools;
     let tool = Tool::parse(&arg_or(
       "Choose a tool:",
       self.args.tool.clone(),

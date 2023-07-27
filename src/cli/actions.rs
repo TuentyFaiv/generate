@@ -2,7 +2,7 @@ use crate::cli::command;
 
 pub fn create_url(repository: &str) -> String {
   if cfg!(target_os = "windows") {
-    let repo_win = repository.replace("git@", "https://");
+    let repo_win = repository.replace("git@", "https://").replace("github.com:", "github.com/");
     return repo_win;
   }
 

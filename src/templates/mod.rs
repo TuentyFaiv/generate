@@ -18,26 +18,30 @@ use crate::create::svelte::CLISvelteCreation;
 pub struct CLITemplates {
 	answers: Answers,
 	config: CLIConfig,
-	global_creation: CLIGlobalCreation,
-	react_creation: CLIReactCreation,
-	svelte_creation: CLISvelteCreation,
+	creation: CLICreation,
 	pub error: String,
+}
+
+struct CLICreation {
+	global: CLIGlobalCreation,
+	svelte: CLISvelteCreation,
+	react: CLIReactCreation,
 }
 
 impl CLITemplates {
 	pub fn new(config: CLIConfig, answers: Answers) -> Self {
 		let error = format!("{} Option not implemented yet", NOT_IMPLEMENTED);
-		let global_creation = CLIGlobalCreation::new(
+		let global = CLIGlobalCreation::new(
 			config.clone(),
 			answers.clone(),
 			error.clone()
 		);
-		let react_creation = CLIReactCreation::new(
+		let react = CLIReactCreation::new(
 			config.clone(),
 			answers.clone(),
 			error.clone()
 		);
-		let svelte_creation = CLISvelteCreation::new(
+		let svelte = CLISvelteCreation::new(
 			config.clone(),
 			answers.clone(),
 			error.clone()
@@ -47,34 +51,34 @@ impl CLITemplates {
 			config,
 			answers,
 			error,
-			global_creation,
-			react_creation,
-			svelte_creation,
+			creation: CLICreation {
+				global,
+				svelte,
+				react,
+			},
 		}
 	}
 	pub fn create(&self) -> Result<String> {
 		let template_type = self.get_template()?;
-		let create_global = &self.global_creation;
-		let create_react = &self.react_creation;
-		let create_svelte = &self.svelte_creation;
+		let CLICreation { global, react, svelte } = &self.creation;
 
 		match template_type {
-			ArchType::Project | ArchType::Library => create_global.make_project(),
-			ArchType::Component => create_global.make_component(),
-			ArchType::Page => create_global.make_page(),
-			ArchType::Layout => create_global.make_layout(),
-			ArchType::Schema => create_global.make_schema(),
-			ArchType::Service => create_global.make_service(),
-			ArchType::Context => create_global.make_context(),
-			ArchType::Hoc => create_react.make_hoc(),
-			ArchType::Hook => create_react.make_hook(),
-			ArchType::Action => create_svelte.make_action(),
-			ArchType::Store => create_svelte.make_store(),
+			ArchType::Project | ArchType::Library => global.make_project(),
+			ArchType::Component => global.make_component(),
+			ArchType::Page => global.make_page(),
+			ArchType::Layout => global.make_layout(),
+			ArchType::Schema => global.make_schema(),
+			ArchType::Service => global.make_service(),
+			ArchType::Context => global.make_context(),
+			ArchType::Hoc => react.make_hoc(),
+			ArchType::Hook => react.make_hook(),
+			ArchType::Action => svelte.make_action(),
+			ArchType::Store => svelte.make_store(),
 			_ => Err(anyhow!(self.error.clone()))
 		}
 	}
 	fn get_template(&self) -> Result<&ArchType> {
-		let tools = self.config.get_tools();
+		let tools = &self.config.tools;
 		let react_options = self.config.projects_options(&Tool::React);
 		let svelte_options = self.config.projects_options(&Tool::Svelte);
 		let vanilla_options = self.config.projects_options(&Tool::Vanilla);

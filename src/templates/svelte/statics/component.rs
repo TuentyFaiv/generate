@@ -7,9 +7,10 @@ pub static STYLES: &str = r#"import { css, cx } from "@emotion/css";
 
 import * as responsive from "./NAME.styles.responsive";
 
-export const NAME_LOWER = cx(css`
-
-`, responsive.NAME_LOWER);
+export const NAME_LOWER = cx(
+  css``,
+  responsive.NAME_LOWER,
+);
 "#;
 
 pub static STYLES_RESPONSIVE: &str = r#"import { css } from "@emotion/css";

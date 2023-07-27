@@ -69,15 +69,15 @@ impl CLIGlobalCreation {
   }
   pub fn make_page(&self) -> Result<String> {
     let Answers { name, tool, path, language, .. } = &self.answers;
-    let paths = self.config.get_paths();
+    let paths = &self.config.paths;
 
     let is_ts = language == "typescript";
     let name_capitalize = change_case(&name, None);
     let path_proptypes = format!("{}/pages", paths.types);
     let path_locales = if tool == &Tool::Svelte {
-      &paths.svelte_locales
+      &paths.locales.svelte
     } else {
-      &paths.react_locales
+      &paths.locales.react
     };
 
     create_dir_all(path).unwrap_or_else(|why| {
@@ -97,7 +97,7 @@ impl CLIGlobalCreation {
 
     let result = match tool {
       Tool::React => {
-        let path_i18n_context = format!("{}/i18n", paths.context);
+        let path_i18n_context = format!("{}/i18n", paths.contexts);
 
         create_dir_all(format!("{path}/styles")).unwrap_or_else(|why| {
           println!("! {:?}", why.kind());
@@ -120,12 +120,12 @@ impl CLIGlobalCreation {
         // )?;
       },
       Tool::Svelte => {
-        let path_i18n_store = format!("{}/i18n", paths.store);
+        let path_i18n_store = format!("{}/i18n", paths.stores);
         let path_ui = format!("{}/{}", paths.ui, name).to_lowercase();
         create_dir_all(format!("{path_ui}/styles")).unwrap_or_else(|why| {
           println!("! {:?}", why.kind());
         });
-        create_dir_all(&paths.page).unwrap_or_else(|why| {
+        create_dir_all(&paths.pages).unwrap_or_else(|why| {
           println!("! {:?}", why.kind());
         });
         create_dir_all(&path_i18n_store).unwrap_or_else(|why| {
@@ -155,7 +155,7 @@ impl CLIGlobalCreation {
   }
   pub fn make_layout(&self) -> Result<String> {
     let Answers { name, path, tool, language, .. } = &self.answers;
-    let paths = &self.config.get_paths();
+    let paths = &self.config.paths;
 
     let name_capitalize = change_case(&name, None);
     let is_ts = language == "typescript";
@@ -210,7 +210,7 @@ impl CLIGlobalCreation {
   }
   pub fn make_schema(&self) -> Result<String> {
     let Answers { name, path, language, .. } = &self.answers;
-    let paths = &self.config.get_paths();
+    let paths = &self.config.paths;
 
     let name_dash = transform(&name, Some("dash"));
     let name_capitalize = change_case(&transform(&name, None), None);
@@ -244,7 +244,7 @@ impl CLIGlobalCreation {
   }
   pub fn make_service(&self) -> Result<String> {
     let Answers { name, path, language, .. } = &self.answers;
-    let paths = &self.config.get_paths();
+    let paths = &self.config.paths;
 
     let name_capitalize = change_case(&name, None);
     let name_camel = change_case(&name_capitalize, Some("camel"));

@@ -7,7 +7,7 @@ use anyhow::{Result, anyhow};
 use indicatif::{ProgressBar, ProgressStyle};
 
 use crate::statics::NOT_IMPLEMENTED;
-use crate::utils::{change_case};
+use crate::utils::change_case;
 use crate::config::CLIConfig;
 use crate::cli::{enums::ArchType, structs::Answers};
 
@@ -24,7 +24,7 @@ impl CLIGlobalTemplates {
   }
   pub fn generate_project(&self) -> Result<()> {
     // For project generation
-    use crate::cli::{command};
+    use crate::cli::command;
     use crate::cli::actions::{create_url, rm_git, cp_envs, install};
 
     let Answers { name, path, tool, tool_type, arch, .. } = self.answers.clone();

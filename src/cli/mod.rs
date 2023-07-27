@@ -64,7 +64,7 @@ pub fn input(prompt: &str, default: &str) -> Result<String> {
 pub fn command(program: &str, args: Vec<&str>, path: Option<&str>, error_msg: Option<&str>) {
 	let mut cmd = Command::new(program);
 	cmd
-		.current_dir(path.unwrap_or("."))
+		.current_dir(path.unwrap_or("./"))
 		.args(args)
 		.output()
 		.expect(error_msg.unwrap_or("Failed to execute command"));

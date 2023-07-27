@@ -7,7 +7,7 @@ pub static TOOLS_REACT: &[(&str, Option<RepositoryTool>)] = &[
   ("base", Some(RepositoryTool {
     name: "BoilerplateReact",
     project: "main",
-    library: None
+    library: Some("library"),
   })),
   ("next", Some(RepositoryTool {
     name: "BoilerplateNext",
@@ -27,13 +27,13 @@ pub static TOOLS_SVELTE: &[(&str, Option<RepositoryTool>)] = &[
   ("sveltekit", Some(RepositoryTool {
     name: "BoilerplateSveltekit",
     project: "main",
-    library: None
+    library: Some("library")
   }))
 ];
 pub static TOOLS_VANILLA: &[(&str, Option<RepositoryTool>)] = &[
   ("base", None),
 ];
-pub static TOOLS_WEBCOMPONENTS: &[&str] = &["webcomponent", "webcomponent-ts"];
+pub static TOOLS_WEBCOMPONENTS: &[&str] = &["webcomponent"];//, "webcomponent-ts"];
 pub static TOOLS_COMPONENTS: &[&str] = &["atoms", "molecules", "organisms", "custom"];
 pub static LANGS: &[&str] = &["javascript", "typescript"];
 

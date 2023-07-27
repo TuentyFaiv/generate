@@ -1,31 +1,7 @@
-use std::{option::Option};
-
-use crate::config::file::{RepositoryTool, ConfigRepositoryTool};
+use std::{option::Option, fs::File, io::{BufReader, Read}};
 
 pub fn to_vec(arr: &[&str]) -> Vec<String> {
 	arr.iter().map(|&s| s.to_string()).collect::<Vec<String>>()
-}
-
-pub fn to_tool_type(tools: &[(&str, Option<RepositoryTool>)]) -> Option<Vec<(String, Option<ConfigRepositoryTool>)>> {
-	Some(tools.iter().map(|(name, repository)| {
-		(name.to_string(), match repository {
-			None => None,
-			Some(repository) => Some(ConfigRepositoryTool {
-				name: Some(repository.name.to_string()),
-				project: Some(repository.project.to_string()),
-				library: match repository.library {
-					None => None,
-					Some(library) => Some(library.to_string()),
-				},
-			}),
-		})
-	}).collect::<Vec<(String, Option<ConfigRepositoryTool>)>>())
-}
-
-pub fn tool_to_vec(tools: &[(&str, Option<RepositoryTool>)]) -> Vec<String> {
-	tools.iter().map(|(tool, _)| {
-		tool.to_string()
-	}).collect()
 }
 
 pub fn change_case(word: &str, to: Option<&str>) -> String {
@@ -62,4 +38,23 @@ pub fn transform(name: &str, to: Option<&str>) -> String {
 	}
 
 	formatted.join(&separator)
+}
+
+pub fn read_path(root: &Option<String>, template: String, default: String) -> String {
+	match root {
+		Some(path) => match File::open(format!("{path}{template}")) {
+			Ok(file) => {
+				let mut buf_reader = BufReader::new(&file);
+				let mut content = String::new();
+				match buf_reader.read_to_string(&mut content) {
+					Ok(_) => {},
+					Err(_) => return default
+				};
+
+				content
+			},
+			Err(_) => default
+		},
+		None => default
+	}
 }

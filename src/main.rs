@@ -5,7 +5,7 @@ mod templates;
 mod create;
 mod config;
 
-use anyhow::{Result};
+use anyhow::Result;
 use clap::Parser;
 
 use config::CLIConfig;

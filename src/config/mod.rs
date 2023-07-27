@@ -1,3 +1,4 @@
+mod utils;
 pub mod file;
 pub mod structs;
 
@@ -7,20 +8,22 @@ use dirs_next::home_dir;
 
 use crate::statics::{TOOLS, TOOLS_REACT, TOOLS_SVELTE, TOOLS_WEBCOMPONENTS, TOOLS_VANILLA};
 use crate::statics::{ARCHS, ARCHS_REACT, ARCHS_SVELTE, TOOLS_COMPONENTS, ARCHS_VANILLA};
-use crate::statics::{LANGS};
-use crate::utils::{to_vec, tool_to_vec, to_tool_type};
+use crate::statics::LANGS;
+use crate::utils::to_vec;
 use crate::cli::enums::Tool;
 use crate::cli::structs::Args;
 
-use self::file::{ConfigFile, ConfigFileToolsType, ConfigRepositoryTool};
-use self::structs::{Paths, Archs, Tools};
+use self::utils::{tool_to_vec, to_tool_type, default_tool, list_libraries, list_projects, search_repository};
+use self::file::{ConfigFile, ConfigFileToolsType, ConfigRepositoryTool, ConfigTemplates};
+use self::structs::{Paths, PathLocales, Archs, Tools, PathHooks};
 
 #[derive(Clone, Debug)]
 pub struct CLIConfig {
-  paths: Paths,
-  langs: Vec<String>,
-  tools: Tools,
-  archs: Archs,
+  pub paths: Paths,
+  pub langs: Vec<String>,
+  pub tools: Tools,
+  pub archs: Archs,
+  pub templates: Option<ConfigTemplates>,
   tools_type: ConfigFileToolsType,
   repository: String,
 }
@@ -39,21 +42,25 @@ impl CLIConfig {
       },
     };
 
-    let langs = to_vec(LANGS);
-    let paths = CLIConfig::build_paths(&config_file);
-    let tools = CLIConfig::build_tools(&config_file);
-    let tools_type = CLIConfig::build_tools_type(&config_file);
-    let repository = CLIConfig::build_repository(&config_file);
-    let archs = Archs {
-      globals: to_vec(ARCHS),
-      react: to_vec(ARCHS_REACT),
-      svelte: to_vec(ARCHS_SVELTE),
-      vanilla: to_vec(ARCHS_VANILLA),
-    };
+    println!("{:?}", config_file);
 
-    Self { paths, langs, tools, tools_type, archs, repository }
+    Self {
+      langs: to_vec(LANGS),
+      paths: CLIConfig::build_paths(&config_file),
+      tools: CLIConfig::build_tools(&config_file),
+      tools_type: CLIConfig::build_tools_type(&config_file),
+      repository: CLIConfig::build_repository(&config_file),
+      archs: Archs {
+        globals: to_vec(ARCHS),
+        react: to_vec(ARCHS_REACT),
+        svelte: to_vec(ARCHS_SVELTE),
+        vanilla: to_vec(ARCHS_VANILLA),
+      },
+      templates: CLIConfig::build_templates(&config_file),
+    }
   }
   fn read_config(path: &str) -> Option<ConfigFile> {
+    println!("Reading config file: {}", path);
     match File::open(path) {
       Err(_) => None,
       Ok(file) => {
@@ -68,21 +75,26 @@ impl CLIConfig {
   fn build_paths(config_file: &Option<ConfigFile>) -> Paths {
     let default_paths = Paths {
       root: "./".to_string(),
-      action: "./src/logic/actions".to_string(),
-      store: "./src/logic/stores".to_string(),
-      class: "./src/logic/classes".to_string(),
-      function: "./src/logic/functions".to_string(),
-      hoc: "./src/logic/hocs".to_string(),
-      hook: "./src/logic/hooks".to_string(),
-      page: "./src/routes".to_string(),
-      layout: "./src/routes".to_string(),
+      actions: "./src/logic/actions".to_string(),
+      stores: "./src/logic/stores".to_string(),
+      classes: "./src/logic/classes".to_string(),
+      functions: "./src/logic/functions".to_string(),
+      hocs: "./src/logic/hocs".to_string(),
+      hooks: PathHooks {
+        global: "./src/logic/hooks".to_string(),
+        internal: "hooks".to_string(),
+      },
+      pages: "./src/routes".to_string(),
+      layouts: "./src/routes".to_string(),
       ui: "./src/ui".to_string(),
-      context: "./src/logic/contexts".to_string(),
-      service: "./src/logic/services".to_string(),
-      schema: "./src/logic/schemas".to_string(),
+      contexts: "./src/logic/contexts".to_string(),
+      services: "./src/logic/services".to_string(),
+      schemas: "./src/logic/schemas".to_string(),
       types: "./src/logic/typing".to_string(),
-      svelte_locales: "./static/locales".to_string(),
-      react_locales: "./public/locales".to_string(),
+      locales: PathLocales {
+        react: "./src/ui/locales".to_string(),
+        svelte: "./src/ui/locales".to_string(),
+      },
       routes: "./src/logic/routes".to_string(),
     };
     match config_file.as_ref() {
@@ -91,28 +103,28 @@ impl CLIConfig {
           let root = match &file.root {
             Some(root) => root.clone(),
             None => default_paths.root
-          };
+          }; 
           // Global paths
-          let service = match &paths.globals {
-            Some(globals) => match &globals.service {
+          let services = match &paths.globals {
+            Some(globals) => match &globals.services {
               Some(path) => path.clone(),
-              None => default_paths.service
+              None => default_paths.services
             },
-            None => default_paths.service
+            None => default_paths.services
           };
-          let schema = match &paths.globals {
-            Some(globals) => match &globals.schema {
+          let schemas = match &paths.globals {
+            Some(globals) => match &globals.schemas {
               Some(path) => path.clone(),
-              None => default_paths.schema
+              None => default_paths.schemas
             },
-            None => default_paths.schema
+            None => default_paths.schemas
           };
-          let context = match &paths.globals {
-            Some(globals) => match &globals.context {
+          let contexts = match &paths.globals {
+            Some(globals) => match &globals.contexts {
               Some(path) => path.clone(),
-              None => default_paths.context
+              None => default_paths.contexts
             },
-            None => default_paths.context
+            None => default_paths.contexts
           };
           let types = match &paths.globals {
             Some(globals) => match &globals.types {
@@ -129,26 +141,35 @@ impl CLIConfig {
             None => default_paths.ui
           };
           // React paths
-          let hoc = match &paths.react {
-            Some(react) => match &react.hoc {
+          let hocs = match &paths.react {
+            Some(react) => match &react.hocs {
               Some(path) => path.clone(),
-              None => default_paths.hoc
+              None => default_paths.hocs
             },
-            None => default_paths.hoc
+            None => default_paths.hocs
           };
-          let hook = match &paths.react {
-            Some(react) => match &react.hook {
-              Some(path) => path.clone(),
-              None => default_paths.hook
+          let hooks = match &paths.react {
+            Some(react) => match &react.hooks {
+              Some(path) => PathHooks {
+                global: match &path.global {
+                  Some(path) => path.clone(),
+                  None => default_paths.hooks.global
+                },
+                internal: match &path.internal {
+                  Some(path) => path.clone(),
+                  None => default_paths.hooks.internal
+                },
+              },
+              None => default_paths.hooks
             },
-            None => default_paths.hook
+            None => default_paths.hooks
           };
           let react_locales = match &paths.react {
             Some(react) => match &react.locales {
               Some(path) => path.clone(),
-              None => default_paths.react_locales
+              None => default_paths.locales.react
             },
-            None => default_paths.react_locales
+            None => default_paths.locales.react
           };
           let routes = match &paths.react {
             Some(react) => match &react.routes {
@@ -158,74 +179,76 @@ impl CLIConfig {
             None => default_paths.routes
           };
           // Svelte paths
-          let action = match &paths.svelte {
-            Some(svelte) => match &svelte.action {
+          let actions = match &paths.svelte {
+            Some(svelte) => match &svelte.actions {
               Some(path) => path.clone(),
-              None => default_paths.action
+              None => default_paths.actions
             },
-            None => default_paths.action
+            None => default_paths.actions
           };
-          let store = match &paths.svelte {
-            Some(svelte) => match &svelte.store {
+          let stores = match &paths.svelte {
+            Some(svelte) => match &svelte.stores {
               Some(path) => path.clone(),
-              None => default_paths.store
+              None => default_paths.stores
             },
-            None => default_paths.store
+            None => default_paths.stores
           };
           let svelte_locales = match &paths.svelte {
             Some(svelte) => match &svelte.locales {
               Some(path) => path.clone(),
-              None => default_paths.svelte_locales
+              None => default_paths.locales.svelte
             },
-            None => default_paths.svelte_locales
+            None => default_paths.locales.svelte
           };
-          let layout = match &paths.svelte {
-            Some(svelte) => match &svelte.layout {
+          let layouts = match &paths.svelte {
+            Some(svelte) => match &svelte.layouts {
               Some(path) => path.clone(),
-              None => default_paths.layout
+              None => default_paths.layouts
             },
-            None => default_paths.layout
+            None => default_paths.layouts
           };
-          let page = match &paths.svelte {
-            Some(svelte) => match &svelte.page {
+          let pages = match &paths.svelte {
+            Some(svelte) => match &svelte.pages {
               Some(path) => path.clone(),
-              None => default_paths.page
+              None => default_paths.pages
             },
-            None => default_paths.page
+            None => default_paths.pages
           };
           // Vanilla paths
-          let class = match &paths.vanilla {
-            Some(vanilla) => match &vanilla.class {
+          let classes = match &paths.vanilla {
+            Some(vanilla) => match &vanilla.classes {
               Some(path) => path.clone(),
-              None => default_paths.class
+              None => default_paths.classes
             },
-            None => default_paths.class
+            None => default_paths.classes
           };
-          let function = match &paths.vanilla {
-            Some(vanilla) => match &vanilla.function {
+          let functions = match &paths.vanilla {
+            Some(vanilla) => match &vanilla.functions {
               Some(path) => path.clone(),
-              None => default_paths.function
+              None => default_paths.functions
             },
-            None => default_paths.function
+            None => default_paths.functions
           };
 
           Paths {
             root,
-            action,
-            store,
-            class,
-            function,
-            hoc,
-            hook,
-            page,
-            layout,
+            actions,
+            stores,
+            classes,
+            functions,
+            hocs,
+            hooks,
+            pages,
+            layouts,
             ui,
-            context,
-            service,
-            schema,
+            contexts,
+            services,
+            schemas,
             types,
-            svelte_locales,
-            react_locales,
+            locales: PathLocales {
+              react: react_locales,
+              svelte: svelte_locales,
+            },
             routes,
           }
         },
@@ -262,24 +285,9 @@ impl CLIConfig {
       Some(file) => match &file.tools_type {
         None => default_tools,
         Some(tools_type) => {
-          let react = match &tools_type.react {
-            Some(react) => {
-              react.iter().map(|(tool, _)| tool.clone()).collect()
-            },
-            None => default_tools.react
-          };
-          let svelte = match &tools_type.svelte {
-            Some(svelte) => {
-              svelte.iter().map(|(tool, _)| tool.clone()).collect()
-            },
-            None => default_tools.svelte
-          };
-          let vanilla = match &tools_type.vanilla {
-            Some(vanilla) => {
-              vanilla.iter().map(|(tool, _)| tool.clone()).collect()
-            },
-            None => default_tools.vanilla
-          };
+          let react = default_tool(&tools_type.react, default_tools.react);
+          let svelte = default_tool(&tools_type.svelte, default_tools.svelte);
+          let vanilla = default_tool(&tools_type.vanilla, default_tools.vanilla);
 
           Tools {
             globals: default_tools.globals,
@@ -327,91 +335,37 @@ impl CLIConfig {
       }
     }
   }
-  pub fn get_paths(&self) -> &Paths {
-    &self.paths
-  }
-  pub fn get_tools(&self) -> &Tools {
-    &self.tools
-  }
-  pub fn get_archs(&self) -> &Archs {
-    &self.archs
-  }
-  pub fn get_langs(&self) -> &Vec<String> {
-    &self.langs
+  fn build_templates(config_file: &Option<ConfigFile>) -> Option<ConfigTemplates> {
+    match config_file {
+      None => None,
+      Some(file) => match &file.templates {
+        None => None,
+        Some(templates) => Some(templates.clone())
+      }
+    }
   }
   pub fn get_repository(&self, repo: &str) -> String {
     format!("{}/{}.git", self.repository, repo)
   }
   pub fn find_repository(&self, tool: &Tool, tool_type: &str) -> Option<ConfigRepositoryTool> {
     match tool {
-      Tool::React => {
-        self.tools_type.react.clone()?.iter()
-          .find(|(name, _)| name.as_str() == tool_type)?.1.clone()
-      },
-      Tool::Svelte => {
-        self.tools_type.svelte.clone()?.iter()
-          .find(|(name, _)| name.as_str() == tool_type)?.1.clone()
-      },
-      Tool::Vanilla => {
-        self.tools_type.vanilla.clone()?.iter()
-          .find(|(name, _)| name.as_str() == tool_type)?.1.clone()
-      },
+      Tool::React => search_repository(&self.tools_type.react, tool_type),
+      Tool::Svelte => search_repository(&self.tools_type.svelte, tool_type),
+      Tool::Vanilla => search_repository(&self.tools_type.vanilla, tool_type),
     }
   }
   pub fn projects_options(&self, tool: &Tool) -> Vec<String> {
     match tool {
-      Tool::React => match &self.tools_type.react {
-        None => [].to_vec(),
-        Some(react) => react.iter().map(|(name, _)| name.clone()).collect()
-      },
-      Tool::Svelte => match &self.tools_type.svelte {
-        None => [].to_vec(),
-        Some(svelte) => svelte.iter().map(|(name, _)| name.clone()).collect()
-      },
-      Tool::Vanilla => match &self.tools_type.vanilla {
-        None => [].to_vec(),
-        Some(vanilla) => vanilla.iter().map(|(name, _)| name.clone()).collect()
-      },
+      Tool::React => list_projects(&self.tools_type.react),
+      Tool::Svelte => list_projects(&self.tools_type.svelte),
+      Tool::Vanilla => list_projects(&self.tools_type.vanilla),
     }
   }
   pub fn library_options(&self, tool: &Tool) -> Vec<String> {
     match tool {
-      Tool::React => match &self.tools_type.react {
-        None => [].to_vec(),
-        Some(react) => react.iter().filter_map(|(name, repository)| -> Option<String> {
-          match repository {
-            Some(repo) => match repo.library {
-              Some(_) => Some(name.clone()),
-              None => None
-            },
-            None => None
-          }
-        }).collect()
-      },
-      Tool::Svelte => match &self.tools_type.svelte {
-        None => [].to_vec(),
-        Some(svelte) => svelte.iter().filter_map(|(name, repository)| -> Option<String> {
-          match repository {
-            Some(repo) => match repo.library {
-              Some(_) => Some(name.clone()),
-              None => None
-            },
-            None => None
-          }
-        }).collect()
-      },
-      Tool::Vanilla => match &self.tools_type.vanilla {
-        None => [].to_vec(),
-        Some(vanilla) => vanilla.iter().filter_map(|(name, repository)| -> Option<String> {
-          match repository {
-            Some(repo) => match repo.library {
-              Some(_) => Some(name.clone()),
-              None => None
-            },
-            None => None
-          }
-        }).collect()
-      },
+      Tool::React => list_libraries(&self.tools_type.react),
+      Tool::Svelte => list_libraries(&self.tools_type.svelte),
+      Tool::Vanilla => list_libraries(&self.tools_type.vanilla),
     }
   }
 }
