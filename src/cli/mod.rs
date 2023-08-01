@@ -175,7 +175,7 @@ impl CLIQuestions {
                 format!("{}/{}", paths.pages, name)
               }
             },
-            _ => format!("{}/{}", paths.ui, name)
+            _ => format!("{}/{}", paths.ui, name.to_lowercase())
           };
 
           full_path

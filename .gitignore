@@ -3,4 +3,8 @@
 /static
 src/logic
 src/ui
+src/routes
 .tfverse
+vite.config.*
+svelte.config.*
+tsconfig.*

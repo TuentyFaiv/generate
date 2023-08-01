@@ -21,6 +21,7 @@ pub struct ComponentCreationExports {
   pub styles: String,
   pub responsive: String,
   pub component: String,
+  pub barrel: String,
   pub proptypes: Option<String>,
 }
 
@@ -86,6 +87,7 @@ pub struct PageCreation {
   pub aliases: PageCreationAliases,
   pub router: Option<CreationPaths>,
   pub route: Option<CreationPaths>,
+  pub script: Option<CreationPaths>,
   pub proptypes: Option<CreationPaths>,
   pub i18n: Option<PageCreationI18n>,
   pub exports: PageCreationExports,
@@ -94,12 +96,15 @@ pub struct PageCreation {
 pub struct PageCreationImports {
   pub styles: String,
   pub page: Option<String>,
+  pub locale: Option<String>,
   pub i18n: Option<String>,
 }
 
 pub struct PageCreationAliases {
-  pub ts_file: Option<String>,
-  pub config: String,
+  pub ts_file: Option<CreationPaths>,
+  pub ts_aliases: Option<CreationPaths>,
+  pub config: CreationPaths,
+  pub config_aliases: CreationPaths,
 }
 
 pub struct PageCreationExports {
@@ -107,9 +112,12 @@ pub struct PageCreationExports {
   pub styles: String,
   pub barrel_styles: String,
   pub responsive: String,
+  pub config: String,
+  pub barrel_i18n: Option<String>,
   pub locales: Option<Vec<String>>,
   pub i18n: Option<String>,
   pub proptypes: Option<String>,
+  pub router: Option<String>,
 }
 
 pub struct PageCreationI18n {
@@ -127,6 +135,7 @@ impl PageCreation {
     aliases: PageCreationAliases,
     router: Option<CreationPaths>,
     route: Option<CreationPaths>,
+    script: Option<CreationPaths>,
     proptypes: Option<CreationPaths>,
     i18n: Option<PageCreationI18n>,
     exports: PageCreationExports,
@@ -138,6 +147,7 @@ impl PageCreation {
       styles,
       responsive,
       aliases,
+      script,
       router,
       route,
       proptypes,

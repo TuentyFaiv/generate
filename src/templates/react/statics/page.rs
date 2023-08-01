@@ -1,24 +1,24 @@
 pub static PROPTYPES: &str = r#"// Change for interface if is an object
-export type NAMEState = null;
+export type NAME_CAPITALState = null;
 "#;
 
 pub static PAGE_TS: &str = r#"import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useAppContext } from "@contexts";
 
-import type { NAMEState } from "@typing/pages/NAME_LOWER";
+import type { NAME_CAPITALState } from "@typing/pages/NAME_LOWER";
 
 import { Page } from "@NAME_LOWER/styles";
 
-export default function NAMEPage() {
+export default function NAME_CAPITALPage() {
   const { t } = useTranslation("NAME_LOWER");
   const { global, dispatch } = useAppContext();
-  const [state, setState] = useState<NAMEState>(null);
+  const [state, setState] = useState<NAME_CAPITALState>(null);
 
   return (
-    <Page.NAME>
+    <Page.NAME_CAPITAL>
       {t("seo-title")}
-    </Page.NAME>
+    </Page.NAME_CAPITAL>
   );
 }
 "#;
@@ -29,27 +29,24 @@ import { useAppContext } from "@contexts";
 
 import { Page } from "@NAME_LOWER/styles";
 
-export default function NAMEPage() {
+export default function NAME_CAPITALPage() {
   const { t } = useTranslation("NAME_LOWER");
   const { global, dispatch } = useAppContext();
   const [state, setState] = useState(null);
 
   return (
-    <Page.NAME>
+    <Page.NAME_CAPITAL>
       {t("seo-title")}
-    </Page.NAME>
+    </Page.NAME_CAPITAL>
   );
 }
 "#;
-
-// pub static STYLES_IMPORT: &str = r#"export * as Page from "./NAME.styles";
-// "#;
 
 pub static STYLES: &str = r#"import styled from "@emotion/styled";
 
 import * as responsive from "./NAME.styles.responsive";
 
-export const NAME = styled.div`
+export const NAME_CAPITAL = styled.div`
   ${responsive.NAME_LOWER}
 `;
 "#;
@@ -61,14 +58,11 @@ export const NAME_LOWER = forsize({
   "desktop-mid": css``,
   desktop: css``,
 });
-"#;
 
-// pub static PAGE_IMPORT: &str = r#"const NAME = lazy(() => (import("@NAME_LOWER/page")));
-// // ROUTES"#;
-
-pub static LOCALE: &str = r#"{
-  "seo-title": "NAME"
-}
+export const title = forsize({
+  "desktop-mid": css``,
+  desktop: css``,
+});
 "#;
 
 pub static ROUTER: &str = r#"import { lazy, Suspense } from "react";
@@ -100,16 +94,22 @@ pub static ROUTE: &str = r#"{
         path: "NAME_LOWER",
         element: (
           <Suspense fallback={<LoaderPortal />}>
-            <NAME />
+            <NAME_CAPITAL />
           </Suspense>
         ),
       },
       // NEXT_ROUTE"#;
 
+pub static LOCALE: &str = r#"{
+  "seo-title": "NAME_CAPITAL"
+}
+"#;
+
 pub static I18N: &str = r#"import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
 import LanguageDetector from "i18next-browser-languagedetector";
 import Backend from "i18next-http-backend";
+import { enUS, es } from "date-fns/locale";
 import config from "@config";
 
 i18n
@@ -133,11 +133,13 @@ i18n
     },
   });
 
-export default i18n;
-"#;
+const locales = {
+  "en-US": enUS,
+  es,
+};
 
-// pub static I18N_LOCALE: &str = r#""NAME_LOWER",
-//       // NEXT_LOCALE"#;
+export { i18n, locales };
+"#;
 
 pub static TS_CONFIG: &str = r#"{
   "compilerOptions": {
@@ -237,7 +239,7 @@ pub static TS_CONFIG: &str = r#"{
 }
 "#;
 
-pub static TS_ALIAS: &str = r#"// UI NAME
+pub static TS_ALIAS: &str = r#"// UI NAME_CAPITAL
       "@NAME_LOWER/hooks": [
         "src/ui/NAME_LOWER/hooks/index.ts"
       ],
@@ -303,7 +305,7 @@ export default defineConfig({
 });
 "#;
 
-pub static VITE_ALIAS: &str = r#"// UI NAME
+pub static VITE_ALIAS: &str = r#"// UI NAME_CAPITAL
       "@NAME_LOWER/hooks": resolve("src/ui/NAME_LOWER/hooks/index.ts"),
       "@NAME_LOWER/atoms": resolve("src/ui/NAME_LOWER/atoms/index.ts"),
       "@NAME_LOWER/molecules": resolve("src/ui/NAME_LOWER/molecules/index.ts"),
@@ -311,5 +313,4 @@ pub static VITE_ALIAS: &str = r#"// UI NAME
       "@NAME_LOWER/styles": resolve("src/ui/NAME_LOWER/styles/index.ts"),
       "@NAME_LOWER/page": resolve("src/ui/NAME_LOWER/+page.tsx"),
       "@NAME_LOWER/layout": resolve("src/ui/NAME_LOWER/+layout.tsx"),
-      // NEXT_ALIAS
-"#;
+      // NEXT_ALIAS"#;
