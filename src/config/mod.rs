@@ -93,8 +93,8 @@ impl CLIConfig {
       schemas: "./src/logic/schemas".to_string(),
       types: "./src/logic/typing".to_string(),
       locales: PathLocales {
-        react: "./src/ui/locales".to_string(),
-        svelte: "./src/ui/locales".to_string(),
+        react: "./public/locales".to_string(),
+        svelte: "./static/locales".to_string(),
       },
       routes: "./src/logic/routes".to_string(),
     };

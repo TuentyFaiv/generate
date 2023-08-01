@@ -179,6 +179,10 @@ impl CLIGlobalTemplates {
       None => Err(anyhow!(self.error.clone()))
     }
   }
+  pub fn generate_page(&self) -> Result<()> {
+
+    Ok(())
+  }
   pub fn generate_schema(&self) -> Result<()> {
     // For schema generation
     use statics::schema::{PROPTYPES, SCHEMA, SCHEMA_TS};

@@ -1,6 +1,6 @@
 use std::io::{Write, Read, BufReader};
 use std::fs::File;
-use anyhow::{Result};
+use anyhow::Result;
 
 use super::statics::page::{PROPTYPES, PAGE_TS, PAGE};
 use super::statics::page::{STYLES, STYLES_RESPONSIVE, STYLES_IMPORT};

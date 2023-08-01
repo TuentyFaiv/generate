@@ -42,8 +42,8 @@ export default function NAMEPage() {
 }
 "#;
 
-pub static STYLES_IMPORT: &str = r#"export * as Page from "./NAME.styles";
-"#;
+// pub static STYLES_IMPORT: &str = r#"export * as Page from "./NAME.styles";
+// "#;
 
 pub static STYLES: &str = r#"import styled from "@emotion/styled";
 
@@ -57,15 +57,14 @@ export const NAME = styled.div`
 pub static STYLES_RESPONSIVE: &str = r#"import { css } from "@emotion/react";
 import { forsize } from "@mixins";
 
-export const NAME_LOWER = css`
-${forsize({ size: "desktop-mid", content: css`
-
-` })}
-`;
+export const NAME_LOWER = forsize({
+  "desktop-mid": css``,
+  desktop: css``,
+});
 "#;
 
-pub static PAGE_IMPORT: &str = r#"const NAME = lazy(() => (import("@NAME_LOWER/page")));
-// ROUTES"#;
+// pub static PAGE_IMPORT: &str = r#"const NAME = lazy(() => (import("@NAME_LOWER/page")));
+// // ROUTES"#;
 
 pub static LOCALE: &str = r#"{
   "seo-title": "NAME"
@@ -137,8 +136,8 @@ i18n
 export default i18n;
 "#;
 
-pub static I18N_LOCALE: &str = r#""NAME_LOWER",
-      // NEXT_LOCALE"#;
+// pub static I18N_LOCALE: &str = r#""NAME_LOWER",
+//       // NEXT_LOCALE"#;
 
 pub static TS_CONFIG: &str = r#"{
   "compilerOptions": {
@@ -260,8 +259,7 @@ pub static TS_ALIAS: &str = r#"// UI NAME
       "@NAME_LOWER/layout": [
         "src/ui/NAME_LOWER/+layout.tsx"
       ],
-      // NEXT_ALIAS
-"#;
+      // NEXT_ALIAS"#;
 
 pub static VITE_CONFIG: &str = r#"import { resolve } from "path";
 import { defineConfig } from "vite";

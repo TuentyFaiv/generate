@@ -1,5 +1,6 @@
 /target
 /public
+/static
 src/logic
 src/ui
 .tfverse

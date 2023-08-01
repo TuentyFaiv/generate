@@ -2,6 +2,7 @@ use std::fs::create_dir_all;
 use anyhow::{Result, anyhow};
 use console::style;
 
+use crate::create::structs::{PageCreationAliases, PageCreationI18n};
 use crate::statics::OK;
 use crate::templates;
 use crate::utils::{change_case, transform};
@@ -11,7 +12,14 @@ use crate::templates::global::CLIGlobalTemplates;
 use crate::templates::react::CLIReactTemplates;
 use crate::templates::svelte::CLISvelteTemplates;
 
-use super::structs::{ComponentCreation, ComponentCreationPaths, ComponentExports};
+use super::structs::{
+  CreationPaths,
+  ComponentCreation,
+  ComponentCreationExports,
+  PageCreation,
+  PageCreationImports,
+  PageCreationExports,
+};
 
 pub struct CLIGlobalCreation {
   answers: Answers,
@@ -57,7 +65,7 @@ impl CLIGlobalCreation {
         };
         
         let proptypes = if is_ts {
-          Some(ComponentCreationPaths {
+          Some(CreationPaths {
             template: format!("/proptypes{ext}"),
             default: PROPTYPES.to_string(),
           })
@@ -66,21 +74,21 @@ impl CLIGlobalCreation {
         Ok(ComponentCreation::new(
           &self.config.templates,
           format!("export {{ default as {name} }} from \"./{name}/{name}\";\n"),
-          ComponentCreationPaths {
+          CreationPaths {
             template: format!("/styles{ext}"),
             default: STYLES.to_string(),
           },
-          ComponentCreationPaths {
+          CreationPaths {
             template: format!("/component{ext}x"),
             default: if is_ts { COMPONENT_TS.to_string() } else { COMPONENT.to_string() },
           },
-          ComponentCreationPaths {
+          CreationPaths {
             template: format!("/styles.responsive{ext}"),
             default: STYLES_RESPONSIVE.to_string(),
           },
           proptypes,
           None,
-          ComponentExports {
+          ComponentCreationExports {
             component: format!("{full_path}/{name}{ext}x"),
             styles: format!("{full_path}/{name}.styles{ext}"),
             responsive: format!("{full_path}/{name}.styles.responsive{ext}"),
@@ -99,12 +107,12 @@ impl CLIGlobalCreation {
         };
 
         let proptypes = if is_ts {
-          Some(ComponentCreationPaths {
+          Some(CreationPaths {
             template: format!("/proptypes{ext}"),
             default: PROPTYPES.to_string(),
           })
         } else { None };
-        let script = Some(ComponentCreationPaths {
+        let script = Some(CreationPaths {
           template: format!("/script{ext}.svelte"),
           default: if is_ts { SCRIPT_TS.to_string() } else { SCRIPT.to_string() }
         });
@@ -112,21 +120,21 @@ impl CLIGlobalCreation {
         Ok(ComponentCreation::new(
           &self.config.templates,
           format!("export {{ default as {name} }} from \"./{name}/{name}.svelte\";\n"),
-          ComponentCreationPaths {
+          CreationPaths {
             template: format!("/styles{ext}"),
             default: STYLES.to_string(),
           },
-          ComponentCreationPaths {
+          CreationPaths {
             template: "/component.svelte".to_string(),
             default: COMPONENT.to_string(),
           },
-          ComponentCreationPaths {
+          CreationPaths {
             template: format!("/styles.responsive{ext}"),
             default: STYLES_RESPONSIVE.to_string(),
           },
           proptypes,
           script,
-          ComponentExports {
+          ComponentCreationExports {
             component: format!("{full_path}/{name}.svelte"),
             styles: format!("{full_path}/{name}.styles{ext}"),
             responsive: format!("{full_path}/{name}.styles.responsive{ext}"),
@@ -157,25 +165,46 @@ impl CLIGlobalCreation {
     let Answers { name, tool, path, language, .. } = &self.answers;
     let paths = &self.config.paths;
 
-    let is_ts = language == "typescript";
+    let i18n = true;
+    let is_ts = language.as_str() == "typescript";
+    let ext = if is_ts { ".ts".to_string() } else { ".js".to_string() };
     let name_capitalize = change_case(&name, None);
-    let path_proptypes = format!("{}/pages", paths.types);
-    let path_locales = if tool == &Tool::Svelte {
-      &paths.locales.svelte
-    } else {
-      &paths.locales.react
-    };
+
+    let path_ui = format!("{}/{}", paths.ui, name).to_lowercase();
+    let mut path_proptypes = String::new();
+    let mut path_locales = &String::new();
+    let mut path_i18n = String::new();
 
     create_dir_all(path).unwrap_or_else(|why| {
       println!("! {:?}", why.kind());
     });
-    create_dir_all(format!("{path_locales}/en-US")).unwrap_or_else(|why| {
+    create_dir_all(format!("{path_ui}/styles")).unwrap_or_else(|why| {
       println!("! {:?}", why.kind());
     });
-    create_dir_all(format!("{path_locales}/es")).unwrap_or_else(|why| {
-      println!("! {:?}", why.kind());
-    });
+
+    if i18n {
+      path_locales = if tool == &Tool::Svelte {
+        &paths.locales.svelte
+      } else {
+        &paths.locales.react
+      };
+      path_i18n = if tool == &Tool::Svelte {
+        format!("{}/i18n", paths.stores)
+      } else {
+        format!("{}/i18n", paths.contexts)
+      };
+      create_dir_all(format!("{path_locales}/en-US")).unwrap_or_else(|why| {
+        println!("! {:?}", why.kind());
+      });
+      create_dir_all(format!("{path_locales}/es")).unwrap_or_else(|why| {
+        println!("! {:?}", why.kind());
+      });
+      create_dir_all(path_i18n).unwrap_or_else(|why| {
+        println!("! {:?}", why.kind());
+      });
+    }
     if is_ts {
+      path_proptypes = format!("{}/pages", paths.types);
       create_dir_all(&path_proptypes).unwrap_or_else(|why| {
         println!("! {:?}", why.kind());
       });
@@ -183,18 +212,29 @@ impl CLIGlobalCreation {
 
     let result = match tool {
       Tool::React => {
-        let path_i18n_context = format!("{}/i18n", paths.contexts);
+        use templates::react::statics::page::{
+          PAGE,
+          PAGE_TS,
+          PROPTYPES,
+          STYLES,
+          STYLES_RESPONSIVE,
+          ROUTER,
+          ROUTE,
+          LOCALE,
+          I18N,
+        };
+        // let path_i18n_context = format!("{}/i18n", paths.contexts);
 
-        create_dir_all(format!("{path}/styles")).unwrap_or_else(|why| {
-          println!("! {:?}", why.kind());
-        });
-        create_dir_all(&paths.routes).unwrap_or_else(|why| {
-          println!("! {:?}", why.kind());
-        });
-        create_dir_all(&path_i18n_context).unwrap_or_else(|why| {
-          println!("! {:?}", why.kind());
-        });
-        self.react.generate_page()
+        // create_dir_all(format!("{path}/styles")).unwrap_or_else(|why| {
+        //   println!("! {:?}", why.kind());
+        // });
+        // create_dir_all(&paths.routes).unwrap_or_else(|why| {
+        //   println!("! {:?}", why.kind());
+        // });
+        // create_dir_all(&path_i18n_context).unwrap_or_else(|why| {
+        //   println!("! {:?}", why.kind());
+        // });
+        // self.react.generate_page()
         // react::page::generate(
         //   path,
         //   path_proptypes.as_str(),
@@ -204,20 +244,77 @@ impl CLIGlobalCreation {
         //   &name_capitalize.as_str(),
         //   is_ts
         // )?;
+        let proptypes = if is_ts {
+          Some(CreationPaths {
+            template: format!("/proptypes{ext}"),
+            default: PROPTYPES.to_string(),
+          })
+        } else { None };
+
+        let i18n_templates = if i18n {
+          Some(PageCreationI18n {
+            locale: CreationPaths {
+              template: "/locale.json".to_string(),
+              default: LOCALE.to_string()
+            },
+            context: CreationPaths {
+              template: format!("/i18n{ext}"),
+              default: I18N.to_string()
+            }
+          })
+        } else { None };
+
+        Ok(PageCreation::new(
+          &self.config.templates,
+          PageCreationImports {
+            page: Some(format!("const {name} = lazy(() => (import(\"@{}/page\")));\n// ROUTES", name.to_lowercase())),
+            styles: format!("export * as Page from \"./{name}.styles\";\n"),
+            i18n: if i18n { Some(format!("\"{}\",\n      // NEXT_LOCALE", name.to_lowercase())) } else { None }
+          },
+          CreationPaths {
+            template: format!("/page{ext}x"),
+            default: if is_ts { PAGE_TS.to_string() } else { PAGE.to_string() }
+          },
+          CreationPaths {
+            template: format!("/styles{ext}"),
+            default: STYLES.to_string()
+          },
+          CreationPaths {
+            template: format!("/styles.responsive{ext}"),
+            default: STYLES_RESPONSIVE.to_string()
+          },
+          PageCreationAliases {
+            config: format!("./vite.config{ext}"),
+            ts_file: Some("./tsconfig.json".to_string())
+          },
+          Some(CreationPaths {
+            template: format!("/router{ext}"),
+            default: ROUTER.to_string()
+          }),
+          Some(CreationPaths {
+            template: format!("/route{ext}"),
+            default: ROUTE.to_string()
+          }),
+          proptypes,
+          i18n_templates,
+          PageCreationExports {
+            
+          }
+        ))
       },
       Tool::Svelte => {
-        let path_i18n_store = format!("{}/i18n", paths.stores);
-        let path_ui = format!("{}/{}", paths.ui, name).to_lowercase();
-        create_dir_all(format!("{path_ui}/styles")).unwrap_or_else(|why| {
-          println!("! {:?}", why.kind());
-        });
-        create_dir_all(&paths.pages).unwrap_or_else(|why| {
-          println!("! {:?}", why.kind());
-        });
-        create_dir_all(&path_i18n_store).unwrap_or_else(|why| {
-          println!("! {:?}", why.kind());
-        });
-        self.svelte.generate_page()
+        // let path_i18n_store = format!("{}/i18n", paths.stores);
+        // let path_ui = format!("{}/{}", paths.ui, name).to_lowercase();
+        // create_dir_all(format!("{path_ui}/styles")).unwrap_or_else(|why| {
+        //   println!("! {:?}", why.kind());
+        // });
+        // create_dir_all(&paths.pages).unwrap_or_else(|why| {
+        //   println!("! {:?}", why.kind());
+        // });
+        // create_dir_all(&path_i18n_store).unwrap_or_else(|why| {
+        //   println!("! {:?}", why.kind());
+        // });
+        // self.svelte.generate_page()
         // svelte::page::generate(
         //   path,
         //   path_proptypes.as_str(),
@@ -227,6 +324,7 @@ impl CLIGlobalCreation {
         //   &name_capitalize.as_str(),
         //   is_ts
         // )?;
+        Ok(())
       }
       Tool::Vanilla => Err(anyhow!(self.error.clone())),
     };
