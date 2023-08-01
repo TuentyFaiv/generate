@@ -1,5 +1,3 @@
-pub mod statics;
-
 use std::io::{Write, Read, BufReader};
 use std::fs::File;
 use anyhow::Result;
@@ -15,10 +13,6 @@ pub struct CLIReactTemplates {
 impl CLIReactTemplates {
   pub fn new(config: CLIConfig, answers: Answers) -> Self {
     Self { config, answers }
-  }
-  pub fn generate_page(&self) -> Result<()> {
-    println!("generate_page");
-    Ok(())
   }
   pub fn generate_layout(&self) -> Result<()> {
     println!("generate_layout");

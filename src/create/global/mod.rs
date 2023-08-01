@@ -3,8 +3,8 @@ use anyhow::{Result, anyhow};
 use console::style;
 
 use crate::create::structs::{PageCreationAliases, PageCreationI18n};
+use crate::statics;
 use crate::statics::OK;
-use crate::templates;
 use crate::utils::{change_case, transform};
 use crate::config::CLIConfig;
 use crate::cli::{utils::done, enums::Tool, structs::Answers};
@@ -56,7 +56,7 @@ impl CLIGlobalCreation {
 
     let component = match tool {
       Tool::React => {
-        use templates::react::statics::component::{
+        use statics::react::component::{
           COMPONENT,
           COMPONENT_TS,
           PROPTYPES,
@@ -98,7 +98,7 @@ impl CLIGlobalCreation {
         ))
       },
       Tool::Svelte => {
-        use templates::svelte::statics::component::{
+        use statics::svelte::component::{
           COMPONENT,
           PROPTYPES,
           SCRIPT,
@@ -214,7 +214,7 @@ impl CLIGlobalCreation {
 
     let page = match tool {
       Tool::React => {
-        use templates::react::statics::page::{
+        use statics::react::page::{
           PAGE,
           PAGE_TS,
           PROPTYPES,
@@ -320,7 +320,7 @@ impl CLIGlobalCreation {
         ))
       },
       Tool::Svelte => {
-        use templates::svelte::statics::page::{
+        use statics::svelte::page::{
           PAGE,
           SCRIPT,
           SCRIPT_TS,

@@ -1,3 +1,7 @@
+pub mod global;
+pub mod react;
+pub mod svelte;
+
 use console::Emoji;
 
 use crate::config::file::RepositoryTool;

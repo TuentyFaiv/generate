@@ -1,5 +1,3 @@
-mod statics;
-
 use std::io::{Write, Read, BufReader};
 use std::fs::File;
 use std::time::Duration;
@@ -7,6 +5,7 @@ use anyhow::{Result, anyhow};
 use indicatif::{ProgressBar, ProgressStyle};
 
 use crate::statics::NOT_IMPLEMENTED;
+use crate::statics::global;
 use crate::utils::{change_case, read_path};
 use crate::cli::enums::{Tool, ArchType};
 use crate::cli::structs::Answers;
@@ -474,8 +473,8 @@ impl CLIGlobalTemplates {
   }
   pub fn generate_schema(&self) -> Result<()> {
     // For schema generation
-    use statics::schema::{PROPTYPES, SCHEMA, SCHEMA_TS};
-    use statics::schema::{NEW_IMPORT, TYPE_EXPORT};
+    use global::schema::{PROPTYPES, SCHEMA, SCHEMA_TS};
+    use global::schema::{NEW_IMPORT, TYPE_EXPORT};
 
     let path = "";
     let path_proptypes = "";
@@ -555,8 +554,8 @@ impl CLIGlobalTemplates {
   }
   pub fn generate_service(&self) -> Result<()> {
     // For service generation
-    use statics::service::{PROPTYPES, SERVICE, SERVICE_TS};
-    use statics::service::{SERVICE_IMPORT, TYPE_EXPORT, INSTANCES};
+    use global::service::{PROPTYPES, SERVICE, SERVICE_TS};
+    use global::service::{SERVICE_IMPORT, TYPE_EXPORT, INSTANCES};
 
     let path = "";
     let path_proptypes = "";
