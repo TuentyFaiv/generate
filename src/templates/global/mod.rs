@@ -9,7 +9,7 @@ use crate::statics::global;
 use crate::utils::{change_case, read_path};
 use crate::cli::enums::{Tool, ArchType};
 use crate::cli::structs::Answers;
-use crate::create::structs::{ComponentCreation, PageCreation};
+use crate::create::structs::{ComponentCreation, PageCreation, LayoutCreation};
 use crate::config::CLIConfig;
 
 pub struct CLIGlobalTemplates {
@@ -72,22 +72,7 @@ impl CLIGlobalTemplates {
     styles_file.write_all(styles.as_bytes())?;
     responsive_file.write_all(responsive.as_bytes())?;
 
-    if let Some(template_props) = templates.proptypes {
-      let mut proptypes = read_path(
-        &template_path,
-        template_props.template,
-        template_props.default,
-      );
-      proptypes = proptypes.replace("NAME_LOWER", &name.to_lowercase());
-      proptypes = proptypes.replace("NAME", name);
-      if let Some(export_props) = templates.exports.proptypes {
-        let mut proptypes_file = File::create(export_props)?;
-        proptypes_file.write_all(proptypes.as_bytes())?;
-      }
-    }
-
     let index_path = templates.exports.barrel;
-
     match File::open(&index_path) {
       Ok(index) => {
         let mut buf_reader = BufReader::new(&index);
@@ -107,6 +92,20 @@ impl CLIGlobalTemplates {
         let mut index = File::create(&index_path)?;
 
         index.write_all(component_import.as_bytes())?;
+      }
+    }
+
+    if let Some(template_props) = templates.proptypes {
+      let mut proptypes = read_path(
+        &template_path,
+        template_props.template,
+        template_props.default,
+      );
+      proptypes = proptypes.replace("NAME_LOWER", &name.to_lowercase());
+      proptypes = proptypes.replace("NAME", name);
+      if let Some(export_props) = templates.exports.proptypes {
+        let mut proptypes_file = File::create(export_props)?;
+        proptypes_file.write_all(proptypes.as_bytes())?;
       }
     }
 
@@ -466,6 +465,101 @@ impl CLIGlobalTemplates {
             tsconfig_file.write_all(tsconfig.as_bytes())?;
           }
         }
+      }
+    }
+
+    Ok(())
+  }
+  pub fn generate_layout(&self, templates: LayoutCreation, tool: &Tool) -> Result<()> {
+    let name = self.answers.name.as_str();
+    let nampe_capital = change_case(name, None);
+
+    let template_path = match tool {
+      Tool::React => templates.react_path(),
+      Tool::Svelte => templates.svelte_path(),
+      Tool::Vanilla => templates.vanilla_path(),
+    };
+
+    let mut styles = read_path(
+      &template_path,
+      templates.styles.template,
+      templates.styles.default
+    );
+    let mut responsive = read_path(
+      &template_path,
+      templates.responsive.template,
+      templates.responsive.default
+    );
+    let mut layout = read_path(
+      &template_path,
+      templates.layout.template,
+      templates.layout.default
+    );
+    if let Some(template_script) = templates.script {
+      let script = read_path(
+        &template_path,
+        template_script.template,
+        template_script.default,
+      );
+      layout = layout.replace("SCRIPT", &script);
+    }
+
+    let styles_import = templates.import;
+
+    layout = layout.replace("NAME_CAPITAL", &nampe_capital);
+    layout = layout.replace("NAME_LOWER", &name.to_lowercase());
+    layout = layout.replace("NAME", name);
+    styles = styles.replace("NAME_CAPITAL", &nampe_capital);
+    styles = styles.replace("NAME_LOWER", &name.to_lowercase());
+    styles = styles.replace("NAME", name);
+    responsive = responsive.replace("NAME_CAPITAL", &nampe_capital);
+    responsive = responsive.replace("NAME_LOWER", &name.to_lowercase());
+    responsive = responsive.replace("NAME", name);
+
+    let mut layout_file = File::create(templates.exports.layout)?;
+    let mut styles_file = File::create(templates.exports.styles)?;
+    let mut responsive_file = File::create(templates.exports.responsive)?;
+
+    layout_file.write_all(layout.as_bytes())?;
+    styles_file.write_all(styles.as_bytes())?;
+    responsive_file.write_all(responsive.as_bytes())?;
+
+    let styles_index = templates.exports.barrel_styles;
+    match File::open(&styles_index) {
+      Ok(index_file) => {
+        let mut buf_reader = BufReader::new(&index_file);
+        let mut index_content = String::new();
+        buf_reader.read_to_string(&mut index_content)?;
+
+        if !index_content.contains(&styles_import) {
+          index_content = [index_content, styles_import].join("");
+
+          let mut new_index = File::create(&styles_index)?;
+    
+          new_index.write_all(index_content.as_bytes())?;
+        }
+      },
+      Err(_) => {
+        let mut index_file = File::create(&styles_index)?;
+
+        index_file.write_all(styles_import.as_bytes())?;
+      }
+    }
+
+    if let Some(template_props) = templates.proptypes {
+      let mut proptypes = read_path(
+        &template_path,
+        template_props.template,
+        template_props.default,
+      );
+
+      proptypes = proptypes.replace("NAME_CAPITAL", &nampe_capital);
+      proptypes = proptypes.replace("NAME_LOWER", &name.to_lowercase());
+      proptypes = proptypes.replace("NAME", name);
+
+      if let Some(export_props) = templates.exports.proptypes {
+        let mut proptypes_file = File::create(export_props)?;
+        proptypes_file.write_all(proptypes.as_bytes())?;
       }
     }
 

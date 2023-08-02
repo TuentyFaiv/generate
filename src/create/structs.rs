@@ -184,3 +184,75 @@ impl PageCreation {
     }
   }
 }
+
+// Layout
+pub struct LayoutCreation {
+  templates: Option<ConfigTemplates>,
+  pub import: String,
+  pub layout: CreationPaths,
+  pub styles: CreationPaths,
+  pub responsive: CreationPaths,
+  pub proptypes: Option<CreationPaths>,
+  pub script: Option<CreationPaths>,
+  pub exports: LayoutCreationExports,
+}
+
+pub struct LayoutCreationExports {
+  pub barrel_styles: String,
+  pub layout: String,
+  pub styles: String,
+  pub responsive: String,
+  pub proptypes: Option<String>,
+}
+
+impl LayoutCreation {
+  pub fn new(
+    templates: &Option<ConfigTemplates>,
+    import: String,
+    layout: CreationPaths,
+    styles: CreationPaths,
+    responsive: CreationPaths,
+    proptypes: Option<CreationPaths>,
+    script: Option<CreationPaths>,
+    exports: LayoutCreationExports,
+  ) -> Self {
+    Self {
+      templates: templates.clone(),
+      import,
+      layout,
+      styles,
+      responsive,
+      proptypes,
+      script,
+      exports,
+    }
+  }
+
+  pub fn react_path(&self) -> Option<String> {
+    match &self.templates {
+      None => None,
+      Some(templates) => match &templates.react {
+        None => None,
+        Some(react) => react.layout.clone()
+      }
+    }
+  }
+  pub fn svelte_path(&self) -> Option<String> {
+    match &self.templates {
+      None => None,
+      Some(templates) => match &templates.svelte {
+        None => None,
+        Some(svelte) => svelte.layout.clone()
+      }
+    }
+  }
+  pub fn vanilla_path(&self) -> Option<String> {
+    match &self.templates {
+      None => None,
+      Some(templates) => match &templates.vanilla {
+        None => None,
+        Some(vanilla) => vanilla.layout.clone()
+      }
+    }
+  }
+}
