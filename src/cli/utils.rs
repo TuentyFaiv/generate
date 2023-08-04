@@ -1,4 +1,5 @@
-use std::io::{self, Write};
+use std::io::{self, Write, Error};
+use std::fs::read_dir;
 use std::process::Command;
 
 use anyhow::Result;
@@ -15,6 +16,25 @@ pub fn sure() -> Result<bool> {
 		.wait_for_newline(true)
 		.interact()?;
 	Ok(accept)
+}
+
+pub fn show_namespaces(path_ui: &String) -> Result<String> {
+	let entries = match read_dir(path_ui) {
+		Ok(paths) => paths.map(|entry| entry.map(|entry| entry.path()))
+			.map(|path| path.map(|path_ns| {
+				path_ns.to_string_lossy().to_string().replace(format!("{path_ui}/").as_str(), "")
+			}))
+			.collect::<Result<Vec<_>, Error>>()?,
+		Err(_) => ["sharing".to_owned()].to_vec()
+	};
+
+	let namespace = choose_option("Namespace:", &[entries, ["custom".to_string()].to_vec()].concat())?;
+
+	if namespace.as_str() == "custom" {
+		Ok(input("New namespace:", "namespace")?)
+	} else {
+		Ok(namespace)
+	}
 }
 
 pub fn arg_or(prompt: &str, arg: Option<String>, options: &Vec<String>) -> Result<String> {

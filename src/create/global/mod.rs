@@ -21,6 +21,8 @@ use super::structs::{
   PageCreationExports,
   LayoutCreation,
   LayoutCreationExports,
+  SchemaCreation,
+  SchemaCreationExports,
 };
 
 pub struct CLIGlobalCreation {
@@ -43,7 +45,7 @@ impl CLIGlobalCreation {
   pub fn make_component(&self) -> Result<String> {
     let Answers { name, path, tool, tool_type, language, .. } = &self.answers;
     let is_ts = language.as_str() == "typescript";
-    let ext = if is_ts { ".ts".to_string() } else { ".js".to_string() };
+    let ext = if is_ts { ".ts".to_owned() } else { ".js".to_owned() };
 
     let full_path = match tool_type {
       Some(tool_type) => format!("{path}/{tool_type}/{name}"),
@@ -149,7 +151,7 @@ impl CLIGlobalCreation {
       Tool::Vanilla => Err(anyhow!(self.error.clone())),
     };
 
-    match self.global.generate_component(component?, tool) {
+    match self.global.generate_component(component?) {
       Ok(_) => {
         done();
         Ok(format!("{} {}", OK, style(format!("Component {name} created at {full_path}")).cyan()))
@@ -171,14 +173,14 @@ impl CLIGlobalCreation {
 
     let i18n = true;
     let is_ts = language.as_str() == "typescript";
-    let ext = if is_ts { ".ts".to_string() } else { ".js".to_string() };
+    let ext = if is_ts { ".ts".to_owned() } else { ".js".to_owned() };
     let name_capitalize = change_case(&name, None);
 
     let path_ui = format!("{}/{}", paths.ui, name.to_lowercase());
     let mut path_proptypes = String::new();
     let mut path_locales = &String::new();
     let mut path_i18n = String::new();
-    let i18n_locales = ["en-US".to_string(), "es".to_string()].to_vec();
+    let i18n_locales = ["en-US".to_owned(), "es".to_owned()].to_vec();
 
     create_dir_all(path).unwrap_or_else(|why| {
       println!("! {:?}", why.kind());
@@ -418,7 +420,7 @@ impl CLIGlobalCreation {
       Tool::Vanilla => Err(anyhow!(self.error.clone())),
     };
 
-    match self.global.generate_page(page?, tool) {
+    match self.global.generate_page(page?) {
       Ok(_) => {
         done();
         Ok(format!("{} {}", OK, style(format!("Page {name_capitalize} created at {path}")).cyan()))
@@ -431,7 +433,7 @@ impl CLIGlobalCreation {
     let paths = &self.config.paths;
 
     let is_ts = language.as_str() == "typescript";
-    let ext = if is_ts { ".ts".to_string() } else { ".js".to_string() };
+    let ext = if is_ts { ".ts".to_owned() } else { ".js".to_owned() };
     let name_capitalize = change_case(&name, None);
 
     let path_ui = format!("{}/{}", paths.ui, name.to_lowercase());
@@ -543,7 +545,7 @@ impl CLIGlobalCreation {
       Tool::Vanilla => Err(anyhow!(self.error.clone())),
     };
 
-    match self.global.generate_layout(layout?, tool) {
+    match self.global.generate_layout(layout?) {
       Ok(_) => {
         done();
         Ok(format!( "{} {}", OK, style(format!("Layout {name_capitalize} created at {path}")).cyan()))
@@ -552,38 +554,98 @@ impl CLIGlobalCreation {
     }
   }
   pub fn make_schema(&self) -> Result<String> {
-    let Answers { name, path, language, .. } = &self.answers;
+    let Answers { name, path, language, tool, .. } = &self.answers;
     let paths = &self.config.paths;
 
-    let name_dash = transform(&name, Some("dash"));
+    let is_ts = language == "typescript";
+    let ext = if is_ts { ".ts".to_owned() } else { ".js".to_owned() };
     let name_capitalize = change_case(&transform(&name, None), None);
     let name_camel = change_case(&name_capitalize, Some("camel"));
-    let path_proptypes = format!("{}/schemas", paths.types);
     let namespace = *path.split('/').collect::<Vec<&str>>().last().unwrap();
-    let is_ts = language == "typescript";
-    
+
+    let mut path_proptypes = String::new();
+
     create_dir_all(path).unwrap_or_else(|why| {
       println!("! {:?}", why.kind());
     });
+
     if is_ts {
+      path_proptypes = format!("{}/schemas", paths.types);
       create_dir_all(&path_proptypes).unwrap_or_else(|why| {
         println!("! {:?}", why.kind());
       });
     }
 
-    self.global.generate_schema()?;
+    let schema = match tool {
+      Tool::React => {
+        use statics::react::schema::{
+          SCHEMA,
+          SCHEMA_TS,
+          PROPTYPES,
+        };
 
-    // global::schema::generate(
-    //   &path.as_str(),
-    //   path_proptypes.as_str(),
-    //   &name_capitalize.as_str(),
-    //   &name_dash.to_uppercase().as_str(),
-    //   namespace,
-    //   is_ts
-    // )?;
+        let proptypes = if is_ts {
+          Some(CreationPaths {
+            template: format!("/proptypes{ext}"),
+            default: PROPTYPES.to_owned(),
+          })
+        } else { None };
 
-    done();
-    Ok(format!("{} {}", OK, style(format!("Schema {name_camel} created at {path}")).cyan()))
+        Ok(SchemaCreation::new(
+          &self.config.templates,
+          format!("export * from \"./{name_camel}\";\n"),
+          CreationPaths {
+            template: format!("/schema{ext}"),
+            default: if is_ts { SCHEMA_TS.to_owned() } else { SCHEMA.to_owned() }
+          },
+          proptypes,
+          SchemaCreationExports {
+            barrel: format!("{path}/index{ext}"),
+            schema: format!("{path}/{name_camel}{ext}"),
+            proptypes: if is_ts { Some(format!("{path_proptypes}/{namespace}{ext}")) } else { None },
+            values: Some(format!("{name_capitalize}Values,\n  // NEXT_TYPE"))
+          }
+        ))
+      },
+      Tool::Svelte => {
+        use statics::svelte::schema::{
+          SCHEMA,
+          PROPTYPES,
+        };
+
+        let proptypes = if is_ts {
+          Some(CreationPaths {
+            template: format!("/proptypes{ext}"),
+            default: PROPTYPES.to_owned(),
+          })
+        } else { None };
+
+        Ok(SchemaCreation::new(
+          &self.config.templates,
+          format!("export * from \"./{name_camel}\";\n"),
+          CreationPaths {
+            template: format!("/schema{ext}"),
+            default: SCHEMA.to_owned(),
+          },
+          proptypes,
+          SchemaCreationExports {
+            barrel: format!("{path}/index{ext}"),
+            schema: format!("{path}/{name_camel}{ext}"),
+            proptypes: if is_ts { Some(format!("{path_proptypes}/{namespace}{ext}")) } else { None },
+            values: None
+          }
+        ))
+      },
+      Tool::Vanilla => Err(anyhow!(self.error.clone())),
+    };
+
+    match self.global.generate_schema(schema?) {
+      Ok(_) => {
+        done();
+        Ok(format!("{} {}", OK, style(format!("Schema {name_capitalize} created at {path}")).cyan()))
+      },
+      Err(error) => Err(error)
+    }
   }
   pub fn make_service(&self) -> Result<String> {
     let Answers { name, path, language, .. } = &self.answers;

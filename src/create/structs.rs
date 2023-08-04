@@ -256,3 +256,65 @@ impl LayoutCreation {
     }
   }
 }
+
+// Schema
+pub struct SchemaCreation {
+  templates: Option<ConfigTemplates>,
+  pub import: String,
+  pub schema: CreationPaths,
+  pub proptypes: Option<CreationPaths>,
+  pub exports: SchemaCreationExports,
+}
+
+pub struct SchemaCreationExports {
+  pub barrel: String,
+  pub schema: String,
+  pub proptypes: Option<String>,
+  pub values: Option<String>,
+}
+
+impl SchemaCreation {
+  pub fn new(
+    templates: &Option<ConfigTemplates>,
+    import: String,
+    schema: CreationPaths,
+    proptypes: Option<CreationPaths>,
+    exports: SchemaCreationExports,
+  ) -> Self {
+    Self {
+      templates: templates.clone(),
+      import,
+      schema,
+      proptypes,
+      exports,
+    }
+  }
+
+  pub fn react_path(&self) -> Option<String> {
+    match &self.templates {
+      None => None,
+      Some(templates) => match &templates.react {
+        None => None,
+        Some(react) => react.schema.clone()
+      }
+    }
+  }
+  pub fn svelte_path(&self) -> Option<String> {
+    match &self.templates {
+      None => None,
+      Some(templates) => match &templates.svelte {
+        None => None,
+        Some(svelte) => svelte.schema.clone()
+      }
+    }
+  }
+  pub fn vanilla_path(&self) -> Option<String> {
+    match &self.templates {
+      None => None,
+      Some(templates) => match &templates.vanilla {
+        None => None,
+        Some(vanilla) => vanilla.schema.clone()
+      }
+    }
+  }
+}

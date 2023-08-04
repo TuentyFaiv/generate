@@ -8,7 +8,7 @@ use anyhow::{Result, anyhow};
 use crate::config::CLIConfig;
 use crate::utils::{transform, to_vec};
 
-use self::utils::{input, choose_option, arg_or, sure};
+use self::utils::{show_namespaces, input, choose_option, arg_or, sure};
 use self::enums::{ArchType, Tool};
 use self::structs::{Args, Answers, AnswersName, AnswersPath, AnswersToolType, QuestionToolType};
 
@@ -148,23 +148,22 @@ impl CLIQuestions {
       name_lower,
     })
   }
-  fn ask_path(&self, arch: &ArchType, tool: &Tool, AnswersName { name, namespace, name_lower }: AnswersName) -> Result<AnswersPath> {
+  fn ask_path(&self, arch: &ArchType, tool: &Tool, AnswersName { name, name_lower, .. }: AnswersName) -> Result<AnswersPath> {
     let paths = self.config.paths.clone();
     let mut name = name;
-    let namespace = namespace.as_str();
 
     let path = match &self.args.path {
       None => match arch {
         ArchType::Hoc => paths.hocs,
         ArchType::Hook =>  match choose_option("Which type is:", &to_vec(&["global", "internal"]))?.as_str() {
           "internal" => {
-            let short_path = input("Namespace:", namespace)?; 
+            let short_path = show_namespaces(&paths.ui)?;
             format!("{}/{}/{}", paths.ui, short_path, paths.hooks.internal)
           },
           _ => paths.hooks.global
         },
         ArchType::Page | ArchType::Layout => {
-          let short_path = input("Namespace:", namespace)?.to_string();
+          let short_path = show_namespaces(&paths.ui)?;
           name = short_path;
 
           let full_path = match tool {
@@ -181,14 +180,14 @@ impl CLIQuestions {
           full_path
         }
         ArchType::Component => {
-          let short_path = input("Namespace:", namespace)?;
+          let short_path = show_namespaces(&paths.ui)?;
 
           format!("{}/{}", paths.ui, short_path)
         },
         ArchType::Project | ArchType::Library => input("Proyect path:", &paths.get_root(&name))?,
         ArchType::Context => format!("{}/{}", paths.contexts, name_lower),
         ArchType::Service | ArchType::Schema => {
-          let mut short_path = input("Namespace:", namespace)?;
+          let mut short_path = show_namespaces(&paths.ui)?;
           short_path = transform(&short_path, Some("lower"));
           let to = if *arch == ArchType::Service { paths.services } else { paths.schemas };
           format!("{}/{}", to, short_path)
