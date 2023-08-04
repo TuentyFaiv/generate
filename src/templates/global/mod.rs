@@ -573,10 +573,11 @@ impl CLIGlobalTemplates {
 
     Ok(())
   }
-  pub fn generate_schema(&self, templates: SchemaCreation) -> Result<()> {
+  pub fn generate_schema(&self, templates: SchemaCreation, namespace: &str) -> Result<()> {
     let name = self.answers.name.as_str();
     let tool = &self.answers.tool;
-    let name_dash = transform(&name, Some("dash"));
+    let name_camel = change_case(&transform(&name, None), Some("camel"));
+    let name_dash = transform(&name, Some("dash")).to_uppercase();
     let name_capitalize = change_case(&transform(&name, None), None);
 
     let template_path = match tool {
@@ -591,16 +592,15 @@ impl CLIGlobalTemplates {
       templates.schema.default
     );
 
-    let schema_import = templates.import;
-
-    schema = schema.replace("NAME_CAPITAL", name_capitalize.as_str());
+    schema = schema.replace("NAME_CAPITAL", &name_capitalize);
     schema = schema.replace("NAME_LOWER", &name.to_lowercase());
-    schema = schema.replace("NAME_DASH", name_dash.as_str());
+    schema = schema.replace("NAME_DASH", &name_dash);
     schema = schema.replace("NAME", name);
 
     let mut schema_file = File::create(templates.exports.schema)?;
     schema_file.write_all(schema.as_bytes())?;
 
+    let schema_import = templates.import.barrel;
     let index_path = templates.exports.barrel;
     match File::open(&index_path) {
       Ok(index_file) => {
@@ -610,6 +610,9 @@ impl CLIGlobalTemplates {
 
         if index_content.contains("export {};") {
           index_content = index_content.replace("export {};", "");
+        }
+        if index_content.contains(&schema_import) {
+          index_content = index_content.replace(&schema_import, "");
         }
 
         let mut new_index = File::create(&index_path)?;
@@ -624,21 +627,64 @@ impl CLIGlobalTemplates {
     };
 
     if let Some(template_props) = templates.proptypes {
-      let mut proptypes = read_path(
-        &template_path,
-        template_props.template,
-        template_props.default,
-      );
-      if let Some(epxort_type) = templates.exports.values {
-        proptypes = proptypes.replace("// NEXT_TYPE", &epxort_type);
-      }
-      proptypes = proptypes.replace("NAME_CAPITAL", name_capitalize.as_str());
-      proptypes = proptypes.replace("NAME_LOWER", name.to_lowercase().as_str());
-      proptypes = proptypes.replace("NAME_DASH", name_dash.as_str());
-      proptypes = proptypes.replace("NAME", name);
       if let Some(export_props) = templates.exports.proptypes {
-        let mut proptypes_file = File::create(export_props)?;
-        proptypes_file.write_all(proptypes.as_bytes())?;
+        let import_type = templates.import.types;
+        let mut proptypes = read_path(
+          &template_path,
+          template_props.template,
+          template_props.default,
+        );
+        let mut imports: Option<String> = None;
+
+        if let Some(template_proptypes_imports) = templates.proptypes_imports {
+          let mut template_imports = read_path(
+            &template_path,
+            template_proptypes_imports.template,
+            template_proptypes_imports.default,
+          );
+
+          template_imports = template_imports.replace("NAMESPACE", namespace);
+          template_imports = template_imports.replace("NAME_CAMEL", &name_camel);
+          template_imports = template_imports.replace("NAME_CAPITAL", &name_capitalize);
+          template_imports = template_imports.replace("NAME_LOWER", &name.to_lowercase());
+          template_imports = template_imports.replace("NAME_DASH", &name_dash);
+          template_imports = template_imports.replace("NAME", name);
+          template_imports = template_imports.replace("/* NEXT_IMPORT */", &import_type);
+          imports = Some(template_imports);
+        } 
+
+        proptypes = proptypes.replace("NAMESPACE", namespace);
+        proptypes = proptypes.replace("NAME_CAMEL", &name_camel);
+        proptypes = proptypes.replace("NAME_CAPITAL", &name_capitalize);
+        proptypes = proptypes.replace("NAME_LOWER", &name.to_lowercase());
+        proptypes = proptypes.replace("NAME_DASH", &name_dash);
+        proptypes = proptypes.replace("NAME", name);
+
+        match File::open(&export_props) {
+          Ok(proptypes_file) => {
+            let mut buf_reader = BufReader::new(&proptypes_file);
+            let mut proptypes_content = String::new();
+            buf_reader.read_to_string(&mut proptypes_content)?;
+
+            let mut new_config = File::create(&export_props)?;
+
+            proptypes_content = proptypes_content.replace("/* NEXT_IMPORT */", &import_type);
+            proptypes_content = proptypes_content.replace("// NEXT_TYPE", &proptypes);
+
+            new_config.write_all(proptypes_content.as_bytes())?;
+          },
+          Err(_) => {
+            let mut proptypes_file = File::create(&export_props)?;
+            
+            if let Some(template_imports) = imports {
+              proptypes = template_imports.replace("// PROPTYPES", &proptypes);
+            } else {
+              proptypes = proptypes.replace("/* NEXT_IMPORT */", &import_type);
+            }
+
+            proptypes_file.write_all(proptypes.as_bytes())?;
+          }
+        }
       }
     }
     Ok(())

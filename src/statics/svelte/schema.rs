@@ -5,11 +5,17 @@ export const NAME_CAPITALSchema = {
 };
 "#;
 
-pub static PROPTYPES: &str = r#"import { object } from "yup";
-import { NAME_CAPITALSchema } from "@schemas/NAMESPACE";
+pub static PROPTYPES: &str = r#"const NAME_CAMEL = object(NAME_CAPITALSchema);
+export type NAME_CAPITALValues = InferType<typeof NAME_CAMEL>;
+
+// NEXT_TYPE"#;
+
+pub static PROPTYPES_IMPORTS: &str = r#"import { object } from "yup";
+import {
+  /* NEXT_IMPORT */
+} from "@schemas/NAMESPACE";
 
 import type { InferType } from "yup";
 
-const NAME_LOWER = object(NAME_CAPITALSchema);
-export type NAME_CAPITALValues = InferType<typeof NAME_LOWER>;
+// PROPTYPES
 "#;

@@ -22,6 +22,7 @@ use super::structs::{
   LayoutCreation,
   LayoutCreationExports,
   SchemaCreation,
+  SchemaCreationImports,
   SchemaCreationExports,
 };
 
@@ -593,17 +594,20 @@ impl CLIGlobalCreation {
 
         Ok(SchemaCreation::new(
           &self.config.templates,
-          format!("export * from \"./{name_camel}\";\n"),
+          SchemaCreationImports {
+            barrel: format!("export * from \"./{name_camel}\";\n"),
+            types: format!("{name_capitalize}Values,\n  /* NEXT_IMPORT */")
+          },
           CreationPaths {
             template: format!("/schema{ext}"),
             default: if is_ts { SCHEMA_TS.to_owned() } else { SCHEMA.to_owned() }
           },
           proptypes,
+          None,
           SchemaCreationExports {
             barrel: format!("{path}/index{ext}"),
             schema: format!("{path}/{name_camel}{ext}"),
             proptypes: if is_ts { Some(format!("{path_proptypes}/{namespace}{ext}")) } else { None },
-            values: Some(format!("{name_capitalize}Values,\n  // NEXT_TYPE"))
           }
         ))
       },
@@ -611,6 +615,7 @@ impl CLIGlobalCreation {
         use statics::svelte::schema::{
           SCHEMA,
           PROPTYPES,
+          PROPTYPES_IMPORTS,
         };
 
         let proptypes = if is_ts {
@@ -620,26 +625,36 @@ impl CLIGlobalCreation {
           })
         } else { None };
 
+        let proptypes_imports = if is_ts {
+          Some(CreationPaths {
+            template: format!("/proptypes.imports{ext}"),
+            default: PROPTYPES_IMPORTS.to_owned(),
+          })
+        } else { None };
+
         Ok(SchemaCreation::new(
           &self.config.templates,
-          format!("export * from \"./{name_camel}\";\n"),
+          SchemaCreationImports {
+            barrel: format!("export * from \"./{name_camel}\";\n"),
+            types: format!("{name_capitalize}Schema,\n  /* NEXT_IMPORT */")
+          },
           CreationPaths {
             template: format!("/schema{ext}"),
             default: SCHEMA.to_owned(),
           },
           proptypes,
+          proptypes_imports,
           SchemaCreationExports {
             barrel: format!("{path}/index{ext}"),
             schema: format!("{path}/{name_camel}{ext}"),
             proptypes: if is_ts { Some(format!("{path_proptypes}/{namespace}{ext}")) } else { None },
-            values: None
           }
         ))
       },
       Tool::Vanilla => Err(anyhow!(self.error.clone())),
     };
 
-    match self.global.generate_schema(schema?) {
+    match self.global.generate_schema(schema?, &namespace) {
       Ok(_) => {
         done();
         Ok(format!("{} {}", OK, style(format!("Schema {name_capitalize} created at {path}")).cyan()))

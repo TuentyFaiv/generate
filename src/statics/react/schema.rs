@@ -25,6 +25,6 @@ export const DEFAULT_NAME_DASH_VALUES = {
 "#;
 
 pub static PROPTYPES: &str = r#"export type {
-  // NEXT_TYPE
+  /* NEXT_IMPORT */
 } from "@schemas/NAMESPACE";
 "#;

@@ -157,13 +157,13 @@ impl CLIQuestions {
         ArchType::Hoc => paths.hocs,
         ArchType::Hook =>  match choose_option("Which type is:", &to_vec(&["global", "internal"]))?.as_str() {
           "internal" => {
-            let short_path = show_namespaces(&paths.ui)?;
+            let short_path = show_namespaces(&[&paths.ui].to_vec())?;
             format!("{}/{}/{}", paths.ui, short_path, paths.hooks.internal)
           },
           _ => paths.hooks.global
         },
         ArchType::Page | ArchType::Layout => {
-          let short_path = show_namespaces(&paths.ui)?;
+          let short_path = show_namespaces(&[&paths.ui].to_vec())?;
           name = short_path;
 
           let full_path = match tool {
@@ -180,16 +180,16 @@ impl CLIQuestions {
           full_path
         }
         ArchType::Component => {
-          let short_path = show_namespaces(&paths.ui)?;
+          let short_path = show_namespaces(&[&paths.ui].to_vec())?;
 
           format!("{}/{}", paths.ui, short_path)
         },
         ArchType::Project | ArchType::Library => input("Proyect path:", &paths.get_root(&name))?,
         ArchType::Context => format!("{}/{}", paths.contexts, name_lower),
         ArchType::Service | ArchType::Schema => {
-          let mut short_path = show_namespaces(&paths.ui)?;
-          short_path = transform(&short_path, Some("lower"));
           let to = if *arch == ArchType::Service { paths.services } else { paths.schemas };
+          let mut short_path = show_namespaces(&[&paths.ui, &to].to_vec())?;
+          short_path = transform(&short_path, Some("lower"));
           format!("{}/{}", to, short_path)
         },
         ArchType::Action => input("Choose location:", &paths.actions)?,

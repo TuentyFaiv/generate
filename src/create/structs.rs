@@ -260,25 +260,31 @@ impl LayoutCreation {
 // Schema
 pub struct SchemaCreation {
   templates: Option<ConfigTemplates>,
-  pub import: String,
+  pub import: SchemaCreationImports,
   pub schema: CreationPaths,
   pub proptypes: Option<CreationPaths>,
+  pub proptypes_imports: Option<CreationPaths>,
   pub exports: SchemaCreationExports,
+}
+
+pub struct SchemaCreationImports {
+  pub barrel: String,
+  pub types: String,
 }
 
 pub struct SchemaCreationExports {
   pub barrel: String,
   pub schema: String,
   pub proptypes: Option<String>,
-  pub values: Option<String>,
 }
 
 impl SchemaCreation {
   pub fn new(
     templates: &Option<ConfigTemplates>,
-    import: String,
+    import: SchemaCreationImports,
     schema: CreationPaths,
     proptypes: Option<CreationPaths>,
+    proptypes_imports: Option<CreationPaths>,
     exports: SchemaCreationExports,
   ) -> Self {
     Self {
@@ -286,6 +292,7 @@ impl SchemaCreation {
       import,
       schema,
       proptypes,
+      proptypes_imports,
       exports,
     }
   }

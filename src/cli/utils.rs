@@ -18,17 +18,27 @@ pub fn sure() -> Result<bool> {
 	Ok(accept)
 }
 
-pub fn show_namespaces(path_ui: &String) -> Result<String> {
-	let entries = match read_dir(path_ui) {
+pub fn list_folders(path_root: &str) -> Result<Vec<String>> {
+	let slash = if cfg!(target_os = "windows") { "\\" } else { "/" };
+	let entries = match read_dir(path_root) {
 		Ok(paths) => paths.map(|entry| entry.map(|entry| entry.path()))
 			.map(|path| path.map(|path_ns| {
-				path_ns.to_string_lossy().to_string().replace(format!("{path_ui}/").as_str(), "")
+				path_ns.to_string_lossy().to_string().replace(&format!("{path_root}{slash}"), "")
 			}))
 			.collect::<Result<Vec<_>, Error>>()?,
 		Err(_) => ["sharing".to_owned()].to_vec()
 	};
 
-	let namespace = choose_option("Namespace:", &[entries, ["custom".to_string()].to_vec()].concat())?;
+	Ok(entries)
+}
+
+pub fn show_namespaces(paths: &Vec<&String>) -> Result<String> {
+	let mut options = paths.iter().map(|path| {
+		list_folders(*path).unwrap()
+	}).collect::<Vec<Vec<String>>>().concat();
+	options.sort();
+	options.dedup();
+	let namespace = choose_option("Namespace:", &[options, ["custom".to_owned()].to_vec()].concat())?;
 
 	if namespace.as_str() == "custom" {
 		Ok(input("New namespace:", "namespace")?)
