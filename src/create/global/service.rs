@@ -1,26 +1,31 @@
 use std::fs::create_dir_all;
-use anyhow::Result;
+use anyhow::{Result, anyhow};
 use console::style;
 
-use crate::config::Config;
+use crate::cli::{utils::done, enums::Tool, structs::Answers};
+// use crate::statics;
 use crate::statics::OK;
-use crate::cli::questions::Answers;
-use crate::cli::{done, msg};
-use crate::templates::{global};
-use crate::utils::{change_case};
+use crate::utils::{change_case, transform};
 
-pub fn make(answers: &Answers, config: Config) -> Result<()> {
-  let name = answers.name.as_str();
-  let path = &answers.path;
-  let tool_type = answers.tool_type.as_str();
+use super::CLIGlobalCreation;
 
-  let name_capitalize = change_case(name, None);
-  let name_camel = change_case(&name_capitalize.as_str(), Some("camel"));
-  let path_proptypes = format!("{}/services", config.paths.types);
+pub fn create(CLIGlobalCreation {
+  answers,
+  config,
+  error,
+  global,
+  ..
+}: &CLIGlobalCreation) -> Result<String> {
+  let Answers { name, path, language, .. } = &answers;
+  let paths = &config.paths;
+
+  let name_capitalize = change_case(&name, None);
+  let name_camel = change_case(&name_capitalize, Some("camel"));
+  let path_proptypes = format!("{}/services", paths.types);
   let namespace = *path.split('/').collect::<Vec<&str>>().last().unwrap();
 
   let path_instances = path.clone().replace(namespace, "general");
-  let is_ts = tool_type == "typescript";
+  let is_ts = language == "typescript";
   
   create_dir_all(path).unwrap_or_else(|why| {
     println!("! {:?}", why.kind());
@@ -34,21 +39,21 @@ pub fn make(answers: &Answers, config: Config) -> Result<()> {
     });
   }
 
-  global::service::generate(
-    &path.as_str(),
-    path_proptypes.as_str(),
-    &path_instances.as_str(),
-    &name_capitalize.as_str(),
-    namespace,
-    is_ts
-  )?;
+  global.generate_service()?;
+
+  // global::service::generate(
+  //   &path.as_str(),
+  //   path_proptypes.as_str(),
+  //   &path_instances.as_str(),
+  //   &name_capitalize.as_str(),
+  //   namespace,
+  //   is_ts
+  // )?;
 
   done();
-  msg(&format!(
+  Ok(format!(
     "{} {}",
     OK,
     style(format!("Service {name_camel} created at {path}")).cyan()
-  ));
-
-  Ok(())
+  ))
 }
