@@ -9,3 +9,4 @@ vite.config.*
 svelte.config.*
 tsconfig.*
 /bins
+/node_modules
