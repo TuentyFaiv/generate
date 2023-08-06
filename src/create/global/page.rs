@@ -5,7 +5,6 @@ use console::style;
 use crate::cli::{utils::done, enums::Tool, structs::Answers};
 use crate::statics;
 use crate::statics::OK;
-use crate::utils::change_case;
 
 use super::CLIGlobalCreation;
 use super::structs::{
@@ -30,9 +29,9 @@ pub fn create(CLIGlobalCreation {
   let i18n = true;
   let is_ts = language.as_str() == "typescript";
   let ext = if is_ts { ".ts".to_owned() } else { ".js".to_owned() };
-  let name_capitalize = change_case(&name, None);
+  let name_pascal = &name.pascal;
 
-  let path_ui = format!("{}/{}", paths.ui, name.to_lowercase());
+  let path_ui = format!("{}/{}", paths.ui, name.namespace);
   let mut path_proptypes = String::new();
   let mut path_locales = &String::new();
   let mut path_i18n = String::new();
@@ -117,10 +116,10 @@ pub fn create(CLIGlobalCreation {
       Ok(PageCreation::new(
         &config.templates,
         PageCreationImports {
-          page: Some(format!("const {name_capitalize} = lazy(() => (import(\"@{}/page\")));\n// ROUTES", name.to_lowercase())),
-          styles: format!("export * as Page from \"./{name}.styles\";\n"),
+          page: Some(format!("const {name_pascal} = lazy(() => (import(\"@{}/page\")));\n/* NEXT_IMPORT */", name.namespace)),
+          styles: format!("export * as Page from \"./{name_pascal}.styles\";\n"),
           i18n: if i18n { Some(format!("export * from \"./i18n/Provider{ext}\";\n")) } else { None },
-          locale: if i18n { Some(format!("\"{}\",\n      // NEXT_LOCALE", name.to_lowercase())) } else { None }
+          locale: if i18n { Some(format!("\"{}\",\n      /* NEXT_LOCALE */", name.namespace)) } else { None }
         },
         CreationPaths {
           template: format!("/page{ext}x"),
@@ -167,13 +166,13 @@ pub fn create(CLIGlobalCreation {
           config: format!("./vite.config{ext}"),
           page: format!("{path}/+page{ext}x"),
           barrel_styles: format!("{path_ui}/styles/index{ext}"),
-          styles: format!("{path_ui}/styles/{name}.styles{ext}"),
-          responsive: format!("{path_ui}/styles/{name}.styles.responsive{ext}"),
+          styles: format!("{path_ui}/styles/{name_pascal}.styles{ext}"),
+          responsive: format!("{path_ui}/styles/{name_pascal}.styles.responsive{ext}"),
           i18n: if i18n { Some(format!("{path_i18n}/Provider{ext}")) } else { None },
           barrel_i18n: if i18n { Some(path_i18n.replace("i18n", format!("index{ext}").as_str())) } else { None },
-          proptypes: if is_ts { Some(format!("{path_proptypes}/{}{ext}", name.to_lowercase())) } else { None },
+          proptypes: if is_ts { Some(format!("{path_proptypes}/{}{ext}", name.namespace)) } else { None },
           locales: Some(i18n_locales.into_iter().map(|locale| {
-            format!("{path_locales}/{locale}/{}.json", name.to_lowercase())
+            format!("{path_locales}/{locale}/{}.json", name.namespace)
           }).collect()),
           router: Some(format!("{}/router{ext}x", &paths.routes)),
         }
@@ -221,9 +220,9 @@ pub fn create(CLIGlobalCreation {
         &config.templates,
         PageCreationImports {
           page: None,
-          styles: format!("export * as page from \"./{}.styles\";\n", name.to_lowercase()),
+          styles: format!("export * as page from \"./{}.styles\";\n", name.namespace),
           i18n: if i18n { Some(format!("export * from \"./i18n/store{ext}\";\n")) } else { None },
-          locale: if i18n { Some(format!("\"{}\",\n      // NEXT_LOCALE", name.to_lowercase())) } else { None }
+          locale: if i18n { Some(format!("\"{}\",\n      /* NEXT_LOCALE */", name.namespace)) } else { None }
         },
         CreationPaths {
           template: "/page.svelte".to_string(),
@@ -261,13 +260,13 @@ pub fn create(CLIGlobalCreation {
           config: "./svelte.config.js".to_string(),
           page: format!("{path}/+page.svelte"),
           barrel_styles: format!("{path_ui}/styles/index{ext}"),
-          styles: format!("{path_ui}/styles/{}.styles{ext}", name.to_lowercase()),
-          responsive: format!("{path_ui}/styles/{}.styles.responsive{ext}", name.to_lowercase()),
+          styles: format!("{path_ui}/styles/{}.styles{ext}", name.namespace),
+          responsive: format!("{path_ui}/styles/{}.styles.responsive{ext}", name.namespace),
           i18n: if i18n { Some(format!("{path_i18n}/store{ext}")) } else { None },
           barrel_i18n: if i18n { Some(path_i18n.replace("i18n", format!("index{ext}").as_str())) } else { None },
-          proptypes: if is_ts { Some(format!("{path_proptypes}/{}{ext}", name.to_lowercase())) } else { None },
+          proptypes: if is_ts { Some(format!("{path_proptypes}/{}{ext}", name.namespace)) } else { None },
           locales: Some(i18n_locales.into_iter().map(|locale| {
-            format!("{path_locales}/{locale}/{}.json", name.to_lowercase())
+            format!("{path_locales}/{locale}/{}.json", name.namespace)
           }).collect()),
           router: None,
         }
@@ -279,7 +278,7 @@ pub fn create(CLIGlobalCreation {
   match global.generate_page(page?) {
     Ok(_) => {
       done();
-      Ok(format!("{} {}", OK, style(format!("Page {name_capitalize} created at {path}")).cyan()))
+      Ok(format!("{} {}", OK, style(format!("Page {name_pascal} created at {path}")).cyan()))
     },
     Err(error) => Err(error)
   }

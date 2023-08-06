@@ -1,20 +1,28 @@
 use std::io::{Write, Read, BufReader};
 use std::fs::File;
-use anyhow::{Result};
+use anyhow::Result;
 
-use crate::utils::{change_case};
+use crate::utils::change_case;
+use crate::statics::global;
 
-use super::statics::service::{PROPTYPES, SERVICE, SERVICE_TS};
-use super::statics::service::{SERVICE_IMPORT, TYPE_EXPORT, INSTANCES};
+use super::CLIGlobalTemplates;
 
-pub fn generate(
-  path: &str,
-  path_proptypes: &str,
-  path_instances: &str,
-  name: &str,
-  namespace: &str,
-  is_ts: bool
-) -> Result<()> {
+pub fn generate(CLIGlobalTemplates {
+  answers,
+  config,
+  error
+}: &CLIGlobalTemplates) -> Result<()> {
+  use global::service::{PROPTYPES, SERVICE, SERVICE_TS};
+  use global::service::{SERVICE_IMPORT, TYPE_EXPORT, INSTANCES};
+  // For service generation
+
+  let path = "";
+  let path_proptypes = "";
+  let path_instances = "";
+  let name = "";
+  let namespace = "";
+  let is_ts = true;
+
   let instances = INSTANCES.to_string();
   let name_camel = change_case(name, Some("camel"));
   

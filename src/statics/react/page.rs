@@ -1,24 +1,24 @@
 pub static PROPTYPES: &str = r#"// Change for interface if is an object
-export type NAME_CAPITALState = null;
+export type NAME_PASCALState = null;
 "#;
 
 pub static PAGE_TS: &str = r#"import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useAppContext } from "@contexts";
 
-import type { NAME_CAPITALState } from "@typing/pages/NAME_LOWER";
+import type { NAME_PASCALState } from "@typing/pages/NAMESPACE";
 
-import { Page } from "@NAME_LOWER/styles";
+import { Page } from "@NAMESPACE/styles";
 
-export default function NAME_CAPITALPage() {
-  const { t } = useTranslation("NAME_LOWER");
+export default function NAME_PASCALPage() {
+  const { t } = useTranslation("NAMESPACE");
   const { global, dispatch } = useAppContext();
-  const [state, setState] = useState<NAME_CAPITALState>(null);
+  const [state, setState] = useState<NAME_PASCALState>(null);
 
   return (
-    <Page.NAME_CAPITAL>
+    <Page.NAME_PASCAL>
       {t("seo-title")}
-    </Page.NAME_CAPITAL>
+    </Page.NAME_PASCAL>
   );
 }
 "#;
@@ -27,27 +27,31 @@ pub static PAGE: &str = r#"import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useAppContext } from "@contexts";
 
-import { Page } from "@NAME_LOWER/styles";
+import { Page } from "@NAMESPACE/styles";
 
-export default function NAME_CAPITALPage() {
-  const { t } = useTranslation("NAME_LOWER");
+export default function NAME_PASCALPage() {
+  const { t } = useTranslation("NAMESPACE");
   const { global, dispatch } = useAppContext();
   const [state, setState] = useState(null);
 
   return (
-    <Page.NAME_CAPITAL>
+    <Page.NAME_PASCAL>
       {t("seo-title")}
-    </Page.NAME_CAPITAL>
+    </Page.NAME_PASCAL>
   );
 }
 "#;
 
 pub static STYLES: &str = r#"import styled from "@emotion/styled";
 
-import * as responsive from "./NAME.styles.responsive";
+import * as responsive from "./NAME_PASCAL.styles.responsive";
 
-export const NAME_CAPITAL = styled.div`
+export const NAME_PASCAL = styled.div`
   ${responsive.NAME_LOWER}
+`;
+
+export const Title = styled.div`
+  ${responsive.title}
 `;
 "#;
 
@@ -72,15 +76,14 @@ import { LoaderPortal } from "@sharing/atoms";
 
 import Layout from "@sharing/layout";
 
-// ROUTES
+/* NEXT_IMPORT */
 
-// ROUTER
 export const router = createBrowserRouter([
   {
     path: "/",
     element: <Layout />,
     children: [
-      // NEXT_ROUTE
+      /* NEXT_ROUTE */
     ]
   },
   {
@@ -94,14 +97,14 @@ pub static ROUTE: &str = r#"{
         path: "NAME_LOWER",
         element: (
           <Suspense fallback={<LoaderPortal />}>
-            <NAME_CAPITAL />
+            <NAME_PASCAL />
           </Suspense>
         ),
       },
-      // NEXT_ROUTE"#;
+      /* NEXT_ROUTE */"#;
 
 pub static LOCALE: &str = r#"{
-  "seo-title": "NAME_CAPITAL"
+  "seo-title": "NAME_PASCAL"
 }
 "#;
 
@@ -121,7 +124,7 @@ i18n
     fallbackLng: config.i18n_fallback_lang,
     supportedLngs: config.i18n_langs,
     ns: [
-      // NEXT_LOCALE
+      /* NEXT_LOCALE */
     ],
     nsSeparator: false,
     load: "currentOnly",
@@ -205,7 +208,7 @@ pub static TS_CONFIG: &str = r#"{
       "@hocs": [
         "src/logic/hocs/index.ts"
       ],
-      // NEXT_ALIAS
+      /* NEXT_ALIAS */
       // UI Sharing
       "@sharing/atoms": [
         "src/ui/sharing/atoms/index.ts"
@@ -239,29 +242,29 @@ pub static TS_CONFIG: &str = r#"{
 }
 "#;
 
-pub static TS_ALIAS: &str = r#"// UI NAME_CAPITAL
-      "@NAME_LOWER/hooks": [
-        "src/ui/NAME_LOWER/hooks/index.ts"
+pub static TS_ALIAS: &str = r#"// UI NAME_PASCAL
+      "@NAMESPACE/hooks": [
+        "src/ui/NAMESPACE/hooks/index.ts"
       ],
-      "@NAME_LOWER/atoms": [
-        "src/ui/NAME_LOWER/atoms/index.ts"
+      "@NAMESPACE/atoms": [
+        "src/ui/NAMESPACE/atoms/index.ts"
       ],
-      "@NAME_LOWER/molecules": [
-        "src/ui/NAME_LOWER/molecules/index.ts"
+      "@NAMESPACE/molecules": [
+        "src/ui/NAMESPACE/molecules/index.ts"
       ],
-      "@NAME_LOWER/organisms": [
-        "src/ui/NAME_LOWER/organisms/index.ts"
+      "@NAMESPACE/organisms": [
+        "src/ui/NAMESPACE/organisms/index.ts"
       ],
-      "@NAME_LOWER/styles": [
-        "src/ui/NAME_LOWER/styles/index.ts"
+      "@NAMESPACE/styles": [
+        "src/ui/NAMESPACE/styles/index.ts"
       ],
-      "@NAME_LOWER/page": [
-        "src/ui/NAME_LOWER/+page.tsx"
+      "@NAMESPACE/page": [
+        "src/ui/NAMESPACE/+page.tsx"
       ],
-      "@NAME_LOWER/layout": [
-        "src/ui/NAME_LOWER/+layout.tsx"
+      "@NAMESPACE/layout": [
+        "src/ui/NAMESPACE/+layout.tsx"
       ],
-      // NEXT_ALIAS"#;
+      /* NEXT_ALIAS */"#;
 
 pub static VITE_CONFIG: &str = r#"import { resolve } from "path";
 import { defineConfig } from "vite";
@@ -292,7 +295,7 @@ export default defineConfig({
       "@contexts": resolve("src/logic/contexts/index.ts"),
       "@hooks": resolve("src/logic/hooks/index.ts"),
       "@hocs": resolve("src/logic/hocs/index.ts"),
-      // NEXT_ALIAS
+      /* NEXT_ALIAS */
       // UI Sharing
       "@sharing/atoms": resolve("src/ui/sharing/atoms/index.ts"),
       "@sharing/molecules": resolve("src/ui/sharing/molecules/index.ts"),
@@ -305,12 +308,12 @@ export default defineConfig({
 });
 "#;
 
-pub static VITE_ALIAS: &str = r#"// UI NAME_CAPITAL
-      "@NAME_LOWER/hooks": resolve("src/ui/NAME_LOWER/hooks/index.ts"),
-      "@NAME_LOWER/atoms": resolve("src/ui/NAME_LOWER/atoms/index.ts"),
-      "@NAME_LOWER/molecules": resolve("src/ui/NAME_LOWER/molecules/index.ts"),
-      "@NAME_LOWER/organisms": resolve("src/ui/NAME_LOWER/organisms/index.ts"),
-      "@NAME_LOWER/styles": resolve("src/ui/NAME_LOWER/styles/index.ts"),
-      "@NAME_LOWER/page": resolve("src/ui/NAME_LOWER/+page.tsx"),
-      "@NAME_LOWER/layout": resolve("src/ui/NAME_LOWER/+layout.tsx"),
-      // NEXT_ALIAS"#;
+pub static VITE_ALIAS: &str = r#"// UI NAME_PASCAL
+      "@NAMESPACE/hooks": resolve("src/ui/NAMESPACE/hooks/index.ts"),
+      "@NAMESPACE/atoms": resolve("src/ui/NAMESPACE/atoms/index.ts"),
+      "@NAMESPACE/molecules": resolve("src/ui/NAMESPACE/molecules/index.ts"),
+      "@NAMESPACE/organisms": resolve("src/ui/NAMESPACE/organisms/index.ts"),
+      "@NAMESPACE/styles": resolve("src/ui/NAMESPACE/styles/index.ts"),
+      "@NAMESPACE/page": resolve("src/ui/NAMESPACE/+page.tsx"),
+      "@NAMESPACE/layout": resolve("src/ui/NAMESPACE/+layout.tsx"),
+      /* NEXT_ALIAS */"#;

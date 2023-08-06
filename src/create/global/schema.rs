@@ -5,7 +5,6 @@ use console::style;
 use crate::cli::{utils::done, enums::Tool, structs::Answers};
 use crate::statics;
 use crate::statics::OK;
-use crate::utils::{change_case, transform};
 
 use super::CLIGlobalCreation;
 use super::structs::{
@@ -27,9 +26,9 @@ pub fn create(CLIGlobalCreation {
 
   let is_ts = language == "typescript";
   let ext = if is_ts { ".ts".to_owned() } else { ".js".to_owned() };
-  let name_capitalize = change_case(&transform(&name, None), None);
-  let name_camel = change_case(&name_capitalize, Some("camel"));
-  let namespace = *path.split('/').collect::<Vec<&str>>().last().unwrap();
+  let name_pascal = &name.pascal;
+  let name_camel = &name.camel;
+  let namespace = &name.namespace;
 
   let mut path_proptypes = String::new();
 
@@ -63,7 +62,7 @@ pub fn create(CLIGlobalCreation {
         &config.templates,
         SchemaCreationImports {
           barrel: format!("export * from \"./{name_camel}\";\n"),
-          types: format!("{name_capitalize}Values,\n  /* NEXT_IMPORT */")
+          types: format!("{name_pascal}Values,\n  /* NEXT_IMPORT */")
         },
         CreationPaths {
           template: format!("/schema{ext}"),
@@ -103,7 +102,7 @@ pub fn create(CLIGlobalCreation {
         &config.templates,
         SchemaCreationImports {
           barrel: format!("export * from \"./{name_camel}\";\n"),
-          types: format!("{name_capitalize}Schema,\n  /* NEXT_IMPORT */")
+          types: format!("{name_pascal}Schema,\n  /* NEXT_IMPORT */")
         },
         CreationPaths {
           template: format!("/schema{ext}"),
@@ -121,10 +120,10 @@ pub fn create(CLIGlobalCreation {
     Tool::Vanilla => Err(anyhow!(error.clone())),
   };
 
-  match global.generate_schema(schema?, &namespace) {
+  match global.generate_schema(schema?) {
     Ok(_) => {
       done();
-      Ok(format!("{} {}", OK, style(format!("Schema {name_capitalize} created at {path}")).cyan()))
+      Ok(format!("{} {}", OK, style(format!("Schema {name_pascal} created at {path}")).cyan()))
     },
     Err(error) => Err(error)
   }

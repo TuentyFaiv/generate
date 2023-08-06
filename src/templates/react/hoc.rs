@@ -1,6 +1,6 @@
 use std::io::{Write, BufReader, Read};
 use std::fs::File;
-use anyhow::{Result};
+use anyhow::Result;
 
 use super::statics::hoc::{PROPTYPES, HOC_TS, HOC};
 

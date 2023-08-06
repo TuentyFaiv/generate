@@ -1,53 +1,46 @@
 use std::io::{Write, Read, BufReader};
 use std::fs::File;
-use anyhow::{Result};
+use anyhow::Result;
 
-use crate::utils::{change_case};
+use crate::cli::enums::Tool;
+use crate::create::structs::SchemaCreation;
 
-use super::statics::schema::{PROPTYPES, SCHEMA, SCHEMA_TS};
-use super::statics::schema::{NEW_IMPORT, TYPE_EXPORT};
+use super::utils::{read_path, set_keywords};
+use super::CLIGlobalTemplates;
 
-pub fn generate(
-  path: &str,
-  path_proptypes: &str,
-  name: &str,
-  name_dash: &str,
-  namespace: &str,
-  is_ts: bool
-) -> Result<()> {
-  let name_camel = change_case(name, Some("camel"));
-  
-  let mut proptypes = PROPTYPES.to_string();
-  let mut schema = SCHEMA.to_string();
-  let mut schema_import = NEW_IMPORT.to_string();
-  let mut type_export = TYPE_EXPORT.to_string();
-  let mut ext = ".js".to_string();
+pub fn generate(CLIGlobalTemplates {
+  answers,
+  ..
+}: &CLIGlobalTemplates, templates: &SchemaCreation) -> Result<()> {
+  let tool = &answers.tool;
 
-  if is_ts {
-    schema = SCHEMA_TS.to_string();
-    ext = ".ts".to_string();
-  }
+  let template_path = match tool {
+    Tool::React => templates.react_path(),
+    Tool::Svelte => templates.svelte_path(),
+    Tool::Vanilla => templates.vanilla_path(),
+  };
 
-  proptypes = proptypes.replace("NAMESPACE", namespace);
-  
-  schema = schema.replace("NAME_DASH", name_dash);
-  schema = schema.replace("NAME", name);
+  let mut schema = read_path(&template_path, &templates.schema);
 
-  schema_import = schema_import.replace("NAME_CAMEL", &name_camel);
-  type_export = type_export.replace("NAME", name);
+  schema = set_keywords(&schema, &answers.name);
 
-  let index_path = format!("{path}/index.ts");
-  let schema_path = format!("{path}/{name_camel}{ext}");
-  let proptypes_path = format!("{path_proptypes}/{namespace}{ext}");
-
-  let mut schema_file = File::create(schema_path)?;
+  let mut schema_file = File::create(&templates.exports.schema)?;
   schema_file.write_all(schema.as_bytes())?;
 
+  let schema_import = &templates.import.barrel;
+  let index_path = &templates.exports.barrel;
   match File::open(&index_path) {
     Ok(index_file) => {
       let mut buf_reader = BufReader::new(&index_file);
       let mut index_content = String::new();
       buf_reader.read_to_string(&mut index_content)?;
+
+      if index_content.contains("export {};") {
+        index_content = index_content.replace("export {};", "");
+      }
+      if index_content.contains(schema_import) {
+        index_content = index_content.replace(schema_import, "");
+      }
 
       let mut new_index = File::create(&index_path)?;
       let updated_index = [index_content.as_str(), schema_import.as_str()].concat();
@@ -60,28 +53,48 @@ pub fn generate(
     }
   };
 
-  if is_ts {
-    match File::open(&proptypes_path) {
-      Ok(proptypes_file) => {
-        let mut buf_reader = BufReader::new(&proptypes_file);
-        let mut proptypes_content = String::new();
-        buf_reader.read_to_string(&mut proptypes_content)?;
-  
-        let mut new_proptypes = File::create(&proptypes_path)?;
-        
-        proptypes_content = proptypes_content.replace("// NEXT_TYPE", &type_export);
-  
-        new_proptypes.write_all(proptypes_content.as_bytes())?;
-      },
-      Err(_) => {
-        let mut proptypes_file = File::create(&proptypes_path)?;
-  
-        proptypes = proptypes.replace("// NEXT_TYPE", &type_export);
-  
-        proptypes_file.write_all(proptypes.as_bytes())?;
-      }
-    };
-  }
+  if let Some(template_props) = &templates.proptypes {
+    if let Some(export_props) = &templates.exports.proptypes {
+      let import_type = &templates.import.types;
+      let mut proptypes = read_path(&template_path, template_props);
+      let mut imports: Option<String> = None;
 
+      if let Some(template_proptypes_imports) = &templates.proptypes_imports {
+        let mut template_imports = read_path(&template_path, template_proptypes_imports);
+
+        template_imports = set_keywords(&template_imports, &answers.name);
+        template_imports = template_imports.replace("/* NEXT_IMPORT */", &import_type);
+        imports = Some(template_imports);
+      } 
+
+      proptypes = set_keywords(&proptypes, &answers.name);
+
+      match File::open(&export_props) {
+        Ok(proptypes_file) => {
+          let mut buf_reader = BufReader::new(&proptypes_file);
+          let mut proptypes_content = String::new();
+          buf_reader.read_to_string(&mut proptypes_content)?;
+
+          let mut new_config = File::create(&export_props)?;
+
+          proptypes_content = proptypes_content.replace("/* NEXT_IMPORT */", &import_type);
+          proptypes_content = proptypes_content.replace("/* NEXT_TYPE */", &proptypes);
+
+          new_config.write_all(proptypes_content.as_bytes())?;
+        },
+        Err(_) => {
+          let mut proptypes_file = File::create(&export_props)?;
+          
+          if let Some(template_imports) = imports {
+            proptypes = template_imports.replace("/* PROPTYPES */", &proptypes);
+          } else {
+            proptypes = proptypes.replace("/* NEXT_IMPORT */", &import_type);
+          }
+
+          proptypes_file.write_all(proptypes.as_bytes())?;
+        }
+      }
+    }
+  }
   Ok(())
 }

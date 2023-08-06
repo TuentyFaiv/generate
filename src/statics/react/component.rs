@@ -7,9 +7,9 @@ export interface Props {
 
 pub static STYLES: &str = r#"import styled from "@emotion/styled";
 
-import * as responsive from "./NAME.styles.responsive";
+import * as responsive from "./NAME_PASCAL.styles.responsive";
 
-export const NAME = styled.div`
+export const NAME_PASCAL = styled.div`
   ${responsive.NAME_LOWER}
 `;
 "#;
@@ -23,26 +23,26 @@ export const NAME_LOWER = forsize({
 });
 "#;
 
-pub static COMPONENT: &str = r#"import * as Styles from "./NAME.styles";
+pub static COMPONENT: &str = r#"import * as Styles from "./NAME_PASCAL.styles";
 
-export default function NAME({ children }) {
+export default function NAME_PASCAL({ children }) {
   return (
-    <Styles.NAME>
+    <Styles.NAME_PASCAL>
       {children}
-    </Styles.NAME>
+    </Styles.NAME_PASCAL>
   );
 }
 "#;
 
-pub static COMPONENT_TS: &str = r#"import type { Props } from "./NAME.proptypes";
+pub static COMPONENT_TS: &str = r#"import type { Props } from "./NAME_PASCAL.proptypes";
 
-import * as Styles from "./NAME.styles";
+import * as Styles from "./NAME_PASCAL.styles";
 
-export default function NAME({ children }: Props) {
+export default function NAME_PASCAL({ children }: Props) {
   return (
-    <Styles.NAME>
+    <Styles.NAME_PASCAL>
       {children}
-    </Styles.NAME>
+    </Styles.NAME_PASCAL>
   );
 }
 "#;

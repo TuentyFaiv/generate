@@ -8,6 +8,7 @@ use dialoguer::{Confirm, Select, Input};
 use dialoguer::{console::Term, theme::ColorfulTheme};
 
 use crate::statics::DONE;
+use crate::utils::transform;
 
 pub fn sure() -> Result<bool> {
 	let accept = Confirm::with_theme(&ColorfulTheme::default())
@@ -41,7 +42,8 @@ pub fn show_namespaces(paths: &Vec<&String>) -> Result<String> {
 	let namespace = choose_option("Namespace:", &[options, ["custom".to_owned()].to_vec()].concat())?;
 
 	if namespace.as_str() == "custom" {
-		Ok(input("New namespace:", "namespace")?)
+		let namespace = input("New namespace:", "namespace")?;
+		Ok(transform(&namespace, Some("lower")))
 	} else {
 		Ok(namespace)
 	}

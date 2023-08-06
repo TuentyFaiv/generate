@@ -5,7 +5,6 @@ use console::style;
 use crate::cli::{utils::done, enums::Tool, structs::Answers};
 use crate::statics;
 use crate::statics::OK;
-use crate::utils::change_case;
 
 use super::CLIGlobalCreation;
 use super::structs::{
@@ -26,9 +25,9 @@ pub fn create(CLIGlobalCreation {
 
   let is_ts = language.as_str() == "typescript";
   let ext = if is_ts { ".ts".to_owned() } else { ".js".to_owned() };
-  let name_capitalize = change_case(&name, None);
+  let name_pascal = &name.pascal;
 
-  let path_ui = format!("{}/{}", paths.ui, name.to_lowercase());
+  let path_ui = format!("{}/{}", paths.ui, name.namespace);
   let mut path_proptypes = String::new();
 
   create_dir_all(path).unwrap_or_else(|why| {
@@ -64,7 +63,7 @@ pub fn create(CLIGlobalCreation {
 
       Ok(LayoutCreation::new(
         &config.templates,
-        format!("export * as Layout from \"./{name}Layout.styles\";\n"),
+        format!("export * as Layout from \"./{name_pascal}Layout.styles\";\n"),
         CreationPaths {
           template: format!("/layout{ext}x"),
           default: if is_ts { LAYOUT_TS.to_string() } else { LAYOUT.to_string() }
@@ -82,9 +81,9 @@ pub fn create(CLIGlobalCreation {
         LayoutCreationExports {
           barrel_styles: format!("{path_ui}/styles/index{ext}"),
           layout: format!("{path}/+layout{ext}x"),
-          styles: format!("{path_ui}/styles/{name}Layout.styles{ext}"),
-          responsive: format!("{path_ui}/styles/{name}Layout.styles.responsive{ext}"),
-          proptypes: if is_ts { Some(format!("{path_proptypes}/{}{ext}", name.to_lowercase())) } else { None },
+          styles: format!("{path_ui}/styles/{name_pascal}Layout.styles{ext}"),
+          responsive: format!("{path_ui}/styles/{name_pascal}Layout.styles.responsive{ext}"),
+          proptypes: if is_ts { Some(format!("{path_proptypes}/{}{ext}", name.namespace)) } else { None },
         }
       ))
     },
@@ -107,7 +106,7 @@ pub fn create(CLIGlobalCreation {
 
       Ok(LayoutCreation::new(
         &config.templates,
-        format!("export * as layout from \"./{}.layout.styles\";\n", name.to_lowercase()),
+        format!("export * as layout from \"./{}.layout.styles\";\n", name.namespace),
         CreationPaths {
           template: "/layout.svelte".to_string(),
           default: LAYOUT.to_string()
@@ -128,9 +127,9 @@ pub fn create(CLIGlobalCreation {
         LayoutCreationExports {
           barrel_styles: format!("{path_ui}/styles/index{ext}"),
           layout: format!("{path}/+layout.svelte"),
-          styles: format!("{path_ui}/styles/{}.layout.styles{ext}", name.to_lowercase()),
-          responsive: format!("{path_ui}/styles/{}.layout.styles.responsive{ext}", name.to_lowercase()),
-          proptypes: if is_ts { Some(format!("{path_proptypes}/{}{ext}", name.to_lowercase())) } else { None },
+          styles: format!("{path_ui}/styles/{}.layout.styles{ext}", name.namespace),
+          responsive: format!("{path_ui}/styles/{}.layout.styles.responsive{ext}", name.namespace),
+          proptypes: if is_ts { Some(format!("{path_proptypes}/{}{ext}", name.namespace)) } else { None },
         }
       ))
     }
@@ -140,7 +139,7 @@ pub fn create(CLIGlobalCreation {
   match global.generate_layout(layout?) {
     Ok(_) => {
       done();
-      Ok(format!( "{} {}", OK, style(format!("Layout {name_capitalize} created at {path}")).cyan()))
+      Ok(format!( "{} {}", OK, style(format!("Layout {name_pascal} created at {path}")).cyan()))
     },
     Err(error) => Err(error)
   }

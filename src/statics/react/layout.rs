@@ -1,17 +1,17 @@
 pub static LAYOUT_TS: &str = r#"import { useState } from "react";
 import { Outlet } from "react-router-dom";
 
-import type { NAME_CAPITALLayoutState } from "@typing/layouts/NAME_LOWER";
+import type { NAME_PASCALLayoutState } from "@typing/layouts/NAMESPACE";
 
-import { Layout } from "@NAME_LOWER/styles";
+import { Layout } from "@NAMESPACE/styles";
 
-export default function NAME_CAPITALLayout() {
-  const [state, setState] = useState<NAME_CAPITALLayoutState>(null);
+export default function NAME_PASCALLayout() {
+  const [state, setState] = useState<NAME_PASCALLayoutState>(null);
 
   return (
-    <Layout.NAME_CAPITAL>
+    <Layout.NAME_PASCAL>
       <Outlet />
-    </Layout.NAME_CAPITAL>
+    </Layout.NAME_PASCAL>
   );
 }
 "#;
@@ -19,25 +19,25 @@ export default function NAME_CAPITALLayout() {
 pub static LAYOUT: &str = r#"import { useState } from "react";
 import { Outlet } from "react-router-dom";
 
-import { Layout } from "@NAME_LOWER/styles";
+import { Layout } from "@NAMESPACE/styles";
 
-export default function NAME_CAPITALLayout() {
+export default function NAME_PASCALLayout() {
   const [state, setState] = useState(null);
 
   return (
-    <Layout.NAME_CAPITAL>
+    <Layout.NAME_PASCAL>
       <Outlet />
-    </Layout.NAME_CAPITAL>
+    </Layout.NAME_PASCAL>
   );
 }
 "#;
 
 pub static STYLES: &str = r#"import styled from "@emotion/styled";
 
-import * as responsive from "./NAMELayout.styles.responsive";
+import * as responsive from "./NAME_PASCALLayout.styles.responsive";
 
-export const NAME_CAPITAL = styled.div`
-  ${responsive.NAME_LOWER}
+export const NAME_PASCAL = styled.div`
+  ${responsive.NAMESPACE}
 `;
 "#;
 
@@ -51,5 +51,5 @@ export const NAME_LOWER = forsize({
 "#;
 
 pub static PROPTYPES: &str = r#"// Change for interface if is an object
-export type NAME_CAPITALLayoutState = null;
+export type NAME_PASCALLayoutState = null;
 "#;

@@ -5,7 +5,7 @@ pub static PROPTYPES: &str = r#"export interface Props {
 
 pub static STYLES: &str = r#"import { css, cx } from "@emotion/css";
 
-import * as responsive from "./NAME.styles.responsive";
+import * as responsive from "./NAME_PASCAL.styles.responsive";
 
 export const NAME_LOWER = cx(
   css``,
@@ -30,15 +30,15 @@ pub static COMPONENT: &str = r#"SCRIPT
 "#;
 
 pub static SCRIPT_TS: &str = r#"<script lang="ts">
-  import type { Props } from "./NAME.proptypes";
+  import type { Props } from "./NAME_PASCAL.proptypes";
 
-  import * as styles from "./NAME.styles";
+  import * as styles from "./NAME_PASCAL.styles";
 
   export let prop: Props["prop"];
 </script>"#;
 
 pub static SCRIPT: &str = r#"<script>
-  import * as styles from "./NAME.styles";
+  import * as styles from "./NAME_PASCAL.styles";
 
   export let prop;
 </script>"#;

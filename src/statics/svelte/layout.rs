@@ -2,12 +2,12 @@ pub static PROPTYPES: &str = r#"export {};
 "#;
 
 pub static SCRIPT_TS: &str = r#"<script lang="ts">
-	import { layout } from "@NAME_LOWER/styles";
+	import { layout } from "@NAMESPACE/styles";
 </script>
 "#;
 
 pub static SCRIPT: &str = r#"<script>
-	import { layout } from "@NAME_LOWER/styles";
+	import { layout } from "@NAMESPACE/styles";
 </script>
 "#;
 
@@ -19,7 +19,7 @@ pub static LAYOUT: &str = r#"SCRIPT
 
 pub static STYLES: &str = r#"import { css, cx } from "@emotion/css";
 
-import * as responsive from "./NAME_LOWER.layout.styles.responsive";
+import * as responsive from "./NAMESPACE.layout.styles.responsive";
 
 export const NAME_LOWER = cx(
 	css``,

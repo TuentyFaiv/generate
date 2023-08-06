@@ -5,7 +5,6 @@ use console::style;
 use crate::cli::{utils::done, enums::Tool, structs::Answers};
 // use crate::statics;
 use crate::statics::OK;
-use crate::utils::{change_case, transform};
 
 use super::CLIGlobalCreation;
 
@@ -19,10 +18,10 @@ pub fn create(CLIGlobalCreation {
   let Answers { name, path, language, .. } = &answers;
   let paths = &config.paths;
 
-  let name_capitalize = change_case(&name, None);
-  let name_camel = change_case(&name_capitalize, Some("camel"));
+  let name_pascal = &name.pascal;
+  let name_camel = &name.camel;
+  let namespace = &name.namespace;
   let path_proptypes = format!("{}/services", paths.types);
-  let namespace = *path.split('/').collect::<Vec<&str>>().last().unwrap();
 
   let path_instances = path.clone().replace(namespace, "general");
   let is_ts = language == "typescript";

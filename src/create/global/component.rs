@@ -23,6 +23,7 @@ pub fn create(CLIGlobalCreation {
   let Answers { name, path, tool, tool_type, language, .. } = answers;
   let is_ts = language.as_str() == "typescript";
   let ext = if is_ts { ".ts".to_owned() } else { ".js".to_owned() };
+  let name = &name.pascal;
 
   let full_path = match tool_type {
     Some(tool_type) => format!("{path}/{tool_type}/{name}"),

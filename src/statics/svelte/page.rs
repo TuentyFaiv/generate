@@ -4,7 +4,7 @@ pub static PROPTYPES: &str = r#"export {};
 pub static SCRIPT_TS: &str = r#"<script lang="ts">
   import { i18n } from "@stores";
 
-  import { page } from "@NAME_LOWER/styles";
+  import { page } from "@NAMESPACE/styles";
 
 	import { SEO } from "@sharing/atoms";
 </script>
@@ -13,7 +13,7 @@ pub static SCRIPT_TS: &str = r#"<script lang="ts">
 pub static SCRIPT: &str = r#"<script>
   import { i18n } from "@stores";
 
-  import { page } from "@NAME_LOWER/styles";
+  import { page } from "@NAMESPACE/styles";
 
 	import { SEO } from "@sharing/atoms";
 </script>
@@ -31,7 +31,7 @@ pub static PAGE: &str = r#"SCRIPT
 
 pub static STYLES: &str = r#"import { css, cx } from "@emotion/css";
 
-import * as responsive from "./NAME_LOWER.styles.responsive";
+import * as responsive from "./NAMESPACE.styles.responsive";
 
 export const NAME_LOWER = cx(
 	css``,
@@ -59,7 +59,7 @@ export const title = forsize({
 "#;
 
 pub static LOCALE: &str = r#"{
-  "seo-title": "NAME_CAPITAL"
+  "seo-title": "NAME_PASCAL"
 }
 "#;
 
@@ -78,7 +78,7 @@ i18next
     fallbackLng: config.i18n_fallback_lang,
     supportedLngs: config.i18n_langs,
     ns: [
-      // NEXT_LOCALE
+      /* NEXT_LOCALE */
     ],
     defaultNS: "translation",
     load: "currentOnly",
@@ -120,7 +120,7 @@ const config = {
 			"@services/*": "src/logic/services/*",
 			"@typing/*": "src/logic/typing/*",
 			"@utils/*": "src/logic/utils/*",
-			// NEXT_ALIAS
+			/* NEXT_ALIAS */
 			// UI Sharing
 			"@sharing/atoms": "src/ui/sharing/atoms/index.ts",
 			"@sharing/molecules": "src/ui/sharing/molecules/index.ts",
@@ -134,9 +134,9 @@ const config = {
 export default config;
 "#;
 
-pub static SVELTE_ALIAS: &str = r#"// UI NAME_CAPITAL
-			"@NAME_LOWER/atoms": "src/ui/NAME_LOWER/atoms/index.ts",
-			"@NAME_LOWER/molecules": "src/ui/NAME_LOWER/molecules/index.ts",
-			"@NAME_LOWER/organisms": "src/ui/NAME_LOWER/organisms/index.ts",
-			"@NAME_LOWER/styles": "src/ui/NAME_LOWER/styles/index.ts",
-      // NEXT_ALIAS"#;
+pub static SVELTE_ALIAS: &str = r#"// UI NAME_PASCAL
+			"@NAMESPACE/atoms": "src/ui/NAMESPACE/atoms/index.ts",
+			"@NAMESPACE/molecules": "src/ui/NAMESPACE/molecules/index.ts",
+			"@NAMESPACE/organisms": "src/ui/NAMESPACE/organisms/index.ts",
+			"@NAMESPACE/styles": "src/ui/NAMESPACE/styles/index.ts",
+      /* NEXT_ALIAS */"#;
