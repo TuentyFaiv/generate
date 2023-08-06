@@ -8,7 +8,7 @@
     "tfverse-macos": "./bins/macos/tfverse"
   },
   "scripts": {
-    "postinstall": "node scripts/postinstall.js"
+    "postinstall": "node ./scripts/postinstall.js"
   },
   "keywords": [
     "CLI",
@@ -24,7 +24,7 @@
   "author": "Tonalli López <contact@tuentyfaiv.com>",
   "license": "MIT",
   "files": [
-    "bins",
+    "scripts/postinstall.js",
     "LICENSE",
     "README.md"
   ],
