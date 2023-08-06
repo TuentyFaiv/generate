@@ -69,12 +69,12 @@ impl CLICreation {
 			ArchType::Page => global.make_page(),
 			ArchType::Layout => global.make_layout(),
 			ArchType::Schema => global.make_schema(),
-			ArchType::Service => global.make_service(),
-			ArchType::Context => global.make_context(),
-			ArchType::Hoc => react.make_hoc(),
-			ArchType::Hook => react.make_hook(),
-			ArchType::Action => svelte.make_action(),
-			ArchType::Store => svelte.make_store(),
+			// ArchType::Service => global.make_service(),
+			// ArchType::Context => global.make_context(),
+			// ArchType::Hoc => react.make_hoc(),
+			// ArchType::Hook => react.make_hook(),
+			// ArchType::Action => svelte.make_action(),
+			// ArchType::Store => svelte.make_store(),
 			_ => Err(anyhow!(self.error.clone()))
 		}
 	}

@@ -9,10 +9,10 @@ use anyhow::{Result, anyhow};
 use super::CLIGlobalCreation;
 
 pub fn create(CLIGlobalCreation {
-  answers,
-  config,
+  // answers,
+  // config,
   error,
-  global,
+  // global,
   ..
 }: &CLIGlobalCreation) -> Result<String> {
   println!("make_context");
