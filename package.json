@@ -1,0 +1,36 @@
+{
+  "name": "@tuentyfaiv/cli",
+  "version": "0.0.1",
+  "description": "A CLI to generate base code for React, Svelte and Vanilla JS projects, like boilerplates,  components, pages, etc.",
+  "bin": {
+    "tfverse": "./bins/linux/tfverse",
+    "tfverse.exe": "./bins/win/tfverse.exe",
+    "tfverse-macos": "./bins/macos/tfverse"
+  },
+  "keywords": [
+    "CLI",
+    "Frontend",
+    "TuentyFaiv",
+    "React",
+    "Svelte",
+    "Vanilla JS",
+    "Boilerplates",
+    "Components",
+    "Pages"
+  ],
+  "author": "Tonalli López <contact@tuentyfaiv.com>",
+  "license": "MIT",
+  "files": [
+    "bins",
+    "LICENSE",
+    "README.md"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TuentyFaiv/generate.git"
+  },
+  "bugs": {
+    "url": "https://github.com/TuentyFaiv/generate/issues"
+  },
+  "homepage": "https://github.com/TuentyFaiv/generate#readme"
+}

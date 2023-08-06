@@ -8,3 +8,4 @@ src/routes
 vite.config.*
 svelte.config.*
 tsconfig.*
+/bins
