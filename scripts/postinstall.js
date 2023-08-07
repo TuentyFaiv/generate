@@ -32,7 +32,7 @@ async function downloadBinary() {
     darwin: "macos",
   }
   const cli = `tfverse${exts[platform]}`;
-  const dir = `../bins/${namespace[platform]}`;
+  const dir = `../bin/${namespace[platform]}`;
 
   const outputDir = path.join(__dirname, dir);
   fs.mkdirSync(outputDir, { recursive: true });
