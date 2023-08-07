@@ -1,51 +1,130 @@
 use std::fs::create_dir_all;
-use anyhow::Result;
+use anyhow::{Result, anyhow};
 use console::style;
 
+use crate::cli::{utils::done, enums::Tool, structs::Answers};
+use crate::statics;
 use crate::statics::OK;
-use crate::cli::questions::Answers;
-use crate::cli::{done, msg};
-use crate::templates::{global};
-use crate::utils::{change_case, transform};
 
-pub fn make(answers: &Answers) -> Result<()> {
-  let name = &answers.name;
-  let path = &answers.path;
-  let tool_type = answers.tool_type.as_str();
+use super::CLIGlobalCreation;
+use super::structs::{
+  CreationPaths,
+  SchemaCreation,
+  SchemaCreationImports,
+  SchemaCreationExports,
+};
 
-  let name_dash = transform(name, Some("dash"));
-  let name_formatted = transform(name, None);
-  let name_capitalize = change_case(&name_formatted.as_str(), None);
-  let name_camel = change_case(&name_capitalize.as_str(), Some("camel"));
-  let path_proptypes = "./src/logic/typing/schemas";
-  let path_splitted: Vec<&str> = path.split('/').collect();
-  let namespace = *path_splitted.last().unwrap();
-  let is_ts = tool_type == "typescript";
-  
+pub fn create(CLIGlobalCreation {
+  answers,
+  config,
+  error,
+  global,
+  ..
+}: &CLIGlobalCreation) -> Result<String> {
+  let Answers { name, path, language, tool, .. } = answers;
+  let paths = &config.paths;
+
+  let is_ts = language == "typescript";
+  let ext = if is_ts { ".ts".to_owned() } else { ".js".to_owned() };
+  let name_pascal = &name.pascal;
+  let name_camel = &name.camel;
+  let namespace = &name.namespace;
+
+  let mut path_proptypes = String::new();
+
   create_dir_all(path).unwrap_or_else(|why| {
     println!("! {:?}", why.kind());
   });
+
   if is_ts {
-    create_dir_all(path_proptypes.to_string()).unwrap_or_else(|why| {
+    path_proptypes = format!("{}/schemas", paths.types);
+    create_dir_all(&path_proptypes).unwrap_or_else(|why| {
       println!("! {:?}", why.kind());
     });
   }
 
-  global::schema::generate(
-    &path.as_str(),
-    path_proptypes,
-    &name_capitalize.as_str(),
-    &name_dash.to_uppercase().as_str(),
-    namespace,
-    is_ts
-  )?;
+  let schema = match tool {
+    Tool::React => {
+      use statics::react::schema::{
+        SCHEMA,
+        SCHEMA_TS,
+        PROPTYPES,
+      };
 
-  done();
-  msg(&format!(
-    "{} {}",
-    OK,
-    style(format!("Schema {name_camel} created at {path}")).cyan()
-  ));
+      let proptypes = if is_ts {
+        Some(CreationPaths {
+          template: format!("/proptypes{ext}"),
+          default: PROPTYPES.to_owned(),
+        })
+      } else { None };
 
-  Ok(())
+      Ok(SchemaCreation::new(
+        &config.templates,
+        SchemaCreationImports {
+          barrel: format!("export * from \"./{name_camel}\";\n"),
+          types: format!("{name_pascal}Values,\n  /* NEXT_IMPORT */")
+        },
+        CreationPaths {
+          template: format!("/schema{ext}"),
+          default: if is_ts { SCHEMA_TS.to_owned() } else { SCHEMA.to_owned() }
+        },
+        proptypes,
+        None,
+        SchemaCreationExports {
+          barrel: format!("{path}/index{ext}"),
+          schema: format!("{path}/{name_camel}{ext}"),
+          proptypes: if is_ts { Some(format!("{path_proptypes}/{namespace}{ext}")) } else { None },
+        }
+      ))
+    },
+    Tool::Svelte => {
+      use statics::svelte::schema::{
+        SCHEMA,
+        PROPTYPES,
+        PROPTYPES_IMPORTS,
+      };
+
+      let proptypes = if is_ts {
+        Some(CreationPaths {
+          template: format!("/proptypes{ext}"),
+          default: PROPTYPES.to_owned(),
+        })
+      } else { None };
+
+      let proptypes_imports = if is_ts {
+        Some(CreationPaths {
+          template: format!("/proptypes.imports{ext}"),
+          default: PROPTYPES_IMPORTS.to_owned(),
+        })
+      } else { None };
+
+      Ok(SchemaCreation::new(
+        &config.templates,
+        SchemaCreationImports {
+          barrel: format!("export * from \"./{name_camel}\";\n"),
+          types: format!("{name_pascal}Schema,\n  /* NEXT_IMPORT */")
+        },
+        CreationPaths {
+          template: format!("/schema{ext}"),
+          default: SCHEMA.to_owned(),
+        },
+        proptypes,
+        proptypes_imports,
+        SchemaCreationExports {
+          barrel: format!("{path}/index{ext}"),
+          schema: format!("{path}/{name_camel}{ext}"),
+          proptypes: if is_ts { Some(format!("{path_proptypes}/{namespace}{ext}")) } else { None },
+        }
+      ))
+    },
+    Tool::Vanilla => Err(anyhow!(error.clone())),
+  };
+
+  match global.generate_schema(schema?) {
+    Ok(_) => {
+      done();
+      Ok(format!("{} {}", OK, style(format!("Schema {name_pascal} created at {path}")).cyan()))
+    },
+    Err(error) => Err(error)
+  }
 }

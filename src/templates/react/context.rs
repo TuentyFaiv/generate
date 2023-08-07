@@ -1,6 +1,6 @@
 use std::io::{Write, Read, BufReader};
 use std::fs::File;
-use anyhow::{Result};
+use anyhow::Result;
 
 use super::statics::context::{PROPTYPES, CONTEXT, CONTEXT_TS, REDUCER_TS, REDUCER};
 

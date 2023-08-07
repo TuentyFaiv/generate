@@ -1,29 +1,20 @@
 use anyhow::Result;
 use console::style;
 
-use crate::cli::questions::Answers;
-use crate::cli::{done, msg};
-use crate::templates::{global};
+use crate::cli::{utils::done, structs::Answers};
+use crate::statics::OK;
 
-pub fn make(answers: &Answers, template: &Vec<&str>, is_library: bool) -> Result<()> {
-  let tool = answers.tool.as_str();
-  let name = answers.name.as_str();
-  let path = answers.path.as_str();
-  let arch = answers.arch.as_str();
+use super::CLIGlobalCreation;
 
-  let repository = *template.get(1).unwrap();
+pub fn create(CLIGlobalCreation {
+  answers,
+  global,
+  ..
+}: &CLIGlobalCreation) -> Result<String> {
+  let Answers { path, .. } = &answers;
 
-  let result = match tool {
-    _ => {
-      global::project::generate(repository, name, path, tool, arch, is_library);
-      true
-    }
-  };
+  global.generate_project()?;
 
-  if result {
-    done();
-    msg(&format!("{}", style(format!("Move to {path} and start a new universe")).cyan()));
-  }
-
-  Ok(())
+  done();
+  Ok(format!("{} {}", OK, style(format!("Move to {} and start a new universe", path)).cyan()))
 }

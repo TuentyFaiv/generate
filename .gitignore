@@ -1,4 +1,15 @@
 /target
 /public
+/static
 src/logic
 src/ui
+src/routes
+.tfverse
+vite.config.*
+svelte.config.*
+tsconfig.*
+/bins
+/bin/linux
+/bin/win
+/bin/macos
+/node_modules

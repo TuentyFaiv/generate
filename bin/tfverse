@@ -1,0 +1,45 @@
+#!/usr/bin/env node
+const { platform, arch, env, version, release } = process;
+
+function detectPackageManager() {
+  const userAgent = env.npm_config_user_agent;
+
+  if (userAgent == null) {
+    return null;
+  }
+
+  return userAgent.split(" ")[0];
+}
+
+const PLATFORMS = {
+	win32: "./win/tfverse.exe",
+  darwin: "./macos/tfverse",
+  linux: "./linux/tfverse",
+};
+
+const binPath = PLATFORMS?.[platform];
+if (binPath) {
+	const result = require("child_process").spawnSync(
+		require.resolve(binPath),
+		process.argv.slice(2),
+		{
+			shell: false,
+			stdio: "inherit",
+			env: {
+				...env,
+				JS_RUNTIME_VERSION: version,
+				JS_RUNTIME_NAME: release.name,
+				NODE_PACKAGE_MANAGER: detectPackageManager(),
+			},
+		},
+	);
+
+	if (result.error) {
+		throw result.error;
+	}
+
+	process.exitCode = result.status;
+} else {
+	console.error("");
+	process.exitCode = 1;
+}

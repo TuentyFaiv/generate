@@ -1,14 +1,25 @@
 pub static PROPTYPES: &str = r#"export {};
 "#;
 
-pub static PAGE_TS: &str = r#"<script lang="ts">
+pub static SCRIPT_TS: &str = r#"<script lang="ts">
   import { i18n } from "@stores";
 
-  import { page } from "@NAME_LOWER/styles";
+  import { page } from "@NAMESPACE/styles";
 
 	import { SEO } from "@sharing/atoms";
 </script>
+"#;
 
+pub static SCRIPT: &str = r#"<script>
+  import { i18n } from "@stores";
+
+  import { page } from "@NAMESPACE/styles";
+
+	import { SEO } from "@sharing/atoms";
+</script>
+"#;
+
+pub static PAGE: &str = r#"SCRIPT
 <SEO title={$i18n.t("NAME_LOWER:seo-title")} />
 
 <section class={page.NAME_LOWER}>
@@ -18,57 +29,37 @@ pub static PAGE_TS: &str = r#"<script lang="ts">
 </section>
 "#;
 
-pub static PAGE: &str = r#"<script>
-  import { i18n } from "@stores";
+pub static STYLES: &str = r#"import { css, cx } from "@emotion/css";
 
-  import { page } from "@NAME_LOWER/styles";
+import * as responsive from "./NAMESPACE.styles.responsive";
 
-	import { SEO } from "@sharing/atoms";
-</script>
+export const NAME_LOWER = cx(
+	css``,
+	responsive.NAME_LOWER,
+);
 
-<SEO title={$i18n.t("NAME_LOWER:seo-title")} />
-
-<section class={page.NAME_LOWER}>
-  <h1 class={page.title}>
-    {$i18n.t("NAME_LOWER:seo-title")}
-	</h1>
-</section>
-"#;
-
-pub static STYLES_IMPORT: &str = r#"export * as page from "./NAME_LOWER.styles";
-"#;
-
-pub static STYLES: &str = r#"import { css } from "@emotion/css";
-
-import * as responsive from "./NAME_LOWER.styles.responsive";
-
-export const NAME_LOWER = css`
-  ${responsive.NAME_LOWER}
-`;
-
-export const title = css`
-  ${responsive.title}
-`;
+export const title = cx(
+	css``,
+	responsive.title,
+);
 "#;
 
 pub static STYLES_RESPONSIVE: &str = r#"import { css } from "@emotion/css";
 import { forsize } from "@mixins";
 
-export const NAME_LOWER = css`
-${forsize({ size: "desktop-mid", content: css`
+export const NAME_LOWER = forsize({
+  "desktop-mid": css``,
+  desktop: css``,
+});
 
-` })}
-`;
-
-export const title = css`
-${forsize({ size: "desktop-mid", content: css`
-
-` })}
-`;
+export const title = forsize({
+  "desktop-mid": css``,
+  desktop: css``,
+});
 "#;
 
 pub static LOCALE: &str = r#"{
-  "seo-title": "NAME"
+  "seo-title": "NAME_PASCAL"
 }
 "#;
 
@@ -87,7 +78,7 @@ i18next
     fallbackLng: config.i18n_fallback_lang,
     supportedLngs: config.i18n_langs,
     ns: [
-      // NEXT_LOCALE
+      /* NEXT_LOCALE */
     ],
     defaultNS: "translation",
     load: "currentOnly",
@@ -105,9 +96,6 @@ const locales = {
 
 export { i18next, i18n, locales };
 "#;
-
-pub static I18N_LOCALE: &str = r#""NAME_LOWER",
-      // NEXT_LOCALE"#;
 
 pub static SVELTE_CONFIG: &str = r#"import adapter from "@sveltejs/adapter-static";
 import preprocess from "svelte-preprocess";
@@ -132,7 +120,7 @@ const config = {
 			"@services/*": "src/logic/services/*",
 			"@typing/*": "src/logic/typing/*",
 			"@utils/*": "src/logic/utils/*",
-			// NEXT_ALIAS
+			/* NEXT_ALIAS */
 			// UI Sharing
 			"@sharing/atoms": "src/ui/sharing/atoms/index.ts",
 			"@sharing/molecules": "src/ui/sharing/molecules/index.ts",
@@ -146,10 +134,9 @@ const config = {
 export default config;
 "#;
 
-pub static SVELTE_ALIAS: &str = r#"// UI NAME
-			"@NAME_LOWER/atoms": "src/ui/NAME_LOWER/atoms/index.ts",
-			"@NAME_LOWER/molecules": "src/ui/NAME_LOWER/molecules/index.ts",
-			"@NAME_LOWER/organisms": "src/ui/NAME_LOWER/organisms/index.ts",
-			"@NAME_LOWER/styles": "src/ui/NAME_LOWER/styles/index.ts",
-      // NEXT_ALIAS
-"#;
+pub static SVELTE_ALIAS: &str = r#"// UI NAME_PASCAL
+			"@NAMESPACE/atoms": "src/ui/NAMESPACE/atoms/index.ts",
+			"@NAMESPACE/molecules": "src/ui/NAMESPACE/molecules/index.ts",
+			"@NAMESPACE/organisms": "src/ui/NAMESPACE/organisms/index.ts",
+			"@NAMESPACE/styles": "src/ui/NAMESPACE/styles/index.ts",
+      /* NEXT_ALIAS */"#;

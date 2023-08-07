@@ -1,61 +1,146 @@
 use std::fs::create_dir_all;
-use anyhow::Result;
+use anyhow::{Result, anyhow};
 use console::style;
 
-use crate::config::{Config};
+use crate::cli::{utils::done, enums::Tool, structs::Answers};
+use crate::statics;
 use crate::statics::OK;
-use crate::cli::questions::Answers;
-use crate::cli::{done, msg};
-use crate::templates::{react, svelte};
-use crate::utils::{change_case};
 
-pub fn make(answers: &Answers, config: Config) -> Result<()> {
-  let name = answers.name.as_str();
-  let path = answers.path.as_str();
-  let tool = answers.tool.as_str();
-  let tool_type = answers.tool_type.as_str();
+use super::CLIGlobalCreation;
+use super::structs::{
+  CreationPaths,
+  LayoutCreation,
+  LayoutCreationExports,
+};
 
-  let name_capitalize = change_case(name, None);
-  let is_ts = tool_type == "typescript";
-  let path_typing =  format!("{}/layouts", config.paths.types);
+pub fn create(CLIGlobalCreation {
+  answers,
+  config,
+  error,
+  global,
+  ..
+}: &CLIGlobalCreation) -> Result<String> {
+  let Answers { name, path, tool, language, .. } = answers;
+  let paths = &config.paths;
+
+  let is_ts = language.as_str() == "typescript";
+  let ext = if is_ts { ".ts".to_owned() } else { ".js".to_owned() };
+  let name_pascal = &name.pascal;
+
+  let path_ui = format!("{}/{}", paths.ui, name.namespace);
+  let mut path_proptypes = String::new();
 
   create_dir_all(path).unwrap_or_else(|why| {
     println!("! {:?}", why.kind());
   });
+  create_dir_all(format!("{path_ui}/styles")).unwrap_or_else(|why| {
+    println!("! {:?}", why.kind());
+  });
+
   if is_ts {
-    create_dir_all(path_typing.clone()).unwrap_or_else(|why| {
+    path_proptypes =  format!("{}/layouts", paths.types);
+    create_dir_all(&path_proptypes).unwrap_or_else(|why| {
       println!("! {:?}", why.kind());
     });
   }
 
-  let result = match tool {
-    "react" => {
-      create_dir_all(format!("{path}/styles")).unwrap_or_else(|why| {
-        println!("! {:?}", why.kind());
-      });
-      react::layout::generate(path, path_typing.as_str(), name_capitalize.as_str(), is_ts)?;
-      true
+  let layout = match tool {
+    Tool::React => {
+      use statics::react::layout::{
+        LAYOUT,
+        LAYOUT_TS,
+        PROPTYPES,
+        STYLES,
+        STYLES_RESPONSIVE,
+      };
+
+      let proptypes = if is_ts {
+        Some(CreationPaths {
+          template: format!("/proptypes{ext}"),
+          default: PROPTYPES.to_string(),
+        })
+      } else { None };
+
+      Ok(LayoutCreation::new(
+        &config.templates,
+        format!("export * as Layout from \"./{name_pascal}Layout.styles\";\n"),
+        CreationPaths {
+          template: format!("/layout{ext}x"),
+          default: if is_ts { LAYOUT_TS.to_string() } else { LAYOUT.to_string() }
+        },
+        CreationPaths {
+          template: format!("/styles{ext}"),
+          default: STYLES.to_string()
+        },
+        CreationPaths {
+          template: format!("/styles.responsive{ext}"),
+          default: STYLES_RESPONSIVE.to_string()
+        },
+        proptypes,
+        None,
+        LayoutCreationExports {
+          barrel_styles: format!("{path_ui}/styles/index{ext}"),
+          layout: format!("{path}/+layout{ext}x"),
+          styles: format!("{path_ui}/styles/{name_pascal}Layout.styles{ext}"),
+          responsive: format!("{path_ui}/styles/{name_pascal}Layout.styles.responsive{ext}"),
+          proptypes: if is_ts { Some(format!("{path_proptypes}/{}{ext}", name.namespace)) } else { None },
+        }
+      ))
     },
-    "svelte" => {
-      let path_ui = format!("{}/{}", config.paths.ui, name).to_lowercase();
-      create_dir_all(format!("{path_ui}/styles")).unwrap_or_else(|why| {
-        println!("! {:?}", why.kind());
-      });
-      svelte::layout::generate(path, path_typing.as_str(), path_ui.as_str(), name, is_ts)?;
-      true
+    Tool::Svelte => {
+      use statics::svelte::layout::{
+        LAYOUT,
+        SCRIPT,
+        SCRIPT_TS,
+        PROPTYPES,
+        STYLES,
+        STYLES_RESPONSIVE,
+      };
+
+      let proptypes = if is_ts {
+        Some(CreationPaths {
+          template: format!("/proptypes{ext}"),
+          default: PROPTYPES.to_string(),
+        })
+      } else { None };
+
+      Ok(LayoutCreation::new(
+        &config.templates,
+        format!("export * as layout from \"./{}.layout.styles\";\n", name.namespace),
+        CreationPaths {
+          template: "/layout.svelte".to_string(),
+          default: LAYOUT.to_string()
+        },
+        CreationPaths {
+          template: format!("/styles{ext}"),
+          default: STYLES.to_string()
+        },
+        CreationPaths {
+          template: format!("/styles.responsive{ext}"),
+          default: STYLES_RESPONSIVE.to_string()
+        },
+        proptypes,
+        Some(CreationPaths {
+          template: format!("/script{ext}.svelte"),
+          default: if is_ts { SCRIPT_TS.to_string() } else { SCRIPT.to_string() }
+        }),
+        LayoutCreationExports {
+          barrel_styles: format!("{path_ui}/styles/index{ext}"),
+          layout: format!("{path}/+layout.svelte"),
+          styles: format!("{path_ui}/styles/{}.layout.styles{ext}", name.namespace),
+          responsive: format!("{path_ui}/styles/{}.layout.styles.responsive{ext}", name.namespace),
+          proptypes: if is_ts { Some(format!("{path_proptypes}/{}{ext}", name.namespace)) } else { None },
+        }
+      ))
     }
-    "vanilla" => false,
-    _ => false
+    Tool::Vanilla => Err(anyhow!(error.clone())),
   };
 
-  if result {
-    done();
-    msg(&format!(
-      "{} {}",
-      OK,
-      style(format!("Layout {name_capitalize} created at {path}")).cyan()
-    ));
+  match global.generate_layout(layout?) {
+    Ok(_) => {
+      done();
+      Ok(format!( "{} {}", OK, style(format!("Layout {name_pascal} created at {path}")).cyan()))
+    },
+    Err(error) => Err(error)
   }
-
-  Ok(())
 }

@@ -1,11 +1,12 @@
-use crate::cli::command;
+use crate::cli::utils::command;
 
 pub fn create_url(repository: &str) -> String {
   if cfg!(target_os = "windows") {
-    format!("https://github.com/Platimex/{repository}.git")
-  } else {
-    format!("git@github.com:Platimex/{repository}.git")
+    let repo_win = repository.replace("git@", "https://").replace("github.com:", "github.com/");
+    return repo_win;
   }
+
+  repository.to_string()
 }
 
 pub fn rm_git(path: &str) {

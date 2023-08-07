@@ -1,24 +1,24 @@
 pub static PROPTYPES: &str = r#"// Change for interface if is an object
-export type NAMEState = null;
+export type NAME_PASCALState = null;
 "#;
 
 pub static PAGE_TS: &str = r#"import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useAppContext } from "@contexts";
 
-import type { NAMEState } from "@typing/pages/NAME_LOWER";
+import type { NAME_PASCALState } from "@typing/pages/NAMESPACE";
 
-import { Page } from "@NAME_LOWER/styles";
+import { Page } from "@NAMESPACE/styles";
 
-export default function NAMEPage() {
-  const { t } = useTranslation("NAME_LOWER");
+export default function NAME_PASCALPage() {
+  const { t } = useTranslation("NAMESPACE");
   const { global, dispatch } = useAppContext();
-  const [state, setState] = useState<NAMEState>(null);
+  const [state, setState] = useState<NAME_PASCALState>(null);
 
   return (
-    <Page.NAME>
+    <Page.NAME_PASCAL>
       {t("seo-title")}
-    </Page.NAME>
+    </Page.NAME_PASCAL>
   );
 }
 "#;
@@ -27,49 +27,46 @@ pub static PAGE: &str = r#"import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useAppContext } from "@contexts";
 
-import { Page } from "@NAME_LOWER/styles";
+import { Page } from "@NAMESPACE/styles";
 
-export default function NAMEPage() {
-  const { t } = useTranslation("NAME_LOWER");
+export default function NAME_PASCALPage() {
+  const { t } = useTranslation("NAMESPACE");
   const { global, dispatch } = useAppContext();
   const [state, setState] = useState(null);
 
   return (
-    <Page.NAME>
+    <Page.NAME_PASCAL>
       {t("seo-title")}
-    </Page.NAME>
+    </Page.NAME_PASCAL>
   );
 }
 "#;
 
-pub static STYLES_IMPORT: &str = r#"export * as Page from "./NAME.styles";
-"#;
-
 pub static STYLES: &str = r#"import styled from "@emotion/styled";
 
-import * as responsive from "./NAME.styles.responsive";
+import * as responsive from "./NAME_PASCAL.styles.responsive";
 
-export const NAME = styled.div`
+export const NAME_PASCAL = styled.div`
   ${responsive.NAME_LOWER}
+`;
+
+export const Title = styled.div`
+  ${responsive.title}
 `;
 "#;
 
 pub static STYLES_RESPONSIVE: &str = r#"import { css } from "@emotion/react";
 import { forsize } from "@mixins";
 
-export const NAME_LOWER = css`
-${forsize({ size: "desktop-mid", content: css`
+export const NAME_LOWER = forsize({
+  "desktop-mid": css``,
+  desktop: css``,
+});
 
-` })}
-`;
-"#;
-
-pub static PAGE_IMPORT: &str = r#"const NAME = lazy(() => (import("@NAME_LOWER/page")));
-// ROUTES"#;
-
-pub static LOCALE: &str = r#"{
-  "seo-title": "NAME"
-}
+export const title = forsize({
+  "desktop-mid": css``,
+  desktop: css``,
+});
 "#;
 
 pub static ROUTER: &str = r#"import { lazy, Suspense } from "react";
@@ -79,15 +76,14 @@ import { LoaderPortal } from "@sharing/atoms";
 
 import Layout from "@sharing/layout";
 
-// ROUTES
+/* NEXT_IMPORT */
 
-// ROUTER
 export const router = createBrowserRouter([
   {
     path: "/",
     element: <Layout />,
     children: [
-      // NEXT_ROUTE
+      /* NEXT_ROUTE */
     ]
   },
   {
@@ -101,16 +97,22 @@ pub static ROUTE: &str = r#"{
         path: "NAME_LOWER",
         element: (
           <Suspense fallback={<LoaderPortal />}>
-            <NAME />
+            <NAME_PASCAL />
           </Suspense>
         ),
       },
-      // NEXT_ROUTE"#;
+      /* NEXT_ROUTE */"#;
+
+pub static LOCALE: &str = r#"{
+  "seo-title": "NAME_PASCAL"
+}
+"#;
 
 pub static I18N: &str = r#"import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
 import LanguageDetector from "i18next-browser-languagedetector";
 import Backend from "i18next-http-backend";
+import { enUS, es } from "date-fns/locale";
 import config from "@config";
 
 i18n
@@ -122,7 +124,7 @@ i18n
     fallbackLng: config.i18n_fallback_lang,
     supportedLngs: config.i18n_langs,
     ns: [
-      // NEXT_LOCALE
+      /* NEXT_LOCALE */
     ],
     nsSeparator: false,
     load: "currentOnly",
@@ -134,11 +136,13 @@ i18n
     },
   });
 
-export default i18n;
-"#;
+const locales = {
+  "en-US": enUS,
+  es,
+};
 
-pub static I18N_LOCALE: &str = r#""NAME_LOWER",
-      // NEXT_LOCALE"#;
+export { i18n, locales };
+"#;
 
 pub static TS_CONFIG: &str = r#"{
   "compilerOptions": {
@@ -204,7 +208,7 @@ pub static TS_CONFIG: &str = r#"{
       "@hocs": [
         "src/logic/hocs/index.ts"
       ],
-      // NEXT_ALIAS
+      /* NEXT_ALIAS */
       // UI Sharing
       "@sharing/atoms": [
         "src/ui/sharing/atoms/index.ts"
@@ -238,30 +242,29 @@ pub static TS_CONFIG: &str = r#"{
 }
 "#;
 
-pub static TS_ALIAS: &str = r#"// UI NAME
-      "@NAME_LOWER/hooks": [
-        "src/ui/NAME_LOWER/hooks/index.ts"
+pub static TS_ALIAS: &str = r#"// UI NAME_PASCAL
+      "@NAMESPACE/hooks": [
+        "src/ui/NAMESPACE/hooks/index.ts"
       ],
-      "@NAME_LOWER/atoms": [
-        "src/ui/NAME_LOWER/atoms/index.ts"
+      "@NAMESPACE/atoms": [
+        "src/ui/NAMESPACE/atoms/index.ts"
       ],
-      "@NAME_LOWER/molecules": [
-        "src/ui/NAME_LOWER/molecules/index.ts"
+      "@NAMESPACE/molecules": [
+        "src/ui/NAMESPACE/molecules/index.ts"
       ],
-      "@NAME_LOWER/organisms": [
-        "src/ui/NAME_LOWER/organisms/index.ts"
+      "@NAMESPACE/organisms": [
+        "src/ui/NAMESPACE/organisms/index.ts"
       ],
-      "@NAME_LOWER/styles": [
-        "src/ui/NAME_LOWER/styles/index.ts"
+      "@NAMESPACE/styles": [
+        "src/ui/NAMESPACE/styles/index.ts"
       ],
-      "@NAME_LOWER/page": [
-        "src/ui/NAME_LOWER/+page.tsx"
+      "@NAMESPACE/page": [
+        "src/ui/NAMESPACE/+page.tsx"
       ],
-      "@NAME_LOWER/layout": [
-        "src/ui/NAME_LOWER/+layout.tsx"
+      "@NAMESPACE/layout": [
+        "src/ui/NAMESPACE/+layout.tsx"
       ],
-      // NEXT_ALIAS
-"#;
+      /* NEXT_ALIAS */"#;
 
 pub static VITE_CONFIG: &str = r#"import { resolve } from "path";
 import { defineConfig } from "vite";
@@ -292,7 +295,7 @@ export default defineConfig({
       "@contexts": resolve("src/logic/contexts/index.ts"),
       "@hooks": resolve("src/logic/hooks/index.ts"),
       "@hocs": resolve("src/logic/hocs/index.ts"),
-      // NEXT_ALIAS
+      /* NEXT_ALIAS */
       // UI Sharing
       "@sharing/atoms": resolve("src/ui/sharing/atoms/index.ts"),
       "@sharing/molecules": resolve("src/ui/sharing/molecules/index.ts"),
@@ -305,13 +308,12 @@ export default defineConfig({
 });
 "#;
 
-pub static VITE_ALIAS: &str = r#"// UI NAME
-      "@NAME_LOWER/hooks": resolve("src/ui/NAME_LOWER/hooks/index.ts"),
-      "@NAME_LOWER/atoms": resolve("src/ui/NAME_LOWER/atoms/index.ts"),
-      "@NAME_LOWER/molecules": resolve("src/ui/NAME_LOWER/molecules/index.ts"),
-      "@NAME_LOWER/organisms": resolve("src/ui/NAME_LOWER/organisms/index.ts"),
-      "@NAME_LOWER/styles": resolve("src/ui/NAME_LOWER/styles/index.ts"),
-      "@NAME_LOWER/page": resolve("src/ui/NAME_LOWER/+page.tsx"),
-      "@NAME_LOWER/layout": resolve("src/ui/NAME_LOWER/+layout.tsx"),
-      // NEXT_ALIAS
-"#;
+pub static VITE_ALIAS: &str = r#"// UI NAME_PASCAL
+      "@NAMESPACE/hooks": resolve("src/ui/NAMESPACE/hooks/index.ts"),
+      "@NAMESPACE/atoms": resolve("src/ui/NAMESPACE/atoms/index.ts"),
+      "@NAMESPACE/molecules": resolve("src/ui/NAMESPACE/molecules/index.ts"),
+      "@NAMESPACE/organisms": resolve("src/ui/NAMESPACE/organisms/index.ts"),
+      "@NAMESPACE/styles": resolve("src/ui/NAMESPACE/styles/index.ts"),
+      "@NAMESPACE/page": resolve("src/ui/NAMESPACE/+page.tsx"),
+      "@NAMESPACE/layout": resolve("src/ui/NAMESPACE/+layout.tsx"),
+      /* NEXT_ALIAS */"#;
