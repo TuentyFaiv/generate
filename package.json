@@ -2,11 +2,7 @@
   "name": "@tuentyfaiv/cli",
   "version": "0.0.5",
   "description": "A CLI to generate base code for React, Svelte and Vanilla JS projects, like boilerplates,  components, pages, etc.",
-  "bin": {
-    "tfverse": "./bin/linux/tfverse",
-    "tfverse.exe": "./bin/win/tfverse.exe",
-    "tfverse-macos": "./bin/macos/tfverse"
-  },
+  "bin": "bin/tfverse",
   "scripts": {
     "postinstall": "node ./scripts/postinstall.js"
   },
@@ -24,6 +20,7 @@
   "author": "Tonalli López <contact@tuentyfaiv.com>",
   "license": "MIT",
   "files": [
+    "bin/tfverse",
     "scripts/postinstall.js",
     "LICENSE",
     "README.md"

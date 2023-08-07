@@ -9,5 +9,7 @@ vite.config.*
 svelte.config.*
 tsconfig.*
 /bins
-/bin
+/bin/linux
+/bin/win
+/bin/macos
 /node_modules
