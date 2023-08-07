@@ -36,14 +36,13 @@ impl CLIConfig {
         Some(mut path) => {
           let own_path = ".tfverse/config_cli.json";
           path.push(own_path);
-          println!("Home path: {:?}", path.to_str());
           CLIConfig::read_config(path.to_str().unwrap_or(own_path))
         },
         None => None
       },
     };
 
-    println!("{:?}", config_file);
+    // println!("{:?}", config_file);
 
     Self {
       langs: to_vec(LANGS),
@@ -61,7 +60,7 @@ impl CLIConfig {
     }
   }
   fn read_config(path: &str) -> Option<ConfigFile> {
-    println!("Reading config file: {}", path);
+    // println!("Reading config file: {}", path);
     match File::open(path) {
       Err(_) => None,
       Ok(file) => {

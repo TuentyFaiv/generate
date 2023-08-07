@@ -9,7 +9,7 @@ use crate::create::structs::CreationPaths;
 pub fn read_path(root: &Option<String>, template: &CreationPaths) -> String {
 	let CreationPaths { default, template } = template;
 	let default = default.to_owned();
-	println!("Template dir: {}\nTemplate file: {template}", root.clone().unwrap_or("".to_string()));
+	// println!("Template dir: {}\nTemplate file: {template}", root.clone().unwrap_or("".to_string()));
 
 	match home_dir() {
 		None => default,
@@ -18,7 +18,7 @@ pub fn read_path(root: &Option<String>, template: &CreationPaths) -> String {
 				let template_path = format!("{path}{template}");
 				home.push(template_path.as_str());
 
-				println!("Template path: {:?}", home.to_str());
+				// println!("Template path: {:?}", home.to_str());
 				match home.to_str() {
 					None => default,
 					Some(full_path) => match File::open(full_path) {
@@ -26,21 +26,21 @@ pub fn read_path(root: &Option<String>, template: &CreationPaths) -> String {
 							let mut buf_reader = BufReader::new(&file);
 							let mut content = String::new();
 							match buf_reader.read_to_string(&mut content) {
-								Ok(readed) => {
-									println!("{readed}");
+								Ok(_) => {
+									// println!("{readed}");
 								},
-								Err(error) => {
-									println!("{error}");
+								Err(_) => {
+									// println!("{error}");
 									return default
 								}
 							};
 
-							println!("Content: {content}");
+							// println!("Content: {content}");
 
 							content
 						},
-						Err(error) => {
-							println!("{error}");
+						Err(_) => {
+							// println!("{error}");
 
 							default
 						}

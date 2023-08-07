@@ -14,11 +14,11 @@ impl CLISvelteCreation {
     Self { config, answers, error }
   }
   pub fn make_store(&self) -> Result<String> {
-    println!("make_hoc");
+    // println!("make_hoc");
     Err(anyhow!(self.error.clone()))
   }
   pub fn make_action(&self) -> Result<String> {
-    println!("make_hook");
+    // println!("make_hook");
     Err(anyhow!(self.error.clone()))
   }
 }
