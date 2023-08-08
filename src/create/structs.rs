@@ -325,3 +325,77 @@ impl SchemaCreation {
     }
   }
 }
+
+// Schema
+pub struct ServiceCreation {
+  templates: Option<ConfigTemplates>,
+  pub import: ServiceCreationImports,
+  pub service: CreationPaths,
+  pub instances: CreationPaths,
+  pub proptypes: Option<CreationPaths>,
+  pub proptypes_imports: Option<CreationPaths>,
+  pub exports: ServiceCreationExports,
+}
+
+pub struct ServiceCreationImports {
+  pub barrel: String,
+  pub barrel_instances: String,
+}
+
+pub struct ServiceCreationExports {
+  pub barrel: String,
+  pub barrel_instances: String,
+  pub service: String,
+  pub instances: String,
+  pub proptypes: Option<String>,
+}
+
+impl ServiceCreation {
+  pub fn new(
+    templates: &Option<ConfigTemplates>,
+    import: ServiceCreationImports,
+    service: CreationPaths,
+    instances: CreationPaths,
+    proptypes: Option<CreationPaths>,
+    proptypes_imports: Option<CreationPaths>,
+    exports: ServiceCreationExports,
+  ) -> Self {
+    Self {
+      templates: templates.clone(),
+      import,
+      service,
+      instances,
+      proptypes,
+      proptypes_imports,
+      exports,
+    }
+  }
+
+  pub fn react_path(&self) -> Option<String> {
+    match &self.templates {
+      None => None,
+      Some(templates) => match &templates.react {
+        None => None,
+        Some(react) => react.service.clone()
+      }
+    }
+  }
+  pub fn svelte_path(&self) -> Option<String> {
+    match &self.templates {
+      None => None,
+      Some(templates) => match &templates.svelte {
+        None => None,
+        Some(svelte) => svelte.service.clone()
+      }
+    }
+  }
+  pub fn vanilla_path(&self) -> Option<String> {
+    match &self.templates {
+      None => None,
+      Some(templates) => match &templates.vanilla {
+        None => None,
+        Some(vanilla) => vanilla.service.clone()
+      }
+    }
+  }
+}

@@ -69,7 +69,7 @@ impl CLICreation {
 			ArchType::Page => global.make_page(),
 			ArchType::Layout => global.make_layout(),
 			ArchType::Schema => global.make_schema(),
-			// ArchType::Service => global.make_service(),
+			ArchType::Service => global.make_service(),
 			// ArchType::Context => global.make_context(),
 			// ArchType::Hoc => react.make_hoc(),
 			// ArchType::Hook => react.make_hook(),

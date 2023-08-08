@@ -16,6 +16,7 @@ use crate::create::structs::{
   PageCreation,
   LayoutCreation,
   SchemaCreation,
+  ServiceCreation,
 };
 
 use super::utils;
@@ -46,7 +47,7 @@ impl CLIGlobalTemplates {
   pub fn generate_schema(&self, templates: SchemaCreation) -> Result<()> {
     schema::generate(&self, &templates)
   }
-  pub fn generate_service(&self) -> Result<()> {
-    service::generate(&self)
+  pub fn generate_service(&self, templates: ServiceCreation) -> Result<()> {
+    service::generate(&self, &templates)
   }
 }

@@ -2,62 +2,49 @@ use std::io::{Write, Read, BufReader};
 use std::fs::File;
 use anyhow::Result;
 
-use crate::utils::change_case;
-use crate::statics::global;
+use crate::cli::enums::Tool;
+// use crate::utils::change_case;
+// use crate::statics::global;
+use crate::create::structs::ServiceCreation;
 
+use super::utils::{read_path, set_keywords};
 use super::CLIGlobalTemplates;
 
 pub fn generate(CLIGlobalTemplates {
   answers,
-  config,
-  error
-}: &CLIGlobalTemplates) -> Result<()> {
-  use global::service::{PROPTYPES, SERVICE, SERVICE_TS};
-  use global::service::{SERVICE_IMPORT, TYPE_EXPORT, INSTANCES};
-  // For service generation
+  // config,
+  // error,
+  ..
+}: &CLIGlobalTemplates, templates: &ServiceCreation) -> Result<()> {
+  let tool = &answers.tool;
+  let template_path = match tool {
+    Tool::React => templates.react_path(),
+    Tool::Svelte => templates.svelte_path(),
+    Tool::Vanilla => templates.vanilla_path(),
+  };
 
-  let path = "";
-  let path_proptypes = "";
-  let path_instances = "";
-  let name = "";
-  let namespace = "";
-  let is_ts = true;
+  let mut service = read_path(&template_path, &templates.service);
+  let instances = read_path(&template_path, &templates.instances);
 
-  let instances = INSTANCES.to_string();
-  let name_camel = change_case(name, Some("camel"));
-  
-  let mut proptypes = PROPTYPES.to_string();
-  let mut service = SERVICE.to_string();
-  let mut service_import = SERVICE_IMPORT.to_string();
-  let mut type_export = TYPE_EXPORT.to_string();
-  let mut ext = ".js".to_string();
+  service = set_keywords(&service, &answers.name);
 
-  if is_ts {
-    service = SERVICE_TS.to_string();
-    ext = ".ts".to_string();
-  }
-
-  type_export = type_export.replace("NAME", name);
-  
-  service = service.replace("NAME_CAMEL", &name_camel);
-  service = service.replace("NAMESPACE", namespace);
-  service = service.replace("NAME", name);
-
-  service_import = service_import.replace("NAME_CAMEL", &name_camel);
-
-  let index_path = format!("{path}/index.ts");
-  let instances_path = format!("{path_instances}/instances.ts");
-  let service_path = format!("{path}/{name_camel}{ext}");
-  let proptypes_path = format!("{path_proptypes}/{namespace}{ext}");
-
-  let mut service_file = File::create(service_path)?;
+  let mut service_file = File::create(&templates.exports.service)?;
   service_file.write_all(service.as_bytes())?;
 
+  let service_import = &templates.import.barrel;
+  let index_path = &templates.exports.barrel;
   match File::open(&index_path) {
     Ok(index_file) => {
       let mut buf_reader = BufReader::new(&index_file);
       let mut index_content = String::new();
       buf_reader.read_to_string(&mut index_content)?;
+
+      if index_content.contains("export {};") {
+        index_content = index_content.replace("export {};", "");
+      }
+      if index_content.contains(service_import) {
+        index_content = index_content.replace(service_import, "");
+      }
 
       let mut new_index = File::create(&index_path)?;
       let updated_index = [index_content.as_str(), service_import.as_str()].concat();
@@ -68,8 +55,19 @@ pub fn generate(CLIGlobalTemplates {
 
       index_file.write_all(service_import.as_bytes())?;
     }
-  };
+  }
 
+  let instances_import = &templates.import.barrel_instances;
+  let instances_index = &templates.exports.barrel_instances;
+  match File::open(&instances_index) {
+    Ok(_) => {},
+    Err(_) => {
+      let mut instances_file = File::create(&instances_index)?;
+
+      instances_file.write_all(instances_import.as_bytes())?;
+    }
+  }
+  let instances_path = &templates.exports.instances;
   match File::open(&instances_path) {
     Ok(_) => {},
     Err(_) => {
@@ -79,27 +77,43 @@ pub fn generate(CLIGlobalTemplates {
     }
   }
 
-  if is_ts {
-    match File::open(&proptypes_path) {
-      Ok(proptypes_file) => {
-        let mut buf_reader = BufReader::new(&proptypes_file);
-        let mut proptypes_content = String::new();
-        buf_reader.read_to_string(&mut proptypes_content)?;
-  
-        let mut new_proptypes = File::create(&proptypes_path)?;
-        
-        proptypes_content = proptypes_content.replace("// NEXT_TYPE", &type_export);
-  
-        new_proptypes.write_all(proptypes_content.as_bytes())?;
-      },
-      Err(_) => {
-        let mut proptypes_file = File::create(&proptypes_path)?;
+  if let Some(template_props) = &templates.proptypes {
+    if let Some(export_props) = &templates.exports.proptypes {
+      let mut proptypes = read_path(&template_path, template_props);
+      let mut imports: Option<String> = None;
 
-        proptypes = proptypes.replace("// NEXT_TYPE", &format!("{type_export}\n"));
-  
-        proptypes_file.write_all(proptypes.as_bytes())?;
+      if let Some(template_proptypes_imports) = &templates.proptypes_imports {
+        let mut template_imports = read_path(&template_path, template_proptypes_imports);
+
+        template_imports = set_keywords(&template_imports, &answers.name);
+        imports = Some(template_imports);
+      } 
+
+      proptypes = set_keywords(&proptypes, &answers.name);
+
+      match File::open(&export_props) {
+        Ok(proptypes_file) => {
+          let mut buf_reader = BufReader::new(&proptypes_file);
+          let mut proptypes_content = String::new();
+          buf_reader.read_to_string(&mut proptypes_content)?;
+
+          let mut new_config = File::create(&export_props)?;
+
+          proptypes_content = proptypes_content.replace("/* NEXT_TYPE */", &proptypes);
+
+          new_config.write_all(proptypes_content.as_bytes())?;
+        },
+        Err(_) => {
+          let mut proptypes_file = File::create(&export_props)?;
+          
+          if let Some(template_imports) = imports {
+            proptypes = template_imports.replace("/* PROPTYPES */", &proptypes);
+          }
+
+          proptypes_file.write_all(proptypes.as_bytes())?;
+        }
       }
-    };
+    }
   }
 
   Ok(())
