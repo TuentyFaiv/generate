@@ -118,7 +118,7 @@ pub fn create(CLIGlobalCreation {
         PageCreationImports {
           page: Some(format!("const {name_pascal} = lazy(() => (import(\"@{}/page\")));\n/* NEXT_IMPORT */", name.namespace)),
           styles: format!("export * as Page from \"./{name_pascal}.styles\";\n"),
-          i18n: if i18n { Some(format!("export * from \"./i18n/Provider{ext}\";\n")) } else { None },
+          i18n: if i18n { Some("export * from \"./i18n/Provider\";\n".to_owned()) } else { None },
           locale: if i18n { Some(format!("\"{}\",\n      /* NEXT_LOCALE */", name.namespace)) } else { None }
         },
         CreationPaths {
@@ -221,7 +221,7 @@ pub fn create(CLIGlobalCreation {
         PageCreationImports {
           page: None,
           styles: format!("export * as page from \"./{}.styles\";\n", name.namespace),
-          i18n: if i18n { Some(format!("export * from \"./i18n/store{ext}\";\n")) } else { None },
+          i18n: if i18n { Some(format!("export * from \"./i18n/store\";\n")) } else { None },
           locale: if i18n { Some(format!("\"{}\",\n      /* NEXT_LOCALE */", name.namespace)) } else { None }
         },
         CreationPaths {

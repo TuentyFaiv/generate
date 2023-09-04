@@ -154,13 +154,17 @@ impl CLIQuestions {
 
           let full_path = match tool {
             Tool::Svelte => {
+              answer_name.set_namespace(&answer_name.lower.clone());
               if &answer_name.lower == "home" || &answer_name.lower == "index" {
                 paths.pages
               } else {
                 format!("{}/{}", paths.pages, answer_name.lower)
               }
             },
-            _ => format!("{}/{}", paths.ui, answer_name.lower)
+            _ => {
+              answer_name.set_namespace(&answer_name.lower.clone());
+              format!("{}/{}", paths.ui, answer_name.lower)
+            }
           };
 
           full_path
@@ -183,7 +187,10 @@ impl CLIQuestions {
       }
       Some(exist) => exist.clone()
     };
-    answer_name.set_namespace(&path);
+
+    if *arch != ArchType::Page && *arch != ArchType::Layout {
+      answer_name.set_namespace(&path);
+    }
     Ok(path)
   }
 }
