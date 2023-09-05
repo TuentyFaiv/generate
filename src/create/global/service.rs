@@ -3,6 +3,7 @@ use anyhow::Result;
 use console::style;
 
 use crate::cli::{utils::done, structs::Answers};
+use crate::cli::enums::Lang;
 use crate::statics::global::service::{
   INSTANCES,
   INSTANCES_TS,
@@ -28,11 +29,11 @@ pub fn create(CLIGlobalCreation {
   global,
   ..
 }: &CLIGlobalCreation) -> Result<String> {
-  let Answers { name, path, language, tool, .. } = answers;
+  let Answers { name, path, language, .. } = answers;
   let paths = &config.paths;
 
-  let is_ts = language == "typescript";
-  let ext = if is_ts { ".ts".to_owned() } else { ".js".to_owned() };
+  let is_ts = *language == Lang::TypeScript;
+  let ext = language.to_extension();
   let name_pascal = &name.pascal;
   let name_camel = &name.camel;
   let namespace = &name.namespace;
@@ -72,7 +73,7 @@ pub fn create(CLIGlobalCreation {
     &config.templates,
     ServiceCreationImports {
       barrel: format!("export * from \"./{name_camel}\";\n"),
-      barrel_instances: format!("export * from \"./instances{ext}\";\n"),
+      barrel_instances: format!("export * from \"./instances\";\n"),
     },
     CreationPaths {
       template: format!("/service{ext}"),

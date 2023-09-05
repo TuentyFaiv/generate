@@ -211,6 +211,7 @@ If you want to personalize this CLI you must create the following files inside t
 | `NAME_LOWER` | Lowercase name |
 | `NAME` | User input name |
 | `NAMESPACE` | User input namespace |
+| `EXT_STYLES` | Styles extension |
 
 ## Templates keywords for svelte
 

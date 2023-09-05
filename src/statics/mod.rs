@@ -46,6 +46,8 @@ pub static ARCHS_REACT: &[&str] = &["hoc", "hook", "context"];
 pub static ARCHS_SVELTE: &[&str] = &["action", "store"];
 pub static ARCHS_VANILLA: &[&str] = &["class"];
 
+pub static STYLES : &[&str] = &["css", "scss", "less", "stylus", "postcss", "emotion", "styled"];
+
 pub static NOT_IMPLEMENTED: Emoji<'_, '_> = Emoji("👻 ", "");
 pub static DONE: Emoji<'_, '_> = Emoji("😎 ", "");
 pub static OK: Emoji<'_, '_> = Emoji("🥳 ", "");

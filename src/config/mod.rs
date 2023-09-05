@@ -8,7 +8,7 @@ use dirs_next::home_dir;
 
 use crate::statics::{TOOLS, TOOLS_REACT, TOOLS_SVELTE, TOOLS_WEBCOMPONENTS, TOOLS_VANILLA};
 use crate::statics::{ARCHS, ARCHS_REACT, ARCHS_SVELTE, TOOLS_COMPONENTS, ARCHS_VANILLA};
-use crate::statics::LANGS;
+use crate::statics::{LANGS, STYLES};
 use crate::utils::to_vec;
 use crate::cli::enums::Tool;
 use crate::cli::structs::Args;
@@ -24,6 +24,7 @@ pub struct CLIConfig {
   pub tools: Tools,
   pub archs: Archs,
   pub templates: Option<ConfigTemplates>,
+  pub styles: Vec<String>,
   tools_type: ConfigFileToolsType,
   repository: String,
 }
@@ -56,6 +57,7 @@ impl CLIConfig {
         svelte: to_vec(ARCHS_SVELTE),
         vanilla: to_vec(ARCHS_VANILLA),
       },
+      styles: to_vec(STYLES),
       templates: CLIConfig::build_templates(&config_file),
     }
   }

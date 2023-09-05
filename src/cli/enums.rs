@@ -36,19 +36,19 @@ impl ArchType {
   }
   pub fn to_string(&self) -> String {
     match self {
-      ArchType::Project => "project".to_string(),
-      ArchType::Library => "library".to_string(),
-      ArchType::Component => "component".to_string(),
-      ArchType::Hoc => "hoc".to_string(),
-      ArchType::Hook => "hook".to_string(),
-      ArchType::Context => "context".to_string(),
-      ArchType::Layout => "layout".to_string(),
-      ArchType::Page => "page".to_string(),
-      ArchType::Service => "service".to_string(),
-      ArchType::Schema => "schema".to_string(),
-      ArchType::Action => "action".to_string(),
-      ArchType::Store => "store".to_string(),
-      ArchType::Class => "class".to_string(),
+      ArchType::Project => "project".to_owned(),
+      ArchType::Library => "library".to_owned(),
+      ArchType::Component => "component".to_owned(),
+      ArchType::Hoc => "hoc".to_owned(),
+      ArchType::Hook => "hook".to_owned(),
+      ArchType::Context => "context".to_owned(),
+      ArchType::Layout => "layout".to_owned(),
+      ArchType::Page => "page".to_owned(),
+      ArchType::Service => "service".to_owned(),
+      ArchType::Schema => "schema".to_owned(),
+      ArchType::Action => "action".to_owned(),
+      ArchType::Store => "store".to_owned(),
+      ArchType::Class => "class".to_owned(),
     }
   }
 }
@@ -71,9 +71,85 @@ impl Tool {
   }
   pub fn to_string(&self) -> String {
     match self {
-      Tool::React => "react".to_string(),
-      Tool::Svelte => "svelte".to_string(),
-      Tool::Vanilla => "vanilla".to_string(),
+      Tool::React => "react".to_owned(),
+      Tool::Svelte => "svelte".to_owned(),
+      Tool::Vanilla => "vanilla".to_owned(),
+    }
+  }
+}
+
+#[derive(PartialEq, Eq, Clone, Debug)]
+pub enum Lang {
+  JavaScript,
+  TypeScript,
+}
+
+impl Lang {
+  pub fn parse(name: &str) -> Lang {
+    match name.to_lowercase().as_str() {
+      "javascript" => Lang::JavaScript,
+      "typescript" => Lang::TypeScript,
+      _ => Lang::TypeScript,
+    }
+  }
+  // pub fn to_string(&self) -> String {
+  //   match self {
+  //     Lang::JavaScript => "javascript".to_owned(),
+  //     Lang::TypeScript => "typescript".to_owned(),
+  //   }
+  // }
+  pub fn to_extension(&self) -> String {
+    match self {
+      Lang::JavaScript => ".js".to_owned(),
+      Lang::TypeScript => ".ts".to_owned(),
+    }
+  }
+}
+
+#[derive(PartialEq, Eq, Clone, Debug)]
+pub enum Styles {
+  CSS,
+  SCSS,
+  LESS,
+  Stylus,
+  PostCSS,
+  Emotion,
+  StyledComponents,
+}
+
+impl Styles {
+  pub fn parse(name: &str) -> Styles {
+    match name.to_lowercase().as_str() {
+      "css" => Styles::CSS,
+      "scss" => Styles::SCSS,
+      "less" => Styles::LESS,
+      "stylus" => Styles::Stylus,
+      "postcss" => Styles::PostCSS,
+      "emotion" => Styles::Emotion,
+      "styled" => Styles::StyledComponents,
+      _ => Styles::CSS,
+    }
+  }
+  // pub fn to_string(&self) -> String {
+  //   match self {
+  //     Styles::CSS => "css".to_owned(),
+  //     Styles::SCSS => "scss".to_owned(),
+  //     Styles::LESS => "less".to_owned(),
+  //     Styles::Stylus => "stylus".to_owned(),
+  //     Styles::PostCSS => "postcss".to_owned(),
+  //     Styles::Emotion => "emotion".to_owned(),
+  //     Styles::StyledComponents => "styled".to_owned(),
+  //   }
+  // }
+  pub fn to_extension(&self, lang: &Lang) -> String {
+    match self {
+      Styles::CSS => ".css".to_owned(),
+      Styles::SCSS => ".scss".to_owned(),
+      Styles::LESS => ".less".to_owned(),
+      Styles::Stylus => ".styl".to_owned(),
+      Styles::PostCSS => ".postcss".to_owned(),
+      Styles::Emotion => lang.to_extension(),
+      Styles::StyledComponents => lang.to_extension(),
     }
   }
 }

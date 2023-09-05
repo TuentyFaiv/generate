@@ -29,6 +29,7 @@ pub fn generate(CLIGlobalTemplates {
   }
 
   component = set_keywords(&component, &answers.name);
+  component = component.replace("EXT_STYLES", &templates.styles_ext);
   styles = set_keywords(&styles, &answers.name);
   responsive = set_keywords(&responsive, &answers.name);
 

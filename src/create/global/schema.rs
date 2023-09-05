@@ -2,7 +2,8 @@ use std::fs::create_dir_all;
 use anyhow::{Result, anyhow};
 use console::style;
 
-use crate::cli::{utils::done, enums::Tool, structs::Answers};
+use crate::cli::{utils::done, structs::Answers};
+use crate::cli::enums::{Lang, Tool};
 use crate::statics;
 use crate::statics::OK;
 
@@ -24,8 +25,8 @@ pub fn create(CLIGlobalCreation {
   let Answers { name, path, language, tool, .. } = answers;
   let paths = &config.paths;
 
-  let is_ts = language == "typescript";
-  let ext = if is_ts { ".ts".to_owned() } else { ".js".to_owned() };
+  let is_ts = *language == Lang::TypeScript;
+  let ext = language.to_extension();
   let name_pascal = &name.pascal;
   let name_camel = &name.camel;
   let namespace = &name.namespace;

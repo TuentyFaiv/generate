@@ -1,14 +1,17 @@
 [package]
-name = "generate"
+name = "tfverse"
 version = "0.1.2"
 edition = "2021"
+description = "A command line interface for Frontend development"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
 anyhow = "1.0.69"
 clap = { version = "4.1.8", features = ["derive"] }
-console = { version = "0.15.5", default-features = false, features = ["ansi-parsing"] }
+console = { version = "0.15.5", default-features = false, features = [
+  "ansi-parsing",
+] }
 dialoguer = "0.10.3"
 dirs-next = "2.0.0"
 indicatif = "0.17.3"

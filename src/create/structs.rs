@@ -8,6 +8,7 @@ pub struct CreationPaths {
 // Component
 pub struct ComponentCreation {
   templates: Option<ConfigTemplates>,
+  pub styles_ext: String,
   pub import: String,
   pub styles: CreationPaths,
   pub component: CreationPaths,
@@ -28,6 +29,7 @@ pub struct ComponentCreationExports {
 impl ComponentCreation {
   pub fn new(
     templates: &Option<ConfigTemplates>,
+    styles_ext: String,
     import: String,
     styles: CreationPaths,
     component: CreationPaths,
@@ -38,6 +40,7 @@ impl ComponentCreation {
   ) -> Self {
     Self {
       templates: templates.clone(),
+      styles_ext,
       import,
       styles,
       component,
