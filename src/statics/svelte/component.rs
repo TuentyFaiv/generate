@@ -1,9 +1,12 @@
+pub static IMPORT: &str = r#"export { default as NAME_PASCAL } from "./NAME_PASCAL/NAME_PASCAL.svelte";
+"#;
+
 pub static PROPTYPES: &str = r#"export interface Props {
   prop: unknown;
 }
 "#;
 
-pub static STYLES: &str = r#"import { css, cx } from "@emotion/css";
+pub static STYLES_EMOTION: &str = r#"import { css, cx } from "@emotion/css";
 
 import * as responsive from "./NAME_PASCAL.styles.responsive";
 
@@ -13,7 +16,7 @@ export const NAME_LOWER = cx(
 );
 "#;
 
-pub static STYLES_RESPONSIVE: &str = r#"import { css } from "@emotion/css";
+pub static STYLES_EMOTION_RESPONSIVE: &str = r#"import { css } from "@emotion/css";
 import { forsize } from "@mixins";
 
 export const NAME_LOWER = forsize({
@@ -22,14 +25,35 @@ export const NAME_LOWER = forsize({
 });
 "#;
 
-pub static COMPONENT: &str = r#"SCRIPT
+pub static COMPONENT_CSS: &str = r#"SCRIPT
+
+<div class="NAME_LOWER">
+  {prop}
+</div>
+"#;
+
+pub static COMPONENT_STYLED: &str = r#"SCRIPT
 
 <div class={styles.NAME_LOWER}>
   {prop}
 </div>
 "#;
 
-pub static SCRIPT_TS: &str = r#"<script lang="ts">
+pub static SCRIPT_TS_CSS: &str = r#"<script lang="ts">
+  import type { Props } from "./NAME_PASCAL.proptypes";
+
+  import "./NAME_PASCALEXT_STYLES";
+
+  export let prop: Props["prop"];
+</script>"#;
+
+pub static SCRIPT_CSS: &str = r#"<script>
+  import "./NAME_PASCALEXT_STYLES";
+
+  export let prop;
+</script>"#;
+
+pub static SCRIPT_TS_STYLED: &str = r#"<script lang="ts">
   import type { Props } from "./NAME_PASCAL.proptypes";
 
   import * as styles from "./NAME_PASCAL.styles";
@@ -37,7 +61,7 @@ pub static SCRIPT_TS: &str = r#"<script lang="ts">
   export let prop: Props["prop"];
 </script>"#;
 
-pub static SCRIPT: &str = r#"<script>
+pub static SCRIPT_STYLED: &str = r#"<script>
   import * as styles from "./NAME_PASCAL.styles";
 
   export let prop;

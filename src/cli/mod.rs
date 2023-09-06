@@ -9,7 +9,7 @@ use crate::config::CLIConfig;
 use crate::utils::to_vec;
 
 use self::utils::{show_namespaces, input, choose_option, arg_or, sure};
-use self::enums::{ArchType, Tool};
+use self::enums::{ArchType, Tool, Lang, Styles};
 use self::structs::{
   Args,
   Answers,
@@ -41,7 +41,7 @@ impl CLIQuestions {
     options_archs.sort();
 
     let arch = ArchType::parse(&arg_or(
-      "Choose an architecture:", 
+      "Choose a piece:", 
       self.args.arch.clone(),
       &options_archs
     )?);
@@ -77,13 +77,13 @@ impl CLIQuestions {
         Tool::Svelte => {
           Some(QuestionToolType {
             prompt: "Choose svelte library:",
-            tools: [self.config.library_options(&Tool::Svelte), tools.webcomponents].concat()
+            tools: self.config.library_options(&Tool::Svelte)
           })
         },
         Tool::Vanilla => {
           Some(QuestionToolType {
             prompt: "Choose vanilla library:",
-            tools: [self.config.library_options(&Tool::Svelte), tools.webcomponents].concat()
+            tools: self.config.library_options(&Tool::Svelte)
           })
         }
       },
@@ -111,7 +111,11 @@ impl CLIQuestions {
 
     Ok(AnswersToolType {
       tool_type: tool_type?,
-      language: choose_option(lang_question.prompt, &lang_question.tools)?
+      language: Lang::parse(&arg_or(
+        lang_question.prompt,
+        self.args.language.clone(),
+        &lang_question.tools)?
+      ),
     })
   }
   fn ask_name(&self, arch: &ArchType) -> Result<AnswersName> {
@@ -154,13 +158,17 @@ impl CLIQuestions {
 
           let full_path = match tool {
             Tool::Svelte => {
+              answer_name.set_namespace(&answer_name.lower.clone());
               if &answer_name.lower == "home" || &answer_name.lower == "index" {
                 paths.pages
               } else {
                 format!("{}/{}", paths.pages, answer_name.lower)
               }
             },
-            _ => format!("{}/{}", paths.ui, answer_name.lower)
+            _ => {
+              answer_name.set_namespace(&answer_name.lower.clone());
+              format!("{}/{}", paths.ui, answer_name.lower)
+            }
           };
 
           full_path
@@ -181,10 +189,46 @@ impl CLIQuestions {
         ArchType::Store => input("Choose location:", &paths.stores)?,
         ArchType::Class => input("Choose location:", &format!("{}/{}", paths.classes, answer_name.lower))?,
       }
-      Some(exist) => exist.clone()
+      Some(exist) => {
+        if *arch == ArchType::Page || *arch == ArchType::Layout {
+          answer_name.set_namespace(exist);
+        }
+        exist.clone()
+      }
     };
-    answer_name.set_namespace(&path);
+
+    if *arch != ArchType::Page && *arch != ArchType::Layout {
+      answer_name.set_namespace(&path);
+    }
     Ok(path)
+  }
+  fn ask_styles(&self, arch: &ArchType, tool: &Tool) -> Result<Styles> {
+    match arch {
+      ArchType::Component
+      | ArchType::Layout
+      | ArchType::Page => {
+        let styles_options = match tool {
+          Tool::React => &self.config.styles.react,
+          Tool::Svelte => &self.config.styles.svelte,
+          Tool::Vanilla => &self.config.styles.vanilla,
+        };
+
+        let styles =  Styles::parse(&arg_or(
+          "Choose style:",
+          self.args.styles.clone(),
+          styles_options,
+        )?);
+        Ok(styles)
+      },
+      _ => Ok(Styles::CSS)
+    }
+  }
+  fn ask_sure(&self) -> Result<bool> {
+    let accept = match self.args.sure {
+      Some(accept) => accept,
+      None => sure()?
+    };
+    Ok(accept)
   }
 }
 
@@ -201,11 +245,13 @@ impl Questions for CLIQuestions {
 
     let AnswersToolType { tool_type, language } = self.ask_tool_type(&arch, &tool)?;
 
+    let styles = self.ask_styles(&arch, &tool)?;
+
     let mut name = self.ask_name(&arch)?;
 
     let path = self.ask_path(&arch, &tool, &mut name)?;
 
-    let accept = sure()?;
+    let accept = self.ask_sure()?;
 
     Ok(Answers {
       name,
@@ -213,6 +259,7 @@ impl Questions for CLIQuestions {
       tool,
       tool_type,
       language,
+      styles,
       arch,
       accept,
     })

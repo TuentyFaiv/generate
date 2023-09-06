@@ -2,7 +2,7 @@ use clap::Parser;
 
 use crate::utils::{change_case, transform};
 
-use super::enums::{ArchType, Tool};
+use super::enums::{ArchType, Tool, Lang, Styles};
 
 #[derive(Parser, Clone, Debug)]
 #[command(author, version, about)]
@@ -12,14 +12,23 @@ pub struct Args {
 	/// Template tool to choose
 	#[arg(short, long)]
 	pub tool: Option<String>,
-	/// Frontend architecture
+	/// Frontend piece or project template
   #[arg(short, long)]
 	pub arch: Option<String>,
+	/// TypeScript or JavaScript
+  #[arg(short, long)]
+	pub language: Option<String>,
+	/// Styles type
+  #[arg(short, long)]
+	pub styles: Option<String>,
 	/// Template path to generate
   #[arg(short, long)]
 	pub path: Option<String>,
+	/// Accept all questions
+  #[arg(short = 'y', long)]
+	pub sure: Option<bool>,
   /// Config file to customize this CLI
-  #[arg(short, long)]
+  #[arg(short, long, value_name = "FILE")]
 	pub config: Option<String>,
 }
 
@@ -30,7 +39,8 @@ pub struct Answers {
   pub path: String,
   pub tool: Tool,
   pub tool_type: Option<String>,
-  pub language: String,
+  pub language: Lang,
+  pub styles: Styles,
   pub arch: ArchType,
   pub accept: bool,
 }
@@ -92,7 +102,7 @@ impl AnswersName {
 
 pub struct AnswersToolType {
   pub tool_type: Option<String>,
-  pub language: String,
+  pub language: Lang,
 }
 
 pub struct QuestionToolType<'a> {

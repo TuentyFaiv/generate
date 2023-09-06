@@ -2,7 +2,8 @@ use std::fs::create_dir_all;
 use anyhow::{Result, anyhow};
 use console::style;
 
-use crate::cli::{utils::done, enums::Tool, structs::Answers};
+use crate::cli::{utils::done, structs::Answers};
+use crate::cli::enums::{Lang, Tool};
 use crate::statics;
 use crate::statics::OK;
 
@@ -27,8 +28,8 @@ pub fn create(CLIGlobalCreation {
   let paths = &config.paths;
 
   let i18n = true;
-  let is_ts = language.as_str() == "typescript";
-  let ext = if is_ts { ".ts".to_owned() } else { ".js".to_owned() };
+  let is_ts = *language == Lang::TypeScript;
+  let ext = language.to_extension();
   let name_pascal = &name.pascal;
 
   let path_ui = format!("{}/{}", paths.ui, name.namespace);
@@ -118,7 +119,7 @@ pub fn create(CLIGlobalCreation {
         PageCreationImports {
           page: Some(format!("const {name_pascal} = lazy(() => (import(\"@{}/page\")));\n/* NEXT_IMPORT */", name.namespace)),
           styles: format!("export * as Page from \"./{name_pascal}.styles\";\n"),
-          i18n: if i18n { Some(format!("export * from \"./i18n/Provider{ext}\";\n")) } else { None },
+          i18n: if i18n { Some("export * from \"./i18n/Provider\";\n".to_owned()) } else { None },
           locale: if i18n { Some(format!("\"{}\",\n      /* NEXT_LOCALE */", name.namespace)) } else { None }
         },
         CreationPaths {
@@ -221,7 +222,7 @@ pub fn create(CLIGlobalCreation {
         PageCreationImports {
           page: None,
           styles: format!("export * as page from \"./{}.styles\";\n", name.namespace),
-          i18n: if i18n { Some(format!("export * from \"./i18n/store{ext}\";\n")) } else { None },
+          i18n: if i18n { Some(format!("export * from \"./i18n/store\";\n")) } else { None },
           locale: if i18n { Some(format!("\"{}\",\n      /* NEXT_LOCALE */", name.namespace)) } else { None }
         },
         CreationPaths {
