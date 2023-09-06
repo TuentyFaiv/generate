@@ -77,13 +77,13 @@ impl CLIQuestions {
         Tool::Svelte => {
           Some(QuestionToolType {
             prompt: "Choose svelte library:",
-            tools: [self.config.library_options(&Tool::Svelte), tools.webcomponents].concat()
+            tools: self.config.library_options(&Tool::Svelte)
           })
         },
         Tool::Vanilla => {
           Some(QuestionToolType {
             prompt: "Choose vanilla library:",
-            tools: [self.config.library_options(&Tool::Svelte), tools.webcomponents].concat()
+            tools: self.config.library_options(&Tool::Svelte)
           })
         }
       },
@@ -202,16 +202,22 @@ impl CLIQuestions {
     }
     Ok(path)
   }
-  fn ask_styles(&self, arch: &ArchType) -> Result<Styles> {
+  fn ask_styles(&self, arch: &ArchType, tool: &Tool) -> Result<Styles> {
     match arch {
       ArchType::Component
       | ArchType::Layout
       | ArchType::Page => {
+        let styles_options = match tool {
+          Tool::React => &self.config.styles.react,
+          Tool::Svelte => &self.config.styles.svelte,
+          Tool::Vanilla => &self.config.styles.vanilla,
+        };
+
         let styles =  Styles::parse(&arg_or(
           "Choose style:",
           self.args.styles.clone(),
-          &self.config.styles)?
-        );
+          styles_options,
+        )?);
         Ok(styles)
       },
       _ => Ok(Styles::CSS)
@@ -239,7 +245,7 @@ impl Questions for CLIQuestions {
 
     let AnswersToolType { tool_type, language } = self.ask_tool_type(&arch, &tool)?;
 
-    let styles = self.ask_styles(&arch)?;
+    let styles = self.ask_styles(&arch, &tool)?;
 
     let mut name = self.ask_name(&arch)?;
 

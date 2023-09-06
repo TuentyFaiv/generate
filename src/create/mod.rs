@@ -2,6 +2,7 @@ pub mod global;
 pub mod react;
 pub mod svelte;
 pub mod structs;
+mod constants;
 
 use std::collections::HashMap;
 use anyhow::{Result, anyhow};
@@ -61,7 +62,7 @@ impl CLICreation {
 	}
 	pub fn create(&self) -> Result<String> {
 		let template_type = self.get_template()?;
-		let CLICreators { global, react, svelte } = &self.creators;
+		let CLICreators { global, .. } = &self.creators;
 
 		match template_type {
 			ArchType::Project | ArchType::Library => global.make_project(),
@@ -87,7 +88,7 @@ impl CLICreation {
 		let react_lib_options = self.config.library_options(&Tool::React);
 		let svelte_lib_options = self.config.library_options(&Tool::Svelte);
 		let vanilla_lib_options = self.config.library_options(&Tool::Vanilla);
-		let library_options = [react_lib_options, svelte_lib_options, vanilla_lib_options, tools.webcomponents.clone()].concat();
+		let library_options = [react_lib_options, svelte_lib_options, vanilla_lib_options].concat();
 		let mut templates = HashMap::<ArchType, &Vec<String>>::new();
 
 		let only_react: Vec<String> = to_vec(&["react"]);
@@ -118,7 +119,7 @@ impl CLICreation {
 			None => Err(anyhow!(self.error.clone())),
 			Some(template) => {
 				if let Some(tool_type) = tool_type {
-					if template.contains(&tool_type) {
+					if template.contains(tool_type) {
 						return Ok(arch);
 					}
 				}

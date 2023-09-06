@@ -8,6 +8,7 @@ mod context;
 
 use anyhow::Result;
 use super::structs;
+use super::constants;
 
 use crate::config::CLIConfig;
 use crate::cli::structs::Answers;

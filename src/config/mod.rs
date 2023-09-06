@@ -6,16 +6,16 @@ use std::fs::File;
 use std::io::BufReader;
 use dirs_next::home_dir;
 
-use crate::statics::{TOOLS, TOOLS_REACT, TOOLS_SVELTE, TOOLS_WEBCOMPONENTS, TOOLS_VANILLA};
-use crate::statics::{ARCHS, ARCHS_REACT, ARCHS_SVELTE, TOOLS_COMPONENTS, ARCHS_VANILLA};
-use crate::statics::{LANGS, STYLES};
+use crate::statics::{TOOLS, TOOLS_REACT, TOOLS_SVELTE, TOOLS_VANILLA, TOOLS_COMPONENTS};
+use crate::statics::{ARCHS, ARCHS_REACT, ARCHS_SVELTE, ARCHS_VANILLA};
+use crate::statics::{LANGS, STYLES_GLOBAL, STYLES_REACT, STYLES_SVELTE, STYLES_VANILLA};
 use crate::utils::to_vec;
 use crate::cli::enums::Tool;
 use crate::cli::structs::Args;
 
 use self::utils::{tool_to_vec, to_tool_type, default_tool, list_libraries, list_projects, search_repository};
 use self::file::{ConfigFile, ConfigFileToolsType, ConfigRepositoryTool, ConfigTemplates};
-use self::structs::{Paths, PathLocales, Archs, Tools, PathHooks};
+use self::structs::{Paths, PathLocales, Archs, Tools, PathHooks, ConfigStyles};
 
 #[derive(Clone, Debug)]
 pub struct CLIConfig {
@@ -24,7 +24,7 @@ pub struct CLIConfig {
   pub tools: Tools,
   pub archs: Archs,
   pub templates: Option<ConfigTemplates>,
-  pub styles: Vec<String>,
+  pub styles: ConfigStyles,
   tools_type: ConfigFileToolsType,
   repository: String,
 }
@@ -45,6 +45,20 @@ impl CLIConfig {
 
     // println!("{:?}", config_file);
 
+    let styles_global = to_vec(STYLES_GLOBAL);
+    let styles_react = [
+      styles_global.clone(),
+      to_vec(STYLES_REACT),
+    ].concat();
+    let styles_svelte = [
+      styles_global.clone(),
+      to_vec(STYLES_SVELTE),
+    ].concat();
+    let styles_vanilla = [
+      styles_global.clone(),
+      to_vec(STYLES_VANILLA),
+    ].concat();
+
     Self {
       langs: to_vec(LANGS),
       paths: CLIConfig::build_paths(&config_file),
@@ -57,7 +71,11 @@ impl CLIConfig {
         svelte: to_vec(ARCHS_SVELTE),
         vanilla: to_vec(ARCHS_VANILLA),
       },
-      styles: to_vec(STYLES),
+      styles: ConfigStyles {
+        react: styles_react,
+        svelte: styles_svelte,
+        vanilla: styles_vanilla,
+      },
       templates: CLIConfig::build_templates(&config_file),
     }
   }
@@ -278,7 +296,6 @@ impl CLIConfig {
       react: react_tools,
       svelte: svelte_tools,
       vanilla: vanilla_tools,
-      webcomponents: to_vec(TOOLS_WEBCOMPONENTS),
       components: to_vec(TOOLS_COMPONENTS),
     };
 
@@ -296,7 +313,6 @@ impl CLIConfig {
             react,
             svelte,
             vanilla,
-            webcomponents: default_tools.webcomponents,
             components: default_tools.components,
           }
         }

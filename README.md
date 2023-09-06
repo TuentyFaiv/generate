@@ -3,16 +3,23 @@ With this CLI you can generate base code to start to program fast. Also you can 
 
 ## Options
 ```zsh
+A command line interface for Frontend development
+
 Usage: tfverse [OPTIONS] [NAME]
 
 Arguments:
   [NAME]  Project name
 
 Options:
-  -t, --tool <TOOL>      Template tool to choose
-  -a, --arch <ARCH>      Frontend architecture
-  -p, --path <PATH>      Template path to generate
-  -c, --config <CONFIG>  Config file to customize this CLI
+  -t, --tool <TOOL>          Template tool to choose
+  -a, --arch <ARCH>          Frontend piece or project template
+  -l, --language <LANGUAGE>  TypeScript or JavaScript
+  -s, --styles <STYLES>      Styles type
+  -p, --path <PATH>          Template path to generate
+  -y, --sure <SURE>          Accept all questions [possible values: true, false]
+  -c, --config <FILE>        Config file to customize this CLI
+  -h, --help                 Print help
+  -V, --version              Print version
 ```
 
 ## Config file

@@ -6,6 +6,8 @@ use dirs_next::home_dir;
 use crate::cli::structs::AnswersName;
 use crate::create::structs::CreationPaths;
 
+use super::constants::{NAMESPACE, NAME_CAMEL, NAME_PASCAL, NAME_DASH, NAME_CONSTANT, NAME_SNAKE, NAME_LOWER, NAME};
+
 pub fn read_path(root: &Option<String>, template: &CreationPaths) -> String {
 	let CreationPaths { default, template } = template;
 	let default = default.to_owned();
@@ -55,14 +57,14 @@ pub fn read_path(root: &Option<String>, template: &CreationPaths) -> String {
 pub fn set_keywords(content: &String, name: &AnswersName) -> String {
 	let mut content = content.clone();
 
-	content = content.replace("NAMESPACE", &name.namespace);
-	content = content.replace("NAME_CAMEL", &name.camel);
-	content = content.replace("NAME_PASCAL", &name.pascal);
-	content = content.replace("NAME_DASH", &name.dash);
-	content = content.replace("NAME_CONSTANT", &name.constant);
-	content = content.replace("NAME_SNAKE", &name.snake);
-	content = content.replace("NAME_LOWER", &name.lower);
-	content = content.replace("NAME", &name.original);
+	content = content.replace(NAMESPACE, &name.namespace);
+	content = content.replace(NAME_CAMEL, &name.camel);
+	content = content.replace(NAME_PASCAL, &name.pascal);
+	content = content.replace(NAME_DASH, &name.dash);
+	content = content.replace(NAME_CONSTANT, &name.constant);
+	content = content.replace(NAME_SNAKE, &name.snake);
+	content = content.replace(NAME_LOWER, &name.lower);
+	content = content.replace(NAME, &name.original);
 
 	content
 }

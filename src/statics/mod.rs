@@ -37,7 +37,7 @@ pub static TOOLS_SVELTE: &[(&str, Option<RepositoryTool>)] = &[
 pub static TOOLS_VANILLA: &[(&str, Option<RepositoryTool>)] = &[
   ("base", None),
 ];
-pub static TOOLS_WEBCOMPONENTS: &[&str] = &["webcomponent"];//, "webcomponent-ts"];
+
 pub static TOOLS_COMPONENTS: &[&str] = &["atoms", "molecules", "organisms", "custom"];
 pub static LANGS: &[&str] = &["javascript", "typescript"];
 
@@ -46,7 +46,10 @@ pub static ARCHS_REACT: &[&str] = &["hoc", "hook", "context"];
 pub static ARCHS_SVELTE: &[&str] = &["action", "store"];
 pub static ARCHS_VANILLA: &[&str] = &["class"];
 
-pub static STYLES : &[&str] = &["css", "scss", "less", "stylus", "postcss", "emotion", "styled"];
+pub static STYLES_GLOBAL: &[&str] = &["css", "scss", "less", "stylus", "postcss", "emotion"];
+pub static STYLES_REACT: &[&str] = &["styled"];
+pub static STYLES_SVELTE: &[&str] = &[];
+pub static STYLES_VANILLA: &[&str] = &[];
 
 pub static NOT_IMPLEMENTED: Emoji<'_, '_> = Emoji("👻 ", "");
 pub static DONE: Emoji<'_, '_> = Emoji("😎 ", "");

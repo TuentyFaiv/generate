@@ -1,3 +1,6 @@
+pub static IMPORT: &str = r#"export { default as NAME_PASCAL } from "./NAME_PASCAL/NAME_PASCAL.svelte";
+"#;
+
 pub static PROPTYPES: &str = r#"export interface Props {
   prop: unknown;
 }

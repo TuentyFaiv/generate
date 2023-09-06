@@ -42,13 +42,19 @@ pub struct Tools {
   pub react: Vec<String>,
   pub svelte: Vec<String>,
   pub vanilla: Vec<String>,
-  pub webcomponents: Vec<String>,
   pub components: Vec<String>,
 }
 
 #[derive(Clone, Debug)]
 pub struct Archs {
   pub globals: Vec<String>,
+  pub react: Vec<String>,
+  pub svelte: Vec<String>,
+  pub vanilla: Vec<String>,
+}
+
+#[derive(Clone, Debug)]
+pub struct ConfigStyles {
   pub react: Vec<String>,
   pub svelte: Vec<String>,
   pub vanilla: Vec<String>,

@@ -13,6 +13,20 @@ use super::structs::{
   ComponentCreation,
   ComponentCreationExports,
 };
+use super::constants::{
+  PROPTYPES_PATH,
+  PROPTYPES_EXT,
+  COMPONENT_PATH,
+  SCRIPT_PATH,
+  STYLES_PATH,
+  RESPONSIVE_PATH,
+  INDEX_PATH,
+  IMPORT_PATH,
+  SVELTE_EXT,
+  // VUE_EXT,
+  STYLES_EXT,
+  RESPONSIVE_EXT,
+};
 
 use statics::global::styles::{
   STYLES_CSS,
@@ -35,27 +49,23 @@ pub fn create(CLIGlobalCreation {
   ..
 }: &CLIGlobalCreation) -> Result<String> {
   let Answers { name, path, tool, tool_type, language, styles, .. } = answers;
-  let is_ts = *language == Lang::TypeScript;
   let ext = language.to_extension();
   let styles_ext = styles.to_extension(language);
   let name = &name.pascal;
-  let is_styled = *styles == Styles::StyledComponents || *styles == Styles::Emotion;
 
   let full_path = match tool_type {
     Some(tool_type) => format!("{path}/{tool_type}/{name}"),
     None => format!("{path}/{name}")
   };
 
-  let styles_export = if is_styled {
-    format!("{full_path}/{name}.styles{styles_ext}")
-  } else {
-    format!("{full_path}/{name}{styles_ext}")
+  let styles_export = match styles {
+    Styles::Emotion | Styles::StyledComponents => format!("{full_path}/{name}{STYLES_EXT}{styles_ext}"),
+    _ => format!("{full_path}/{name}{styles_ext}"),
   };
 
-  let responsive_export = if is_styled {
-    format!("{full_path}/{name}.styles.responsive{styles_ext}")
-  } else {
-    format!("{full_path}/{name}.responsive{styles_ext}")
+  let responsive_export = match styles {
+    Styles::Emotion | Styles::StyledComponents => format!("{full_path}/{name}{STYLES_EXT}{RESPONSIVE_EXT}{styles_ext}"),
+    _ => format!("{full_path}/{name}{RESPONSIVE_EXT}{styles_ext}"),
   };
 
   if tool != &Tool::Vanilla {
@@ -67,6 +77,7 @@ pub fn create(CLIGlobalCreation {
   let component = match tool {
     Tool::React => {
       use statics::react::component::{
+        IMPORT,
         COMPONENT_CSS,
         COMPONENT_TS_CSS,
         COMPONENT_STYLED,
@@ -78,10 +89,15 @@ pub fn create(CLIGlobalCreation {
         STYLES_STYLED_RESPONSIVE,
       };
 
-      let component_template  = if is_styled {
-        if is_ts { COMPONENT_TS_STYLED.to_owned() } else { COMPONENT_STYLED.to_owned() }
-      } else {
-        if is_ts { COMPONENT_TS_CSS.to_owned() } else { COMPONENT_CSS.to_owned() }
+      let component_template = match styles {
+        Styles::Emotion | Styles::StyledComponents => match language {
+          Lang::TypeScript => COMPONENT_TS_STYLED.to_owned(),
+          Lang::JavaScript => COMPONENT_STYLED.to_owned(),
+        },
+        _ => match language {
+          Lang::TypeScript => COMPONENT_TS_CSS.to_owned(),
+          Lang::JavaScript => COMPONENT_CSS.to_owned(),
+        },
       };
 
       let styles_template = match styles {
@@ -104,42 +120,52 @@ pub fn create(CLIGlobalCreation {
         Styles::PostCSS => STYLES_POSTCSS_RESPONSIVE.to_owned(),
       };
       
-      let proptypes = if is_ts {
-        Some(CreationPaths {
-          template: format!("/proptypes{ext}"),
+      let proptypes = match language {
+        Lang::TypeScript => Some(CreationPaths {
+          template: format!("{PROPTYPES_PATH}{ext}"),
           default: PROPTYPES.to_string(),
-        })
-      } else { None };
+        }),
+        Lang::JavaScript => None,
+      };
+
+      let proptypes_export = match language {
+        Lang::TypeScript => Some(format!("{full_path}/{name}{PROPTYPES_EXT}{ext}")),
+        Lang::JavaScript => None,
+      };
 
       Ok(ComponentCreation::new(
         &config.templates,
         styles_ext.clone(),
-        format!("export {{ default as {name} }} from \"./{name}/{name}\";\n"),
         CreationPaths {
-          template: format!("/styles{styles_ext}"),
+          template: format!("{IMPORT_PATH}{ext}"),
+          default: IMPORT.to_owned(),
+        },
+        CreationPaths {
+          template: format!("{STYLES_PATH}{styles_ext}"),
           default: styles_template,
         },
         CreationPaths {
-          template: format!("/component{ext}x"),
+          template: format!("{COMPONENT_PATH}{ext}x"),
           default: component_template,
         },
         CreationPaths {
-          template: format!("/styles.responsive{styles_ext}"),
+          template: format!("{RESPONSIVE_PATH}{styles_ext}"),
           default: responsive_template,
         },
         proptypes,
         None,
         ComponentCreationExports {
-          barrel: full_path.replace(format!("/{name}").as_str(), format!("/index{ext}").as_str()),
+          barrel: full_path.replace(format!("/{name}").as_str(), format!("{INDEX_PATH}{ext}").as_str()),
           component: format!("{full_path}/{name}{ext}x"),
           styles: styles_export,
           responsive: responsive_export,
-          proptypes: if is_ts { Some(format!("{full_path}/{name}.proptypes{ext}")) } else { None },
+          proptypes: proptypes_export,
         }
       ))
     },
     Tool::Svelte => {
       use statics::svelte::component::{
+        IMPORT,
         COMPONENT_CSS,
         COMPONENT_STYLED,
         PROPTYPES,
@@ -151,16 +177,20 @@ pub fn create(CLIGlobalCreation {
         STYLES_EMOTION_RESPONSIVE,
       };
 
-      let component_template = if is_styled {
-        COMPONENT_STYLED.to_owned()
-      } else {
-        COMPONENT_CSS.to_owned()
+      let component_template = match styles {
+        Styles::Emotion | Styles::StyledComponents => COMPONENT_STYLED.to_owned(),
+        _ => COMPONENT_CSS.to_owned(),
       };
 
-      let script_template = if is_styled {
-        if is_ts { SCRIPT_TS_STYLED.to_owned() } else { SCRIPT_STYLED.to_owned() }
-      } else {
-        if is_ts { SCRIPT_TS_CSS.to_owned() } else { SCRIPT_CSS.to_owned() }
+      let script_template = match styles {
+        Styles::Emotion | Styles::StyledComponents => match language {
+          Lang::TypeScript => SCRIPT_TS_STYLED.to_owned(),
+          Lang::JavaScript => SCRIPT_STYLED.to_owned(),
+        },
+        _ => match language {
+          Lang::TypeScript => SCRIPT_TS_CSS.to_owned(),
+          Lang::JavaScript => SCRIPT_CSS.to_owned(),
+        }
       };
 
       let styles_template = match styles {
@@ -183,41 +213,49 @@ pub fn create(CLIGlobalCreation {
         Styles::PostCSS => STYLES_POSTCSS_RESPONSIVE.to_owned(),
       };
 
-      let proptypes = if is_ts {
-        Some(CreationPaths {
-          template: format!("/proptypes{ext}"),
+      let proptypes = match language {
+        Lang::TypeScript => Some(CreationPaths {
+          template: format!("{PROPTYPES_PATH}{ext}"),
           default: PROPTYPES.to_string(),
-        })
-      } else { None };
-      let script = Some(CreationPaths {
-        template: format!("/script{ext}.svelte"),
-        default: script_template
-      });
+        }),
+        Lang::JavaScript => None,
+      };
+
+      let proptypes_export = match language {
+        Lang::TypeScript => Some(format!("{full_path}/{name}{PROPTYPES_EXT}{ext}")),
+        Lang::JavaScript => None,
+      };
 
       Ok(ComponentCreation::new(
         &config.templates,
         styles_ext.clone(),
-        format!("export {{ default as {name} }} from \"./{name}/{name}.svelte\";\n"),
         CreationPaths {
-          template: format!("/styles{styles_ext}"),
+          template: format!("{IMPORT_PATH}{ext}"),
+          default: IMPORT.to_owned(),
+        },
+        CreationPaths {
+          template: format!("{STYLES_PATH}{styles_ext}"),
           default: styles_template,
         },
         CreationPaths {
-          template: "/component.svelte".to_string(),
+          template: format!("{COMPONENT_PATH}{SVELTE_EXT}"),
           default: component_template,
         },
         CreationPaths {
-          template: format!("/styles.responsive{styles_ext}"),
+          template: format!("{RESPONSIVE_PATH}{styles_ext}"),
           default: responsive_template,
         },
         proptypes,
-        script,
+        Some(CreationPaths {
+          template: format!("{SCRIPT_PATH}{ext}{SVELTE_EXT}"),
+          default: script_template
+        }),
         ComponentCreationExports {
-          barrel: full_path.replace(format!("/{name}").as_str(), format!("/index{ext}").as_str()),
-          component: format!("{full_path}/{name}.svelte"),
+          barrel: full_path.replace(format!("/{name}").as_str(), format!("{INDEX_PATH}{ext}").as_str()),
+          component: format!("{full_path}/{name}{SVELTE_EXT}"),
           styles: styles_export,
           responsive: responsive_export,
-          proptypes: if is_ts { Some(format!("{full_path}/{name}.proptypes{ext}")) } else { None },
+          proptypes: proptypes_export,
         }
       ))
     },
