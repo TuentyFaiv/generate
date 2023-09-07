@@ -14,6 +14,18 @@ pub static INDEX_PATH: &str = "/index";
 
 pub static IMPORT_PATH: &str = "/import";
 
+pub static LAYOUT_PATH: &str = "/layout";
+
+pub static LAYOUT_PROPS_PATH: &str = "/layouts";
+
+pub static LAYOUT_FILE: &str = "/+layout";
+
+pub static LAYOUT_SVELTE_EXT: &str = ".layout";
+
+pub static LAYOUT_REACT_EXT: &str = "Layout";
+
+pub static LAYOUT_BARREL: &str = "/layout.styles";
+
 pub static SVELTE_EXT: &str = ".svelte";
 
 // pub static VUE_EXT: &str = ".vue";

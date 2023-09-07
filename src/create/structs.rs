@@ -183,7 +183,8 @@ impl PageCreation {
 // Layout
 pub struct LayoutCreation {
   templates: Option<ConfigTemplates>,
-  pub import: String,
+  pub styles_ext: String,
+  pub import: CreationPaths,
   pub layout: CreationPaths,
   pub styles: CreationPaths,
   pub responsive: CreationPaths,
@@ -203,7 +204,8 @@ pub struct LayoutCreationExports {
 impl LayoutCreation {
   pub fn new(
     templates: &Option<ConfigTemplates>,
-    import: String,
+    styles_ext: String,
+    import: CreationPaths,
     layout: CreationPaths,
     styles: CreationPaths,
     responsive: CreationPaths,
@@ -213,6 +215,7 @@ impl LayoutCreation {
   ) -> Self {
     Self {
       templates: templates.clone(),
+      styles_ext,
       import,
       layout,
       styles,
@@ -223,31 +226,23 @@ impl LayoutCreation {
     }
   }
 
-  pub fn react_path(&self) -> Option<String> {
+  pub fn path(&self, tool: &Tool) -> Option<String> {
     match &self.templates {
+      Some(templates) => match tool {
+        Tool::React => match &templates.react {
+          None => None,
+          Some(react) => react.layout.clone()
+        },
+        Tool::Svelte => match &templates.svelte {
+          None => None,
+          Some(svelte) => svelte.layout.clone()
+        },
+        Tool::Vanilla => match &templates.vanilla {
+          None => None,
+          Some(vanilla) => vanilla.layout.clone()
+        },
+      },
       None => None,
-      Some(templates) => match &templates.react {
-        None => None,
-        Some(react) => react.layout.clone()
-      }
-    }
-  }
-  pub fn svelte_path(&self) -> Option<String> {
-    match &self.templates {
-      None => None,
-      Some(templates) => match &templates.svelte {
-        None => None,
-        Some(svelte) => svelte.layout.clone()
-      }
-    }
-  }
-  pub fn vanilla_path(&self) -> Option<String> {
-    match &self.templates {
-      None => None,
-      Some(templates) => match &templates.vanilla {
-        None => None,
-        Some(vanilla) => vanilla.layout.clone()
-      }
     }
   }
 }
