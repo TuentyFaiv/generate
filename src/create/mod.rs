@@ -2,7 +2,7 @@ pub mod global;
 pub mod react;
 pub mod svelte;
 pub mod structs;
-mod constants;
+pub mod constants;
 
 use std::collections::HashMap;
 use anyhow::{Result, anyhow};

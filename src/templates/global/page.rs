@@ -2,11 +2,19 @@ use std::io::{Write, Read, BufReader};
 use std::fs::File;
 use anyhow::Result;
 
-use crate::cli::enums::Tool;
 use crate::create::structs::PageCreation;
+use crate::create::constants::TS_CONFIG;
 
 use super::utils::{read_path, set_keywords};
 use super::CLIGlobalTemplates;
+use super::constants::{
+  NEXT_ALIAS,
+  NEXT_IMPORT,
+  NEXT_ROUTE,
+  NEXT_LOCALE,
+  SCRIPT,
+  PLAIN_EXPORT,
+};
 
 pub fn generate(CLIGlobalTemplates {
   answers,
@@ -14,11 +22,7 @@ pub fn generate(CLIGlobalTemplates {
 }: &CLIGlobalTemplates, templates: &PageCreation) -> Result<()> {
   let tool = &answers.tool;
 
-  let template_path = match tool {
-    Tool::React => templates.react_path(),
-    Tool::Svelte => templates.svelte_path(),
-    Tool::Vanilla => templates.vanilla_path(),
-  };
+  let template_path = templates.path(tool);
 
   let mut config = read_path(&template_path, &templates.aliases.config);
   let mut aliases = read_path(&template_path, &templates.aliases.config_aliases);
@@ -27,7 +31,7 @@ pub fn generate(CLIGlobalTemplates {
   let mut page = read_path(&template_path, &templates.page);
   if let Some(template_script) = &templates.script {
     let script = read_path(&template_path, template_script);
-    page = page.replace("SCRIPT", &script);
+    page = page.replace(SCRIPT, &script);
   }
 
   page = set_keywords(&page, &answers.name);
@@ -52,7 +56,7 @@ pub fn generate(CLIGlobalTemplates {
       buf_reader.read_to_string(&mut config_content)?;
 
       if !config_content.contains(&aliases) {
-        config_content = config_content.replace("/* NEXT_ALIAS */", &aliases);
+        config_content = config_content.replace(NEXT_ALIAS, &aliases);
       }
 
       let mut new_config = File::create(&config_export)?;
@@ -60,7 +64,7 @@ pub fn generate(CLIGlobalTemplates {
     },
     Err(_) => {
       if !config.contains(&aliases) {
-        config = config.replace("/* NEXT_ALIAS */", &aliases);
+        config = config.replace(NEXT_ALIAS, &aliases);
       }
 
       let mut config_file = File::create(&config_export)?;
@@ -107,10 +111,10 @@ pub fn generate(CLIGlobalTemplates {
               buf_reader.read_to_string(&mut router_content)?;
 
               if !router_content.contains(page_import) {
-                router_content = router_content.replace("/* NEXT_IMPORT */", &page_import);
+                router_content = router_content.replace(NEXT_IMPORT, &page_import);
               }
               if !router_content.contains(&route) {
-                router_content = router_content.replace("/* NEXT_ROUTE */", &route);
+                router_content = router_content.replace(NEXT_ROUTE, &route);
               }
 
               let mut new_router = File::create(&router_export)?;
@@ -118,10 +122,10 @@ pub fn generate(CLIGlobalTemplates {
             },
             Err(_) => {
               if !router.contains(page_import) {
-                router = router.replace("/* NEXT_IMPORT */", &page_import);
+                router = router.replace(NEXT_IMPORT, &page_import);
               }
               if !router.contains(&route) {
-                router = router.replace("/* NEXT_ROUTE */", &route);
+                router = router.replace(NEXT_ROUTE, &route);
               }
 
               let mut router_file = File::create(&router_export)?;
@@ -149,7 +153,7 @@ pub fn generate(CLIGlobalTemplates {
             buf_reader.read_to_string(&mut i18n_content)?;
 
             if !i18n_content.contains(locale_import) {
-              i18n_content = i18n_content.replace("/* NEXT_LOCALE */", &locale_import);
+              i18n_content = i18n_content.replace(NEXT_LOCALE, &locale_import);
 
               let mut new_i18n = File::create(&i18n_export)?;  
               new_i18n.write_all(i18n_content.as_bytes())?;
@@ -157,7 +161,7 @@ pub fn generate(CLIGlobalTemplates {
           },
           Err(_) => {
             if !i18n_context.contains(locale_import) {
-              i18n_context = i18n_context.replace("/* NEXT_LOCALE */", &locale_import);
+              i18n_context = i18n_context.replace(NEXT_LOCALE, &locale_import);
             }
 
             let mut i18n_file = File::create(&i18n_export)?;
@@ -173,8 +177,8 @@ pub fn generate(CLIGlobalTemplates {
                 let mut index_content = String::new();
                 buf_reader.read_to_string(&mut index_content)?;
   
-                if index_content.contains("export {};") {
-                  index_content = index_content.replace("export {};", "");
+                if index_content.contains(PLAIN_EXPORT) {
+                  index_content = index_content.replace(PLAIN_EXPORT, "");
                 }
                 if !index_content.contains(i18n_import) {
                   let updated_index = [index_content.as_str(), i18n_import.as_str()].concat();
@@ -232,7 +236,7 @@ pub fn generate(CLIGlobalTemplates {
 
       ts_aliases = set_keywords(&ts_aliases, &answers.name);
 
-      let tsconfig_export = "./tsconfig.json".to_string();
+      let tsconfig_export = TS_CONFIG.to_owned();
 
       match File::open(&tsconfig_export) {
         Ok(tsconfig_file) => {
@@ -243,7 +247,7 @@ pub fn generate(CLIGlobalTemplates {
           let mut new_tsconfig = File::create(&tsconfig_export)?;
 
           if !tsconfig_content.contains(&ts_aliases) {
-            tsconfig_content = tsconfig_content.replace("/* NEXT_ALIAS */", &ts_aliases);
+            tsconfig_content = tsconfig_content.replace(NEXT_ALIAS, &ts_aliases);
           }
 
           new_tsconfig.write_all(tsconfig_content.as_bytes())?;
@@ -252,7 +256,7 @@ pub fn generate(CLIGlobalTemplates {
           let mut tsconfig_file = File::create(&tsconfig_export)?;
 
           if !tsconfig.contains(&ts_aliases) {
-            tsconfig = tsconfig.replace("/* NEXT_ALIAS */", &ts_aliases);
+            tsconfig = tsconfig.replace(NEXT_ALIAS, &ts_aliases);
           }
 
           tsconfig_file.write_all(tsconfig.as_bytes())?;

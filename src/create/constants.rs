@@ -33,3 +33,13 @@ pub static SVELTE_EXT: &str = ".svelte";
 pub static STYLES_EXT: &str = ".styles";
 
 pub static RESPONSIVE_EXT: &str = ".responsive";
+
+pub static TS_CONFIG: &str = "./tsconfig.json";
+
+pub static I18N_PATH: &str = "/i18n";
+
+pub static LOCALE_FILE: &str = "/locale.json";
+
+pub static PAGE_PATH: &str = "/page";
+
+pub static PAGE_PROPS_PATH: &str = "/pages";

@@ -17,6 +17,27 @@ use super::structs::{
   PageCreationAliases,
 };
 
+use super::constants::{
+  INDEX_PATH,
+  I18N_PATH,
+  LOCALE_FILE,
+  PROPTYPES_PATH,
+  STYLES_PATH,
+  STYLES_EXT,
+  RESPONSIVE_PATH,
+  RESPONSIVE_EXT,
+  PAGE_PATH,
+  PAGE_PROPS_PATH,
+  LAYOUT_PATH,
+  LAYOUT_PROPS_PATH,
+  LAYOUT_FILE,
+  LAYOUT_SVELTE_EXT,
+  LAYOUT_REACT_EXT,
+  LAYOUT_BARREL,
+  SVELTE_EXT,
+  SCRIPT_PATH,
+};
+
 pub fn create(CLIGlobalCreation {
   answers,
   config,
@@ -41,20 +62,20 @@ pub fn create(CLIGlobalCreation {
   create_dir_all(path).unwrap_or_else(|why| {
     println!("! {:?}", why.kind());
   });
-  create_dir_all(format!("{path_ui}/styles")).unwrap_or_else(|why| {
+  create_dir_all(format!("{path_ui}{STYLES_PATH}")).unwrap_or_else(|why| {
     println!("! {:?}", why.kind());
   });
 
   if i18n {
-    path_locales = if tool == &Tool::Svelte {
-      &paths.locales.svelte
-    } else {
-      &paths.locales.react
+    path_locales = match tool {
+      Tool::React => &paths.locales.react,
+      Tool::Svelte => &paths.locales.svelte,
+      Tool::Vanilla => &paths.locales.react,
     };
-    path_i18n = if tool == &Tool::Svelte {
-      format!("{}/i18n", paths.stores)
-    } else {
-      format!("{}/i18n", paths.contexts)
+    path_i18n = match tool {
+      Tool::React => format!("{}{I18N_PATH}", paths.contexts),
+      Tool::Svelte => format!("{}{I18N_PATH}", paths.stores),
+      Tool::Vanilla => format!("{}{I18N_PATH}", paths.contexts),
     };
     for locale in i18n_locales.clone() {
       create_dir_all(format!("{path_locales}/{locale}")).unwrap_or_else(|why| {
@@ -65,12 +86,15 @@ pub fn create(CLIGlobalCreation {
       println!("! {:?}", why.kind());
     });
   }
-  if is_ts {
-    path_proptypes = format!("{}/pages", paths.types);
-    create_dir_all(&path_proptypes).unwrap_or_else(|why| {
-      println!("! {:?}", why.kind());
-    });
-  }
+  match language {
+    Lang::TypeScript => {
+      path_proptypes = format!("{}{PAGE_PROPS_PATH}", paths.types);
+      create_dir_all(&path_proptypes).unwrap_or_else(|why| {
+        println!("! {:?}", why.kind());
+      });
+    }
+    Lang::JavaScript => {}
+  };
 
   let page = match tool {
     Tool::React => {
@@ -94,25 +118,27 @@ pub fn create(CLIGlobalCreation {
         println!("! {:?}", why.kind());
       });
 
-      let proptypes = if is_ts {
-        Some(CreationPaths {
-          template: format!("/proptypes{ext}"),
-          default: PROPTYPES.to_string(),
-        })
-      } else { None };
+      let proptypes = match language {
+        Lang::TypeScript => Some(CreationPaths {
+          template: format!("{PROPTYPES_PATH}{ext}"),
+          default: PROPTYPES.to_owned(),
+        }),
+        Lang::JavaScript => None,
+      };
 
-      let i18n_templates = if i18n {
-        Some(PageCreationI18n {
+      let i18n_templates = match i18n {
+        true => Some(PageCreationI18n {
           locale: CreationPaths {
-            template: "/locale.json".to_string(),
-            default: LOCALE.to_string()
+            template: LOCALE_FILE.to_owned(),
+            default: LOCALE.to_owned()
           },
           context: CreationPaths {
-            template: format!("/i18n{ext}"),
-            default: I18N.to_string()
+            template: format!("{I18N_PATH}{ext}"),
+            default: I18N.to_owned()
           }
-        })
-      } else { None };
+        }),
+        false => None,
+      };
 
       Ok(PageCreation::new(
         &config.templates,
@@ -123,7 +149,7 @@ pub fn create(CLIGlobalCreation {
           locale: if i18n { Some(format!("\"{}\",\n      /* NEXT_LOCALE */", name.namespace)) } else { None }
         },
         CreationPaths {
-          template: format!("/page{ext}x"),
+          template: format!("{PAGE_PATH}{ext}x"),
           default: if is_ts { PAGE_TS.to_string() } else { PAGE.to_string() }
         },
         CreationPaths {

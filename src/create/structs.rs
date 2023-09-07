@@ -151,31 +151,23 @@ impl PageCreation {
     }
   }
 
-  pub fn react_path(&self) -> Option<String> {
+  pub fn path(&self, tool: &Tool) -> Option<String> {
     match &self.templates {
+      Some(templates) => match tool {
+        Tool::React => match &templates.react {
+          None => None,
+          Some(react) => react.page.clone()
+        },
+        Tool::Svelte => match &templates.svelte {
+          None => None,
+          Some(svelte) => svelte.page.clone()
+        },
+        Tool::Vanilla => match &templates.vanilla {
+          None => None,
+          Some(vanilla) => vanilla.page.clone()
+        },
+      },
       None => None,
-      Some(templates) => match &templates.react {
-        None => None,
-        Some(react) => react.page.clone()
-      }
-    }
-  }
-  pub fn svelte_path(&self) -> Option<String> {
-    match &self.templates {
-      None => None,
-      Some(templates) => match &templates.svelte {
-        None => None,
-        Some(svelte) => svelte.page.clone()
-      }
-    }
-  }
-  pub fn vanilla_path(&self) -> Option<String> {
-    match &self.templates {
-      None => None,
-      Some(templates) => match &templates.vanilla {
-        None => None,
-        Some(vanilla) => vanilla.page.clone()
-      }
     }
   }
 }
