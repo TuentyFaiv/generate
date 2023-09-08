@@ -1,8 +1,64 @@
+pub static PAGE_IMPORT: &str = r#"const NAME_PASCAL = lazy(() => (import("@NAMESPACE/page")));
+/* NEXT_IMPORT */"#;
+
+pub static BARREL_STYLES_STYLED: &str = r#"export * as Page from "./NAME_PASCAL.styles";
+"#;
+
+pub static BARREL_STYLES_CSS: &str = r#"import "./NAME_PASCALEXT_STYLES";
+"#;
+
+pub static I18N_IMPORT: &str = r#"export * from "./i18n/Provider";
+"#;
+
 pub static PROPTYPES: &str = r#"// Change for interface if is an object
 export type NAME_PASCALState = null;
 "#;
 
-pub static PAGE_TS: &str = r#"import { useState } from "react";
+pub static PAGE_TS_CSS: &str = r#"import { useState } from "react";
+import { useTranslation } from "react-i18next";
+import { useAppContext } from "@contexts";
+
+import type { NAME_PASCALState } from "@typing/pages/NAMESPACE";
+
+import "@NAMESPACE/styles";
+
+export default function NAME_PASCALPage() {
+  const { t } = useTranslation("NAMESPACE");
+  const { global, dispatch } = useAppContext();
+  const [state, setState] = useState<NAME_PASCALState>(null);
+
+  return (
+    <div className="NAME_LOWER">
+      <h1 className="NAME_LOWER__title">
+        {t("seo-title")}
+      </h1>
+    </div>
+  );
+}
+"#;
+
+pub static PAGE_CSS: &str = r#"import { useState } from "react";
+import { useTranslation } from "react-i18next";
+import { useAppContext } from "@contexts";
+
+import "@NAMESPACE/styles";
+
+export default function NAME_PASCALPage() {
+  const { t } = useTranslation("NAMESPACE");
+  const { global, dispatch } = useAppContext();
+  const [state, setState] = useState(null);
+
+  return (
+    <div className="NAME_LOWER">
+      <h1 className="NAME_LOWER__title">
+        {t("seo-title")}
+      </h1>
+    </div>
+  );
+}
+"#;
+
+pub static PAGE_TS_STYLED: &str = r#"import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useAppContext } from "@contexts";
 
@@ -17,13 +73,15 @@ export default function NAME_PASCALPage() {
 
   return (
     <Page.NAME_PASCAL>
-      {t("seo-title")}
+      <Page.Title>
+        {t("seo-title")}
+      </Page.Title>
     </Page.NAME_PASCAL>
   );
 }
 "#;
 
-pub static PAGE: &str = r#"import { useState } from "react";
+pub static PAGE_STYLED: &str = r#"import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useAppContext } from "@contexts";
 
@@ -36,13 +94,15 @@ export default function NAME_PASCALPage() {
 
   return (
     <Page.NAME_PASCAL>
-      {t("seo-title")}
+      <Page.Title>
+        {t("seo-title")}
+      </Page.Title>
     </Page.NAME_PASCAL>
   );
 }
 "#;
 
-pub static STYLES: &str = r#"import styled from "@emotion/styled";
+pub static STYLES_EMOTION: &str = r#"import styled from "@emotion/styled";
 
 import * as responsive from "./NAME_PASCAL.styles.responsive";
 
@@ -55,7 +115,34 @@ export const Title = styled.div`
 `;
 "#;
 
-pub static STYLES_RESPONSIVE: &str = r#"import { css } from "@emotion/react";
+pub static STYLES_EMOTION_RESPONSIVE: &str = r#"import { css } from "@emotion/react";
+import { forsize } from "@mixins";
+
+export const NAME_LOWER = forsize({
+  "desktop-mid": css``,
+  desktop: css``,
+});
+
+export const title = forsize({
+  "desktop-mid": css``,
+  desktop: css``,
+});
+"#;
+
+pub static STYLES_STYLED: &str = r#"import styled from "styled-components";
+
+import * as responsive from "./NAME_PASCAL.styles.responsive";
+
+export const NAME_PASCAL = styled.div`
+  ${responsive.NAME_LOWER}
+`;
+
+export const Title = styled.div`
+  ${responsive.title}
+`;
+"#;
+
+pub static STYLES_STYLED_RESPONSIVE: &str = r#"import { css } from "styled-components";
 import { forsize } from "@mixins";
 
 export const NAME_LOWER = forsize({

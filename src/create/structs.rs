@@ -75,6 +75,7 @@ impl ComponentCreation {
 // Page
 pub struct PageCreation {
   templates: Option<ConfigTemplates>,
+  pub styles_ext: String,
   pub imports: PageCreationImports,
   pub page: CreationPaths,
   pub styles: CreationPaths,
@@ -89,10 +90,10 @@ pub struct PageCreation {
 }
 
 pub struct PageCreationImports {
-  pub styles: String,
-  pub page: Option<String>,
-  pub locale: Option<String>,
-  pub i18n: Option<String>,
+  pub styles: CreationPaths,
+  pub page: Option<CreationPaths>,
+  pub locale: Option<CreationPaths>,
+  pub i18n: Option<CreationPaths>,
 }
 
 pub struct PageCreationAliases {
@@ -123,6 +124,7 @@ pub struct PageCreationI18n {
 impl PageCreation {
   pub fn new(
     templates: &Option<ConfigTemplates>,
+    styles_ext: String,
     imports: PageCreationImports,
     page: CreationPaths,
     styles: CreationPaths,
@@ -137,6 +139,7 @@ impl PageCreation {
   ) -> Self {
     Self {
       templates: templates.clone(),
+      styles_ext,
       imports,
       page,
       styles,

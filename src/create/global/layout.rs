@@ -85,6 +85,11 @@ pub fn create(CLIGlobalCreation {
     _ => format!("{path_ui}{STYLES_PATH}/{styles_name}{styles_tool_ext}{RESPONSIVE_EXT}{styles_ext}"),
   };
 
+  let proptypes_export = match language {
+    Lang::TypeScript => Some(format!("{path_proptypes}/{}{ext}", name.namespace)),
+    Lang::JavaScript => None,
+  };
+
   create_dir_all(path).unwrap_or_else(|why| {
     println!("! {:?}", why.kind());
   });
@@ -157,11 +162,6 @@ pub fn create(CLIGlobalCreation {
         Lang::JavaScript => None,
       };
 
-      let proptypes_export = match language {
-        Lang::TypeScript => Some(format!("{path_proptypes}/{}{ext}", name.namespace)),
-        Lang::JavaScript => None,
-      };
-
       let barrel_styles = match styles {
         Styles::Emotion | Styles::StyledComponents => BARREL_STYLES_STYLED.to_owned(),
         _ => BARREL_STYLES_CSS.to_owned(),
@@ -171,7 +171,7 @@ pub fn create(CLIGlobalCreation {
         &config.templates,
         styles_ext.clone(),
         CreationPaths {
-          template: format!("{LAYOUT_BARREL}{styles_ext}"),
+          template: format!("{LAYOUT_BARREL}{ext}"),
           default: barrel_styles,
         },
         CreationPaths {
@@ -256,11 +256,6 @@ pub fn create(CLIGlobalCreation {
         Lang::JavaScript => None,
       };
 
-      let proptypes_export = match language {
-        Lang::TypeScript => Some(format!("{path_proptypes}/{}{ext}", name.namespace)),
-        Lang::JavaScript => None,
-      };
-
       let barrel_styles = match styles {
         Styles::Emotion | Styles::StyledComponents => BARREL_STYLES_STYLED.to_owned(),
         _ => BARREL_STYLES_CSS.to_owned(),
@@ -270,7 +265,7 @@ pub fn create(CLIGlobalCreation {
         &config.templates,
         styles_ext.clone(),
         CreationPaths {
-          template: format!("{LAYOUT_BARREL}{styles_ext}"),
+          template: format!("{LAYOUT_BARREL}{ext}"),
           default: barrel_styles,
         },
         CreationPaths {

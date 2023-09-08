@@ -68,6 +68,11 @@ pub fn create(CLIGlobalCreation {
     _ => format!("{full_path}/{name}{RESPONSIVE_EXT}{styles_ext}"),
   };
 
+  let proptypes_export = match language {
+    Lang::TypeScript => Some(format!("{full_path}/{name}{PROPTYPES_EXT}{ext}")),
+    Lang::JavaScript => None,
+  };
+
   if tool != &Tool::Vanilla {
     create_dir_all(&full_path).unwrap_or_else(|why| {
       println!("! {:?}", why.kind());
@@ -125,11 +130,6 @@ pub fn create(CLIGlobalCreation {
           template: format!("{PROPTYPES_PATH}{ext}"),
           default: PROPTYPES.to_owned(),
         }),
-        Lang::JavaScript => None,
-      };
-
-      let proptypes_export = match language {
-        Lang::TypeScript => Some(format!("{full_path}/{name}{PROPTYPES_EXT}{ext}")),
         Lang::JavaScript => None,
       };
 
@@ -218,11 +218,6 @@ pub fn create(CLIGlobalCreation {
           template: format!("{PROPTYPES_PATH}{ext}"),
           default: PROPTYPES.to_owned(),
         }),
-        Lang::JavaScript => None,
-      };
-
-      let proptypes_export = match language {
-        Lang::TypeScript => Some(format!("{full_path}/{name}{PROPTYPES_EXT}{ext}")),
         Lang::JavaScript => None,
       };
 

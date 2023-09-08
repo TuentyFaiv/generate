@@ -1,7 +1,16 @@
+pub static BARREL_STYLES_STYLED: &str = r#"export * as page from "./NAMESPACE.styles";
+"#;
+
+pub static BARREL_STYLES_CSS: &str = r#"import "./NAMESPACEEXT_STYLES";
+"#;
+
+pub static I18N_IMPORT: &str = r#"export * from "./i18n/store";
+"#;
+
 pub static PROPTYPES: &str = r#"export {};
 "#;
 
-pub static SCRIPT_TS: &str = r#"<script lang="ts">
+pub static SCRIPT_TS_STYLED: &str = r#"<script lang="ts">
   import { i18n } from "@stores";
 
   import { page } from "@NAMESPACE/styles";
@@ -10,7 +19,7 @@ pub static SCRIPT_TS: &str = r#"<script lang="ts">
 </script>
 "#;
 
-pub static SCRIPT: &str = r#"<script>
+pub static SCRIPT_STYLED: &str = r#"<script>
   import { i18n } from "@stores";
 
   import { page } from "@NAMESPACE/styles";
@@ -19,7 +28,35 @@ pub static SCRIPT: &str = r#"<script>
 </script>
 "#;
 
-pub static PAGE: &str = r#"SCRIPT
+pub static SCRIPT_TS_CSS: &str = r#"<script lang="ts">
+  import { i18n } from "@stores";
+
+  import "@NAMESPACE/styles";
+
+	import { SEO } from "@sharing/atoms";
+</script>
+"#;
+
+pub static SCRIPT_CSS: &str = r#"<script>
+  import { i18n } from "@stores";
+
+  import "@NAMESPACE/styles";
+
+	import { SEO } from "@sharing/atoms";
+</script>
+"#;
+
+pub static PAGE_CSS: &str = r#"SCRIPT
+<SEO title={$i18n.t("NAME_LOWER:seo-title")} />
+
+<section class="NAME_LOWER">
+  <h1 class="NAME_LOWER__title">
+    {$i18n.t("NAME_LOWER:seo-title")}
+	</h1>
+</section>
+"#;
+
+pub static PAGE_STYLED: &str = r#"SCRIPT
 <SEO title={$i18n.t("NAME_LOWER:seo-title")} />
 
 <section class={page.NAME_LOWER}>
@@ -29,7 +66,7 @@ pub static PAGE: &str = r#"SCRIPT
 </section>
 "#;
 
-pub static STYLES: &str = r#"import { css, cx } from "@emotion/css";
+pub static STYLES_EMOTION: &str = r#"import { css, cx } from "@emotion/css";
 
 import * as responsive from "./NAMESPACE.styles.responsive";
 
@@ -44,7 +81,7 @@ export const title = cx(
 );
 "#;
 
-pub static STYLES_RESPONSIVE: &str = r#"import { css } from "@emotion/css";
+pub static STYLES_EMOTION_RESPONSIVE: &str = r#"import { css } from "@emotion/css";
 import { forsize } from "@mixins";
 
 export const NAME_LOWER = forsize({

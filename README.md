@@ -133,6 +133,7 @@ If you want to personalize this CLI you must create the following files inside t
 | Path | To |
 | --- | --- |
 | `/component.(ts\|js)x` | Component |
+| `/import.(ts\|js)` | Component imports |
 | `/proptypes.ts` | Component props |
 | `/styles.(ts\|js)` | Component styles |
 | `/styles.responsive.(ts\|js)` | Component responsive |
@@ -141,6 +142,7 @@ If you want to personalize this CLI you must create the following files inside t
 | --- | --- |
 | `/component.svelte` | Component |
 | `/script.(ts\|js).svelte` | Component script |
+| `/import.(ts\|js)` | Component imports |
 | `/proptypes.ts` | Component props |
 | `/styles.(ts\|js)` | Component styles |
 | `/styles.responsive.(ts\|js)` | Component responsive |
@@ -150,6 +152,7 @@ If you want to personalize this CLI you must create the following files inside t
 | Path | To |
 | --- | --- |
 | `/layout.(ts\|js)x` | Layout |
+| `/layout.styles.(ts\|js)x` | Layout barrel styles |
 | `/proptypes.ts` | Layout props |
 | `/styles.(ts\|js)` | Layout styles |
 | `/styles.responsive.(ts\|js)` | Layout responsive |
@@ -157,6 +160,7 @@ If you want to personalize this CLI you must create the following files inside t
 | Path | To |
 | --- | --- |
 | `/layout.svelte` | Layout |
+| `/layout.styles.(ts\|js)x` | Layout barrel styles |
 | `/script.(ts\|js).svelte` | Layout script |
 | `/proptypes.ts` | Layout props |
 | `/styles.(ts\|js)` | Layout styles |
