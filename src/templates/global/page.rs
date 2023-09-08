@@ -56,7 +56,7 @@ pub fn generate(CLIGlobalTemplates { answers, .. }: &CLIGlobalTemplates, templat
       let mut config_content = String::new();
       buf_reader.read_to_string(&mut config_content)?;
 
-      if !config_content.contains(&aliases) {
+      if !config_content.contains(&aliases.replace(NEXT_ALIAS, "")) {
         config_content = config_content.replace(NEXT_ALIAS, &aliases);
       }
 
@@ -64,7 +64,7 @@ pub fn generate(CLIGlobalTemplates { answers, .. }: &CLIGlobalTemplates, templat
       new_config.write_all(config_content.as_bytes())?;
     },
     Err(_) => {
-      if !config.contains(&aliases) {
+      if !config.contains(&aliases.replace(NEXT_ALIAS, "")) {
         config = config.replace(NEXT_ALIAS, &aliases);
       }
 
@@ -113,10 +113,10 @@ pub fn generate(CLIGlobalTemplates { answers, .. }: &CLIGlobalTemplates, templat
               let mut router_content = String::new();
               buf_reader.read_to_string(&mut router_content)?;
 
-              if !router_content.contains(&page_import) {
+              if !router_content.contains(&page_import.replace(NEXT_IMPORT, "")) {
                 router_content = router_content.replace(NEXT_IMPORT, &page_import);
               }
-              if !router_content.contains(&route) {
+              if !router_content.contains(&route.replace(NEXT_ROUTE, "")) {
                 router_content = router_content.replace(NEXT_ROUTE, &route);
               }
 
@@ -124,10 +124,10 @@ pub fn generate(CLIGlobalTemplates { answers, .. }: &CLIGlobalTemplates, templat
               new_router.write_all(router_content.as_bytes())?;
             },
             Err(_) => {
-              if !router.contains(&page_import) {
+              if !router.contains(&page_import.replace(NEXT_IMPORT, "")) {
                 router = router.replace(NEXT_IMPORT, &page_import);
               }
-              if !router.contains(&route) {
+              if !router.contains(&route.replace(NEXT_ROUTE, "")) {
                 router = router.replace(NEXT_ROUTE, &route);
               }
 
@@ -157,7 +157,7 @@ pub fn generate(CLIGlobalTemplates { answers, .. }: &CLIGlobalTemplates, templat
             let mut i18n_content = String::new();
             buf_reader.read_to_string(&mut i18n_content)?;
 
-            if !i18n_content.contains(&locale_import) {
+            if !i18n_content.contains(&locale_import.replace(NEXT_LOCALE, "")) {
               i18n_content = i18n_content.replace(NEXT_LOCALE, &locale_import);
 
               let mut new_i18n = File::create(&i18n_export)?;  
@@ -165,7 +165,7 @@ pub fn generate(CLIGlobalTemplates { answers, .. }: &CLIGlobalTemplates, templat
             }
           },
           Err(_) => {
-            if !i18n_context.contains(&locale_import) {
+            if !i18n_context.contains(&locale_import.replace(NEXT_LOCALE, "")) {
               i18n_context = i18n_context.replace(NEXT_LOCALE, &locale_import);
             }
 
@@ -253,19 +253,18 @@ pub fn generate(CLIGlobalTemplates { answers, .. }: &CLIGlobalTemplates, templat
 
           let mut new_tsconfig = File::create(&tsconfig_export)?;
 
-          if !tsconfig_content.contains(&ts_aliases) {
+          if !tsconfig_content.contains(&ts_aliases.replace(NEXT_ALIAS, "")) {
             tsconfig_content = tsconfig_content.replace(NEXT_ALIAS, &ts_aliases);
           }
 
           new_tsconfig.write_all(tsconfig_content.as_bytes())?;
         },
         Err(_) => {
-          let mut tsconfig_file = File::create(&tsconfig_export)?;
-
-          if !tsconfig.contains(&ts_aliases) {
+          if !tsconfig.contains(&ts_aliases.replace(NEXT_ALIAS, "")) {
             tsconfig = tsconfig.replace(NEXT_ALIAS, &ts_aliases);
           }
 
+          let mut tsconfig_file = File::create(&tsconfig_export)?;
           tsconfig_file.write_all(tsconfig.as_bytes())?;
         }
       }

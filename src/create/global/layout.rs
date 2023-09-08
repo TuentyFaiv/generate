@@ -61,7 +61,6 @@ pub fn create(CLIGlobalCreation {
   let name_pascal = &name.pascal;
 
   let path_ui = format!("{}/{}", paths.ui, name.namespace);
-  let mut path_proptypes = String::new();
 
   let styles_name = match tool {
     Tool::React => name_pascal,
@@ -86,7 +85,15 @@ pub fn create(CLIGlobalCreation {
   };
 
   let proptypes_export = match language {
-    Lang::TypeScript => Some(format!("{path_proptypes}/{}{ext}", name.namespace)),
+    Lang::TypeScript => {
+      let path_proptypes = format!("{}{LAYOUT_PROPS_PATH}", paths.types);
+
+      create_dir_all(&path_proptypes).unwrap_or_else(|why| {
+        println!("! {:?}", why.kind());
+      });
+
+      Some(format!("{path_proptypes}/{}{ext}", name.namespace))
+    },
     Lang::JavaScript => None,
   };
 
@@ -96,16 +103,6 @@ pub fn create(CLIGlobalCreation {
   create_dir_all(format!("{path_ui}{STYLES_PATH}")).unwrap_or_else(|why| {
     println!("! {:?}", why.kind());
   });
-
-  match language {
-    Lang::TypeScript => {
-      path_proptypes = format!("{}{LAYOUT_PROPS_PATH}", paths.types);
-      create_dir_all(&path_proptypes).unwrap_or_else(|why| {
-        println!("! {:?}", why.kind());
-      });
-    },
-    Lang::JavaScript => {},
-  };
 
   let layout = match tool {
     Tool::React => {

@@ -82,7 +82,6 @@ pub fn create(CLIGlobalCreation {
   let name_pascal = &name.pascal;
 
   let path_ui = format!("{}/{}", paths.ui, name.namespace);
-  let mut path_proptypes = String::new();
   let mut path_locales = &String::new();
   let mut path_i18n = String::new();
   let i18n_locales = ["en-US".to_owned(), "es".to_owned()].to_vec();
@@ -104,7 +103,15 @@ pub fn create(CLIGlobalCreation {
   };
 
   let proptypes_export = match language {
-    Lang::TypeScript => Some(format!("{path_proptypes}/{}{ext}", name.namespace)),
+    Lang::TypeScript => {
+      let path_proptypes = format!("{}{PAGE_PROPS_PATH}", paths.types);
+
+      create_dir_all(&path_proptypes).unwrap_or_else(|why| {
+        println!("! {:?}", why.kind());
+      });
+
+      Some(format!("{path_proptypes}/{}{ext}", name.namespace))
+    },
     Lang::JavaScript => None,
   };
 
@@ -143,16 +150,6 @@ pub fn create(CLIGlobalCreation {
       println!("! {:?}", why.kind());
     });
   }
-
-  match language {
-    Lang::TypeScript => {
-      path_proptypes = format!("{}{PAGE_PROPS_PATH}", paths.types);
-      create_dir_all(&path_proptypes).unwrap_or_else(|why| {
-        println!("! {:?}", why.kind());
-      });
-    }
-    Lang::JavaScript => {}
-  };
 
   let page = match tool {
     Tool::React => {
