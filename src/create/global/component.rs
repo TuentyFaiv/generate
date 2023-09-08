@@ -7,6 +7,19 @@ use crate::cli::enums::{Lang, Tool, Styles};
 use crate::statics;
 use crate::statics::OK;
 
+use statics::global::styles::{
+  STYLES_CSS,
+  STYLES_CSS_RESPONSIVE,
+  STYLES_LESS,
+  STYLES_LESS_RESPONSIVE,
+  STYLES_POSTCSS,
+  STYLES_POSTCSS_RESPONSIVE,
+  STYLES_SASS,
+  STYLES_SASS_RESPONSIVE,
+  STYLES_STYLUS,
+  STYLES_STYLUS_RESPONSIVE
+};
+
 use super::CLIGlobalCreation;
 use super::structs::{
   CreationPaths,
@@ -26,19 +39,6 @@ use super::constants::{
   // VUE_EXT,
   STYLES_EXT,
   RESPONSIVE_EXT,
-};
-
-use statics::global::styles::{
-  STYLES_CSS,
-  STYLES_CSS_RESPONSIVE,
-  STYLES_LESS,
-  STYLES_LESS_RESPONSIVE,
-  STYLES_POSTCSS,
-  STYLES_POSTCSS_RESPONSIVE,
-  STYLES_SASS,
-  STYLES_SASS_RESPONSIVE,
-  STYLES_STYLUS,
-  STYLES_STYLUS_RESPONSIVE
 };
 
 pub fn create(CLIGlobalCreation {
@@ -66,6 +66,11 @@ pub fn create(CLIGlobalCreation {
   let responsive_export = match styles {
     Styles::Emotion | Styles::StyledComponents => format!("{full_path}/{name}{STYLES_EXT}{RESPONSIVE_EXT}{styles_ext}"),
     _ => format!("{full_path}/{name}{RESPONSIVE_EXT}{styles_ext}"),
+  };
+
+  let proptypes_export = match language {
+    Lang::TypeScript => Some(format!("{full_path}/{name}{PROPTYPES_EXT}{ext}")),
+    Lang::JavaScript => None,
   };
 
   if tool != &Tool::Vanilla {
@@ -123,13 +128,8 @@ pub fn create(CLIGlobalCreation {
       let proptypes = match language {
         Lang::TypeScript => Some(CreationPaths {
           template: format!("{PROPTYPES_PATH}{ext}"),
-          default: PROPTYPES.to_string(),
+          default: PROPTYPES.to_owned(),
         }),
-        Lang::JavaScript => None,
-      };
-
-      let proptypes_export = match language {
-        Lang::TypeScript => Some(format!("{full_path}/{name}{PROPTYPES_EXT}{ext}")),
         Lang::JavaScript => None,
       };
 
@@ -216,13 +216,8 @@ pub fn create(CLIGlobalCreation {
       let proptypes = match language {
         Lang::TypeScript => Some(CreationPaths {
           template: format!("{PROPTYPES_PATH}{ext}"),
-          default: PROPTYPES.to_string(),
+          default: PROPTYPES.to_owned(),
         }),
-        Lang::JavaScript => None,
-      };
-
-      let proptypes_export = match language {
-        Lang::TypeScript => Some(format!("{full_path}/{name}{PROPTYPES_EXT}{ext}")),
         Lang::JavaScript => None,
       };
 

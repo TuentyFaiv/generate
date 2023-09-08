@@ -2,24 +2,27 @@ use std::io::{Write, Read, BufReader};
 use std::fs::File;
 use anyhow::Result;
 
-use crate::cli::enums::Tool;
 use crate::create::structs::PageCreation;
+use crate::create::constants::TS_CONFIG_PATH;
 
 use super::utils::{read_path, set_keywords};
 use super::CLIGlobalTemplates;
+use super::constants::{
+  NEXT_ALIAS,
+  NEXT_IMPORT,
+  NEXT_ROUTE,
+  NEXT_LOCALE,
+  SCRIPT,
+  PLAIN_EXPORT,
+  EXT_STYLES,
+};
 
-pub fn generate(CLIGlobalTemplates {
-  answers,
-  ..
-}: &CLIGlobalTemplates, templates: &PageCreation) -> Result<()> {
+pub fn generate(CLIGlobalTemplates { answers, .. }: &CLIGlobalTemplates, templates: &PageCreation) -> Result<()> {
   let tool = &answers.tool;
 
-  let template_path = match tool {
-    Tool::React => templates.react_path(),
-    Tool::Svelte => templates.svelte_path(),
-    Tool::Vanilla => templates.vanilla_path(),
-  };
+  let template_path = templates.path(tool);
 
+  let mut styles_import = read_path(&template_path, &templates.imports.styles);
   let mut config = read_path(&template_path, &templates.aliases.config);
   let mut aliases = read_path(&template_path, &templates.aliases.config_aliases);
   let mut styles = read_path(&template_path, &templates.styles);
@@ -27,9 +30,11 @@ pub fn generate(CLIGlobalTemplates {
   let mut page = read_path(&template_path, &templates.page);
   if let Some(template_script) = &templates.script {
     let script = read_path(&template_path, template_script);
-    page = page.replace("SCRIPT", &script);
+    page = page.replace(SCRIPT, &script);
   }
 
+  styles_import = set_keywords(&styles_import, &answers.name);
+  styles_import = styles_import.replace(EXT_STYLES, &templates.styles_ext);
   page = set_keywords(&page, &answers.name);
   styles = set_keywords(&styles, &answers.name);
   responsive = set_keywords(&responsive, &answers.name);
@@ -51,16 +56,16 @@ pub fn generate(CLIGlobalTemplates {
       let mut config_content = String::new();
       buf_reader.read_to_string(&mut config_content)?;
 
-      if !config_content.contains(&aliases) {
-        config_content = config_content.replace("/* NEXT_ALIAS */", &aliases);
+      if !config_content.contains(&aliases.replace(NEXT_ALIAS, "")) {
+        config_content = config_content.replace(NEXT_ALIAS, &aliases);
       }
 
       let mut new_config = File::create(&config_export)?;
       new_config.write_all(config_content.as_bytes())?;
     },
     Err(_) => {
-      if !config.contains(&aliases) {
-        config = config.replace("/* NEXT_ALIAS */", &aliases);
+      if !config.contains(&aliases.replace(NEXT_ALIAS, "")) {
+        config = config.replace(NEXT_ALIAS, &aliases);
       }
 
       let mut config_file = File::create(&config_export)?;
@@ -69,7 +74,6 @@ pub fn generate(CLIGlobalTemplates {
   }
 
   // Styles barrel file
-  let styles_import = &templates.imports.styles;
   let styles_index = &templates.exports.barrel_styles;
   match File::open(&styles_index) {
     Ok(index_file) => {
@@ -77,7 +81,7 @@ pub fn generate(CLIGlobalTemplates {
       let mut index_content = String::new();
       buf_reader.read_to_string(&mut index_content)?;
 
-      if !index_content.contains(styles_import) {
+      if !index_content.contains(&styles_import) {
         index_content = [index_content, styles_import.to_owned()].join("");
 
         let mut new_index = File::create(&styles_index)?;
@@ -99,6 +103,9 @@ pub fn generate(CLIGlobalTemplates {
       route = set_keywords(&route, &answers.name);
 
       if let Some(page_import) = &templates.imports.page {
+        let mut page_import = read_path(&template_path, page_import);
+        page_import = set_keywords(&page_import, &answers.name);
+
         if let Some(router_export) = &templates.exports.router {
           match File::open(&router_export) {
             Ok(router_file) => {
@@ -106,22 +113,22 @@ pub fn generate(CLIGlobalTemplates {
               let mut router_content = String::new();
               buf_reader.read_to_string(&mut router_content)?;
 
-              if !router_content.contains(page_import) {
-                router_content = router_content.replace("/* NEXT_IMPORT */", &page_import);
+              if !router_content.contains(&page_import.replace(NEXT_IMPORT, "")) {
+                router_content = router_content.replace(NEXT_IMPORT, &page_import);
               }
-              if !router_content.contains(&route) {
-                router_content = router_content.replace("/* NEXT_ROUTE */", &route);
+              if !router_content.contains(&route.replace(NEXT_ROUTE, "")) {
+                router_content = router_content.replace(NEXT_ROUTE, &route);
               }
 
               let mut new_router = File::create(&router_export)?;
               new_router.write_all(router_content.as_bytes())?;
             },
             Err(_) => {
-              if !router.contains(page_import) {
-                router = router.replace("/* NEXT_IMPORT */", &page_import);
+              if !router.contains(&page_import.replace(NEXT_IMPORT, "")) {
+                router = router.replace(NEXT_IMPORT, &page_import);
               }
-              if !router.contains(&route) {
-                router = router.replace("/* NEXT_ROUTE */", &route);
+              if !router.contains(&route.replace(NEXT_ROUTE, "")) {
+                router = router.replace(NEXT_ROUTE, &route);
               }
 
               let mut router_file = File::create(&router_export)?;
@@ -141,6 +148,8 @@ pub fn generate(CLIGlobalTemplates {
     i18n_locale = set_keywords(&i18n_locale, &answers.name);
 
     if let Some(locale_import) = &templates.imports.locale {
+      let mut locale_import = read_path(&template_path, locale_import);
+      locale_import = set_keywords(&locale_import, &answers.name);
       if let Some(i18n_export) = &templates.exports.i18n {
         match File::open(i18n_export.to_string()) {
           Ok(i18n_file) => {
@@ -148,16 +157,16 @@ pub fn generate(CLIGlobalTemplates {
             let mut i18n_content = String::new();
             buf_reader.read_to_string(&mut i18n_content)?;
 
-            if !i18n_content.contains(locale_import) {
-              i18n_content = i18n_content.replace("/* NEXT_LOCALE */", &locale_import);
+            if !i18n_content.contains(&locale_import.replace(NEXT_LOCALE, "")) {
+              i18n_content = i18n_content.replace(NEXT_LOCALE, &locale_import);
 
               let mut new_i18n = File::create(&i18n_export)?;  
               new_i18n.write_all(i18n_content.as_bytes())?;
             }
           },
           Err(_) => {
-            if !i18n_context.contains(locale_import) {
-              i18n_context = i18n_context.replace("/* NEXT_LOCALE */", &locale_import);
+            if !i18n_context.contains(&locale_import.replace(NEXT_LOCALE, "")) {
+              i18n_context = i18n_context.replace(NEXT_LOCALE, &locale_import);
             }
 
             let mut i18n_file = File::create(&i18n_export)?;
@@ -167,16 +176,18 @@ pub fn generate(CLIGlobalTemplates {
 
         if let Some(i18n_barrel) = &templates.exports.barrel_i18n {
           if let Some(i18n_import) = &templates.imports.i18n {
+            let mut i18n_import = read_path(&template_path, i18n_import);
+            i18n_import = set_keywords(&i18n_import, &answers.name);
             match File::open(&i18n_barrel) {
               Ok(index) => {
                 let mut buf_reader = BufReader::new(&index);
                 let mut index_content = String::new();
                 buf_reader.read_to_string(&mut index_content)?;
   
-                if index_content.contains("export {};") {
-                  index_content = index_content.replace("export {};", "");
+                if index_content.contains(PLAIN_EXPORT) {
+                  index_content = index_content.replace(PLAIN_EXPORT, "");
                 }
-                if !index_content.contains(i18n_import) {
+                if !index_content.contains(&i18n_import) {
                   let updated_index = [index_content.as_str(), i18n_import.as_str()].concat();
 
                   let mut new_index = File::create(&i18n_barrel)?;
@@ -232,7 +243,7 @@ pub fn generate(CLIGlobalTemplates {
 
       ts_aliases = set_keywords(&ts_aliases, &answers.name);
 
-      let tsconfig_export = "./tsconfig.json".to_string();
+      let tsconfig_export = format!(".{TS_CONFIG_PATH}");
 
       match File::open(&tsconfig_export) {
         Ok(tsconfig_file) => {
@@ -242,19 +253,18 @@ pub fn generate(CLIGlobalTemplates {
 
           let mut new_tsconfig = File::create(&tsconfig_export)?;
 
-          if !tsconfig_content.contains(&ts_aliases) {
-            tsconfig_content = tsconfig_content.replace("/* NEXT_ALIAS */", &ts_aliases);
+          if !tsconfig_content.contains(&ts_aliases.replace(NEXT_ALIAS, "")) {
+            tsconfig_content = tsconfig_content.replace(NEXT_ALIAS, &ts_aliases);
           }
 
           new_tsconfig.write_all(tsconfig_content.as_bytes())?;
         },
         Err(_) => {
-          let mut tsconfig_file = File::create(&tsconfig_export)?;
-
-          if !tsconfig.contains(&ts_aliases) {
-            tsconfig = tsconfig.replace("/* NEXT_ALIAS */", &ts_aliases);
+          if !tsconfig.contains(&ts_aliases.replace(NEXT_ALIAS, "")) {
+            tsconfig = tsconfig.replace(NEXT_ALIAS, &ts_aliases);
           }
 
+          let mut tsconfig_file = File::create(&tsconfig_export)?;
           tsconfig_file.write_all(tsconfig.as_bytes())?;
         }
       }

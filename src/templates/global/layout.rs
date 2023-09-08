@@ -2,11 +2,12 @@ use std::io::{Write, Read, BufReader};
 use std::fs::File;
 use anyhow::Result;
 
-use crate::cli::enums::Tool;
 use crate::create::structs::LayoutCreation;
 
 use super::utils::{read_path, set_keywords};
 use super::CLIGlobalTemplates;
+
+use super::constants::{EXT_STYLES, SCRIPT};
 
 pub fn generate(CLIGlobalTemplates {
   answers,
@@ -14,20 +15,19 @@ pub fn generate(CLIGlobalTemplates {
 }: &CLIGlobalTemplates, templates: &LayoutCreation) -> Result<()> {
   let tool = &answers.tool;
 
-  let template_path = match tool {
-    Tool::React => templates.react_path(),
-    Tool::Svelte => templates.svelte_path(),
-    Tool::Vanilla => templates.vanilla_path(),
-  };
+  let template_path = templates.path(tool);
 
+  let mut styles_import = read_path(&template_path, &templates.import);
   let mut styles = read_path(&template_path, &templates.styles);
   let mut responsive = read_path(&template_path, &templates.responsive);
   let mut layout = read_path(&template_path, &templates.layout);
   if let Some(template_script) = &templates.script {
     let script = read_path(&template_path, template_script);
-    layout = layout.replace("SCRIPT", &script);
+    layout = layout.replace(SCRIPT, &script);
   }
 
+  styles_import = set_keywords(&styles_import, &answers.name);
+  styles_import = styles_import.replace(EXT_STYLES, &templates.styles_ext);
   layout = set_keywords(&layout, &answers.name);
   styles = set_keywords(&styles, &answers.name);
   responsive = set_keywords(&responsive, &answers.name);
@@ -40,7 +40,6 @@ pub fn generate(CLIGlobalTemplates {
   styles_file.write_all(styles.as_bytes())?;
   responsive_file.write_all(responsive.as_bytes())?;
 
-  let styles_import = &templates.import;
   let styles_index = &templates.exports.barrel_styles;
   match File::open(&styles_index) {
     Ok(index_file) => {
@@ -48,7 +47,7 @@ pub fn generate(CLIGlobalTemplates {
       let mut index_content = String::new();
       buf_reader.read_to_string(&mut index_content)?;
 
-      if !index_content.contains(styles_import) {
+      if !index_content.contains(&styles_import) {
         index_content = [index_content, styles_import.to_owned()].join("");
 
         let mut new_index = File::create(&styles_index)?;
