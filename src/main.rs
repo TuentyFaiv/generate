@@ -23,7 +23,7 @@ pub fn main() -> Result<()> {
 	let questions = CLIQuestions::new(cli_config.clone(), args);
 	let answers = questions.ask()?;
 
-	println!("{:?}", answers.clone());
+	// println!("{:?}", answers.clone());
 	
 	if !answers.accept { return Ok(()); }
 
