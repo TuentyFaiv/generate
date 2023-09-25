@@ -109,13 +109,19 @@ impl CLIQuestions {
       None => Ok(None)
     };
 
-    Ok(AnswersToolType {
-      tool_type: tool_type?,
-      language: Lang::parse(&arg_or(
+    let language = if let Some(global_config) = &self.config.stored {
+      global_config.lang.clone()
+    } else {
+      Lang::parse(&arg_or(
         lang_question.prompt,
         self.args.language.clone(),
         &lang_question.tools)?
-      ),
+      )
+    };
+
+    Ok(AnswersToolType {
+      tool_type: tool_type?,
+      language,
     })
   }
   fn ask_name(&self, arch: &ArchType) -> Result<AnswersName> {
@@ -207,6 +213,9 @@ impl CLIQuestions {
       ArchType::Component
       | ArchType::Layout
       | ArchType::Page => {
+        if let Some(global_config) = &self.config.stored {
+          return Ok(global_config.styles.clone());
+        }
         let styles_options = match tool {
           Tool::React => &self.config.styles.react,
           Tool::Svelte => &self.config.styles.svelte,
@@ -232,6 +241,9 @@ impl CLIQuestions {
   fn ask_i18n(&self, arch: &ArchType) -> Result<bool> {
     match arch {
       ArchType::Page | ArchType::Layout => {
+        if let Some(global_config) = &self.config.stored {
+          return Ok(global_config.i18n);
+        }
         Ok(sure("i18n (internationalization)?")?)
       }
       _ => Ok(false)

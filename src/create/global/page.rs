@@ -73,10 +73,18 @@ pub fn create(CLIGlobalCreation {
   global,
   ..
 }: &CLIGlobalCreation) -> Result<String> {
-  let Answers { name, tool, path, language, styles, .. } = answers;
+  let Answers {
+    name,
+    tool,
+    path,
+    language,
+    styles,
+    i18n,
+    ..
+  } = answers;
   let paths = &config.paths;
 
-  let i18n = true;
+
   let styles_ext = styles.to_extension(language);
   let ext = language.to_extension();
   let name_pascal = &name.pascal;
@@ -130,7 +138,7 @@ pub fn create(CLIGlobalCreation {
     false => None,
   };
 
-  if i18n {
+  if *i18n {
     path_locales = match tool {
       Tool::React => &paths.locales.react,
       Tool::Svelte => &paths.locales.svelte,
@@ -210,6 +218,13 @@ pub fn create(CLIGlobalCreation {
           template: format!("{I18N_CONTEXT}{ext}"),
           default: I18N_IMPORT.to_owned()
         }),
+        false => None,
+      };
+
+      let i18n_locales = match i18n {
+        true => Some(i18n_locales.into_iter().map(|locale| {
+          format!("{path_locales}/{locale}/{}{JSON_EXT}", name.namespace)
+        }).collect()),
         false => None,
       };
 
@@ -329,13 +344,11 @@ pub fn create(CLIGlobalCreation {
           barrel_styles: format!("{path_ui}{STYLES_PATH}{INDEX_PATH}{ext}"),
           styles: styles_export,
           responsive: responsive_export,
+          proptypes: proptypes_export,
+          router: Some(format!("{}{PAGE_ROUTER_PATH}{ext}x", &paths.routes)),
           i18n: i18n_context,
           barrel_i18n: i18n_barrel,
-          proptypes: proptypes_export,
-          locales: Some(i18n_locales.into_iter().map(|locale| {
-            format!("{path_locales}/{locale}/{}{JSON_EXT}", name.namespace)
-          }).collect()),
-          router: Some(format!("{}{PAGE_ROUTER_PATH}{ext}x", &paths.routes)),
+          locales: i18n_locales,
         }
       ))
     },
@@ -363,8 +376,8 @@ pub fn create(CLIGlobalCreation {
         println!("! {:?}", why.kind());
       });
 
-      let i18n_templates = if i18n {
-        Some(PageCreationI18n {
+      let i18n_templates = match i18n {
+        true => Some(PageCreationI18n {
           locale: CreationPaths {
             template: LOCALE_FILE.to_owned(),
             default: LOCALE.to_owned()
@@ -373,8 +386,9 @@ pub fn create(CLIGlobalCreation {
             template: format!("{I18N_PATH}{ext}"),
             default: I18N.to_owned()
           }
-        })
-      } else { None };
+        }),
+        false => None,
+      };
 
       let i18n_barrel = match i18n {
         true => Some(path_i18n.replace("i18n", format!("index{ext}").as_str())),
@@ -391,6 +405,13 @@ pub fn create(CLIGlobalCreation {
           template: format!("{I18N_CONTEXT}{ext}"),
           default: I18N_IMPORT.to_owned()
         }),
+        false => None,
+      };
+
+      let i18n_locales = match i18n {
+        true => Some(i18n_locales.into_iter().map(|locale| {
+          format!("{path_locales}/{locale}/{}{JSON_EXT}", name.namespace)
+        }).collect()),
         false => None,
       };
 
@@ -493,12 +514,10 @@ pub fn create(CLIGlobalCreation {
           barrel_styles: format!("{path_ui}{STYLES_PATH}{INDEX_PATH}{ext}"),
           styles: styles_export,
           responsive: responsive_export,
+          proptypes: proptypes_export,
           i18n: i18n_context,
           barrel_i18n: i18n_barrel,
-          proptypes: proptypes_export,
-          locales: Some(i18n_locales.into_iter().map(|locale| {
-            format!("{path_locales}/{locale}/{}{JSON_EXT}", name.namespace)
-          }).collect()),
+          locales: i18n_locales,
           router: None,
         }
       ))

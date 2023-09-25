@@ -14,21 +14,21 @@ pub fn build_global_config(config_file: &Option<ConfigFile>, set_global: bool, p
     Some(file) => {
       let storaged_i18n = match &config_file {
         Some(file) => match file.i18n {
-          Some(i18n) => i18n,
+          Some(i18n) => if set_global { i18n_question()? } else { i18n },
           None => i18n_question()?,
         },
         None => i18n_question()?,
       };
       let storaged_lang = match &config_file {
         Some(file) => match &file.lang {
-          Some(lang) => Lang::parse(&lang),
+          Some(lang) => if set_global { lang_question()? } else { Lang::parse(&lang) },
           None => lang_question()?,
         },
         None => lang_question()?,
       };
       let storaged_styles = match &config_file {
         Some(file) => match &file.styles {
-          Some(styles) => Styles::parse(&styles) ,
+          Some(styles) => if set_global { styles_question()? } else { Styles::parse(&styles) },
           None => styles_question()?,
         },
         None => styles_question()?,
