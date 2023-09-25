@@ -16,7 +16,8 @@ Options:
   -l, --language <LANGUAGE>  TypeScript or JavaScript
   -s, --styles <STYLES>      Styles type
   -p, --path <PATH>          Template path to generate
-  -y, --sure <SURE>          Accept all questions [possible values: true, false]
+  -y, --sure                 Accept all questions
+  -g, --global               Set configuration
   -c, --config <FILE>        Config file to customize this CLI
   -h, --help                 Print help
   -V, --version              Print version
