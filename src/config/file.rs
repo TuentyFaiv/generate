@@ -3,13 +3,16 @@ use serde::{Serialize, Deserialize};
 #[derive(Serialize, Deserialize, Debug)]
 pub struct ConfigFile {
   pub repository: Option<String>,
+  pub i18n: Option<bool>,
+  pub lang: Option<String>,
+  pub styles: Option<String>,
   pub root: Option<String>,
   pub paths: Option<ConfigPaths>,
   pub tools_type: Option<ConfigFileToolsType>,
   pub templates: Option<ConfigTemplates>,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct ConfigPaths {
   pub globals: Option<ConfigGlobalPaths>,
   pub react: Option<ConfigReactPaths>,
@@ -17,7 +20,7 @@ pub struct ConfigPaths {
   pub vanilla: Option<ConfigVanillaPaths>,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct ConfigGlobalPaths {
   pub services: Option<String>,
   pub schemas: Option<String>,
@@ -26,7 +29,7 @@ pub struct ConfigGlobalPaths {
   pub ui: Option<String>,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct ConfigReactPaths {
   pub hocs: Option<String>,
   pub hooks: Option<ConfigReactHooksPaths>,
@@ -34,13 +37,13 @@ pub struct ConfigReactPaths {
   pub routes: Option<String>,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct ConfigReactHooksPaths {
   pub global: Option<String>,
   pub internal: Option<String>,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct ConfigSveltePaths {
   pub actions: Option<String>,
   pub stores: Option<String>,
@@ -49,7 +52,7 @@ pub struct ConfigSveltePaths {
   pub locales: Option<String>,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct ConfigVanillaPaths {
   pub classes: Option<String>,
   pub functions: Option<String>,

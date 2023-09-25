@@ -92,12 +92,12 @@ impl Lang {
       _ => Lang::TypeScript,
     }
   }
-  // pub fn to_string(&self) -> String {
-  //   match self {
-  //     Lang::JavaScript => "javascript".to_owned(),
-  //     Lang::TypeScript => "typescript".to_owned(),
-  //   }
-  // }
+  pub fn to_string(&self) -> String {
+    match self {
+      Lang::JavaScript => "javascript".to_owned(),
+      Lang::TypeScript => "typescript".to_owned(),
+    }
+  }
   pub fn to_extension(&self) -> String {
     match self {
       Lang::JavaScript => ".js".to_owned(),
@@ -127,20 +127,20 @@ impl Styles {
       "postcss" => Styles::PostCSS,
       "emotion" => Styles::Emotion,
       "styled" => Styles::StyledComponents,
-      _ => Styles::CSS,
+      _ => Styles::Emotion,
     }
   }
-  // pub fn to_string(&self) -> String {
-  //   match self {
-  //     Styles::CSS => "css".to_owned(),
-  //     Styles::SCSS => "scss".to_owned(),
-  //     Styles::LESS => "less".to_owned(),
-  //     Styles::Stylus => "stylus".to_owned(),
-  //     Styles::PostCSS => "postcss".to_owned(),
-  //     Styles::Emotion => "emotion".to_owned(),
-  //     Styles::StyledComponents => "styled".to_owned(),
-  //   }
-  // }
+  pub fn to_string(&self) -> String {
+    match self {
+      Styles::CSS => "css".to_owned(),
+      Styles::SCSS => "scss".to_owned(),
+      Styles::LESS => "less".to_owned(),
+      Styles::Stylus => "stylus".to_owned(),
+      Styles::PostCSS => "postcss".to_owned(),
+      Styles::Emotion => "emotion".to_owned(),
+      Styles::StyledComponents => "styled".to_owned(),
+    }
+  }
   pub fn to_extension(&self, lang: &Lang) -> String {
     match self {
       Styles::CSS => ".css".to_owned(),

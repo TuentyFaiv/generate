@@ -220,15 +220,22 @@ impl CLIQuestions {
         )?);
         Ok(styles)
       },
-      _ => Ok(Styles::CSS)
+      _ => Ok(Styles::Emotion)
     }
   }
   fn ask_sure(&self) -> Result<bool> {
-    let accept = match self.args.sure {
-      Some(accept) => accept,
-      None => sure()?
-    };
-    Ok(accept)
+    if !self.args.sure {
+      return Ok(sure("Are you sure?")?);
+    }
+    Ok(self.args.sure)
+  }
+  fn ask_i18n(&self, arch: &ArchType) -> Result<bool> {
+    match arch {
+      ArchType::Page | ArchType::Layout => {
+        Ok(sure("i18n (internationalization)?")?)
+      }
+      _ => Ok(false)
+    }
   }
 }
 
@@ -243,6 +250,8 @@ impl Questions for CLIQuestions {
 
     let arch = self.ask_arch(&tool)?;
 
+    let i18n = self.ask_i18n(&arch)?;
+
     let AnswersToolType { tool_type, language } = self.ask_tool_type(&arch, &tool)?;
 
     let styles = self.ask_styles(&arch, &tool)?;
@@ -254,6 +263,7 @@ impl Questions for CLIQuestions {
     let accept = self.ask_sure()?;
 
     Ok(Answers {
+      i18n,
       name,
       path,
       tool,

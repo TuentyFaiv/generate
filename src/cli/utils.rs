@@ -10,9 +10,9 @@ use dialoguer::{console::Term, theme::ColorfulTheme};
 use crate::statics::DONE;
 use crate::utils::transform;
 
-pub fn sure() -> Result<bool> {
+pub fn sure(prompt: &str) -> Result<bool> {
 	let accept = Confirm::with_theme(&ColorfulTheme::default())
-		.with_prompt("Are you sure?")
+		.with_prompt(prompt)
 		.default(true)
 		.wait_for_newline(true)
 		.interact()?;

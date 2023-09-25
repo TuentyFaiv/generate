@@ -1,9 +1,11 @@
 mod utils;
+mod global;
 pub mod file;
 pub mod structs;
 
 use std::fs::File;
 use std::io::BufReader;
+use anyhow::Result;
 use dirs_next::home_dir;
 
 use crate::statics::{TOOLS, TOOLS_REACT, TOOLS_SVELTE, TOOLS_VANILLA, TOOLS_COMPONENTS};
@@ -13,12 +15,14 @@ use crate::utils::to_vec;
 use crate::cli::enums::Tool;
 use crate::cli::structs::Args;
 
+use self::global::build_global_config;
 use self::utils::{tool_to_vec, to_tool_type, default_tool, list_libraries, list_projects, search_repository};
 use self::file::{ConfigFile, ConfigFileToolsType, ConfigRepositoryTool, ConfigTemplates};
-use self::structs::{Paths, PathLocales, Archs, Tools, PathHooks, ConfigStyles};
+use self::structs::{Paths, PathLocales, Archs, Tools, PathHooks, ConfigStyles, ConfigStored};
 
 #[derive(Clone, Debug)]
 pub struct CLIConfig {
+  pub stored: Option<ConfigStored>,
   pub paths: Paths,
   pub langs: Vec<String>,
   pub tools: Tools,
@@ -29,21 +33,14 @@ pub struct CLIConfig {
   repository: String,
 }
 
+const OWN_PATH: &str = ".tfverse/config_cli.json";
+
 impl CLIConfig {
-  pub fn new(args: Args) -> Self {
+  pub fn new(args: Args) -> Result<Self> {
     let config_file = match args.config {
       Some(config_path) => CLIConfig::read_config(&config_path),
-      None => match home_dir() {
-        Some(mut path) => {
-          let own_path = ".tfverse/config_cli.json";
-          path.push(own_path);
-          CLIConfig::read_config(path.to_str().unwrap_or(own_path))
-        },
-        None => None
-      },
+      None => CLIConfig::read_global(),
     };
-
-    // println!("{:?}", config_file);
 
     let styles_global = to_vec(STYLES_GLOBAL);
     let styles_react = [
@@ -59,7 +56,8 @@ impl CLIConfig {
       to_vec(STYLES_VANILLA),
     ].concat();
 
-    Self {
+    Ok(Self {
+      stored: CLIConfig::set_storage(args.global)?,
       langs: to_vec(LANGS),
       paths: CLIConfig::build_paths(&config_file),
       tools: CLIConfig::build_tools(&config_file),
@@ -77,10 +75,18 @@ impl CLIConfig {
         vanilla: styles_vanilla,
       },
       templates: CLIConfig::build_templates(&config_file),
+    })
+  }
+  fn read_global() -> Option<ConfigFile> {
+    match home_dir() {
+      Some(mut path) => {
+        path.push(OWN_PATH);
+        CLIConfig::read_config(path.to_str().unwrap_or(OWN_PATH))
+      },
+      None => None
     }
   }
   fn read_config(path: &str) -> Option<ConfigFile> {
-    // println!("Reading config file: {}", path);
     match File::open(path) {
       Err(_) => None,
       Ok(file) => {
@@ -91,6 +97,11 @@ impl CLIConfig {
         }
       },
     }
+  }
+  fn set_storage(set_global: bool) -> Result<Option<ConfigStored>> {
+    let config_file = CLIConfig::read_global();
+
+    Ok(build_global_config(&config_file, set_global, OWN_PATH)?)
   }
   fn build_paths(config_file: &Option<ConfigFile>) -> Paths {
     let default_paths = Paths {

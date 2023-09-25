@@ -26,7 +26,10 @@ pub struct Args {
 	pub path: Option<String>,
 	/// Accept all questions
   #[arg(short = 'y', long)]
-	pub sure: Option<bool>,
+	pub sure: bool,
+	/// Set configuration
+  #[arg(short = 'g', long)]
+	pub global: bool,
   /// Config file to customize this CLI
   #[arg(short, long, value_name = "FILE")]
 	pub config: Option<String>,
@@ -42,6 +45,7 @@ pub struct Answers {
   pub language: Lang,
   pub styles: Styles,
   pub arch: ArchType,
+  pub i18n: bool,
   pub accept: bool,
 }
 

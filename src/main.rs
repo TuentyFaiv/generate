@@ -9,8 +9,8 @@ use anyhow::Result;
 use clap::Parser;
 
 use config::CLIConfig;
-use cli::structs::Args;
 use cli::{Questions, CLIQuestions};
+use cli::structs::Args;
 use cli::utils::msg;
 use create::CLICreation;
 
@@ -18,7 +18,11 @@ use create::CLICreation;
 pub fn main() -> Result<()> {
 	let args = Args::parse();
 
-	let cli_config = CLIConfig::new(args.clone());
+	let cli_config = CLIConfig::new(args.clone())?;
+
+	if args.global { return Ok(()); }
+
+	// println!("{:?}", cli_config.clone());
 
 	let questions = CLIQuestions::new(cli_config.clone(), args);
 	let answers = questions.ask()?;

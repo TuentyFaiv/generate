@@ -1,3 +1,5 @@
+use crate::cli::enums::{Lang, Styles};
+
 #[derive(Clone, Debug)]
 pub struct Paths {
   pub root: String,
@@ -58,4 +60,11 @@ pub struct ConfigStyles {
   pub react: Vec<String>,
   pub svelte: Vec<String>,
   pub vanilla: Vec<String>,
+}
+
+#[derive(Clone, Debug)]
+pub struct ConfigStored {
+  pub i18n: bool,
+  pub lang: Lang,
+  pub styles: Styles,
 }
