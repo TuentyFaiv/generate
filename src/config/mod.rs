@@ -3,19 +3,19 @@ mod global;
 pub mod file;
 pub mod structs;
 
-use std::fs::File;
-use std::io::BufReader;
-use anyhow::Result;
+use std::fs::{File, create_dir_all};
+use std::io::{Write, BufWriter, BufReader};
+use anyhow::{Result, anyhow};
 use dirs_next::home_dir;
 
 use crate::statics::{TOOLS, TOOLS_REACT, TOOLS_SVELTE, TOOLS_VANILLA, TOOLS_COMPONENTS};
 use crate::statics::{ARCHS, ARCHS_REACT, ARCHS_SVELTE, ARCHS_VANILLA};
 use crate::statics::{LANGS, STYLES_GLOBAL, STYLES_REACT, STYLES_SVELTE, STYLES_VANILLA};
 use crate::utils::to_vec;
-use crate::cli::enums::Tool;
+use crate::cli::enums::{Tool, Lang, Styles};
 use crate::cli::structs::Args;
 
-use self::global::build_global_config;
+use self::global::{i18n_question, styles_question, lang_question, repository_question};
 use self::utils::{tool_to_vec, to_tool_type, default_tool, list_libraries, list_projects, search_repository};
 use self::file::{ConfigFile, ConfigFileToolsType, ConfigRepositoryTool, ConfigTemplates};
 use self::structs::{Paths, PathLocales, Archs, Tools, PathHooks, ConfigStyles, ConfigStored};
@@ -99,9 +99,94 @@ impl CLIConfig {
     }
   }
   fn set_storage(set_global: bool) -> Result<Option<ConfigStored>> {
+    let full_path = match home_dir() {
+      Some(mut full_path) => {
+        full_path.push(OWN_PATH);
+        full_path
+      },
+      None => return Err(anyhow!("Error to find HOME path")),
+    };
+    let dir_path = full_path.to_str()
+      .unwrap_or(OWN_PATH)
+      .to_string().replace("/config_cli.json", "");
     let config_file = CLIConfig::read_global();
 
-    Ok(build_global_config(&config_file, set_global, OWN_PATH)?)
+    let storaged: Result<Option<ConfigStored>> = match &config_file {
+      Some(file) => {
+        let storaged_i18n = match &config_file {
+          Some(file) => match file.i18n {
+            Some(i18n) => if set_global { i18n_question()? } else { i18n },
+            None => i18n_question()?,
+          },
+          None => i18n_question()?,
+        };
+        let storaged_lang = match &config_file {
+          Some(file) => match &file.lang {
+            Some(lang) => if set_global { lang_question()? } else { Lang::parse(&lang) },
+            None => lang_question()?,
+          },
+          None => lang_question()?,
+        };
+        let storaged_styles = match &config_file {
+          Some(file) => match &file.styles {
+            Some(styles) => if set_global { styles_question()? } else { Styles::parse(&styles) },
+            None => styles_question()?,
+          },
+          None => styles_question()?,
+        };
+        let storaged_repository = match &config_file {
+          Some(file) => match &file.repository {
+            Some(repository) => if set_global { repository_question()? } else { repository.to_string() },
+            None => repository_question()?
+          },
+          None => repository_question()?
+        };
+
+        if set_global {
+          let global_config = ConfigFile {
+            i18n: Some(storaged_i18n),
+            lang: Some(storaged_lang.to_string()),
+            styles: Some(storaged_styles.to_string()),
+            repository: Some(storaged_repository),
+            paths: file.paths.clone(),
+            root: file.root.clone(),
+            templates: file.templates.clone(),
+            tools_type: file.tools_type.clone(),
+          };
+    
+          let file = File::create(&full_path)?;
+          let mut buf_writer = BufWriter::new(file);
+          serde_json::to_writer_pretty(&mut buf_writer, &global_config)?;
+          buf_writer.flush()?;
+        }
+
+        Ok(Some(ConfigStored { i18n: storaged_i18n, lang: storaged_lang, styles: storaged_styles }))
+      },
+      None => {
+        if set_global {
+          create_dir_all(dir_path).unwrap_or_else(|why| {
+            println!("! {:?}", why.kind());
+          });
+  
+          let file = File::create(&full_path)?;
+          let mut buf_writer = BufWriter::new(file);
+          serde_json::to_writer_pretty(&mut buf_writer, &ConfigFile {
+            repository: None,
+            i18n: None,
+            lang: None,
+            styles: None,
+            paths: None,
+            root: None,
+            templates: None,
+            tools_type: None,
+          })?;
+          buf_writer.flush()?;
+        }
+        Ok(if set_global {CLIConfig::set_storage(set_global)? } else { None })
+      },
+    };
+
+    Ok(storaged?)
   }
   fn build_paths(config_file: &Option<ConfigFile>) -> Paths {
     let default_paths = Paths {
