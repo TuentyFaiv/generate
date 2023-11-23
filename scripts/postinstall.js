@@ -17,9 +17,9 @@ async function downloadBinary() {
     throw new Error(`Unsupported platform: ${platform}`)
   }
 
-  const url = executables[platform];
+  const binaryUrl = executables[platform];
 
-  const response = await axios.get(url, { responseType: "arraybuffer" });
+  const response = await axios.get(binaryUrl, { responseType: "arraybuffer" });
 
   const exts = {
     win32: ".exe",
@@ -30,7 +30,7 @@ async function downloadBinary() {
     win32: "win",
     linux: "linux",
     darwin: "macos",
-  }
+  };
   const cli = `tfverse${exts[platform]}`;
   const dir = `../bin/${namespace[platform]}`;
 
