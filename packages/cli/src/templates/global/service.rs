@@ -1,0 +1,121 @@
+use std::io::{Write, Read, BufReader};
+use std::fs::File;
+use anyhow::Result;
+
+use crate::technologies::enums::Tool;
+// use crate::utils::change_case;
+// use crate::statics::global;
+use crate::create::structs::ServiceCreation;
+
+use super::utils::{read_path, set_keywords};
+use super::CLIGlobalTemplates;
+
+pub fn generate(CLIGlobalTemplates {
+  answers,
+  // config,
+  // error,
+  ..
+}: &CLIGlobalTemplates, templates: &ServiceCreation) -> Result<()> {
+  let tool = &answers.tool;
+  let template_path = match tool {
+    Tool::React => templates.react_path(),
+    Tool::Svelte => templates.svelte_path(),
+    Tool::Vanilla => templates.vanilla_path(),
+    _ => None
+  };
+
+  let mut service = read_path(&template_path, &templates.service);
+  let instances = read_path(&template_path, &templates.instances);
+
+  service = set_keywords(&service, &answers.name);
+
+  let mut service_file = File::create(&templates.exports.service)?;
+  service_file.write_all(service.as_bytes())?;
+
+  let service_import = &templates.import.barrel;
+  let index_path = &templates.exports.barrel;
+  match File::open(&index_path) {
+    Ok(index_file) => {
+      let mut buf_reader = BufReader::new(&index_file);
+      let mut index_content = String::new();
+      buf_reader.read_to_string(&mut index_content)?;
+
+      if index_content.contains("export {};") {
+        index_content = index_content.replace("export {};", "");
+      }
+      if index_content.contains(service_import) {
+        index_content = index_content.replace(service_import, "");
+      }
+
+      let mut new_index = File::create(&index_path)?;
+      let updated_index = [index_content.as_str(), service_import.as_str()].concat();
+      new_index.write_all(updated_index.as_bytes())?;
+    },
+    Err(_) => {
+      let mut index_file = File::create(&index_path)?;
+
+      index_file.write_all(service_import.as_bytes())?;
+    }
+  }
+
+  let instances_import = &templates.import.barrel_instances;
+  let instances_index = &templates.exports.barrel_instances;
+  match File::open(&instances_index) {
+    Ok(_) => {},
+    Err(_) => {
+      let mut instances_file = File::create(&instances_index)?;
+
+      instances_file.write_all(instances_import.as_bytes())?;
+    }
+  }
+  let instances_path = &templates.exports.instances;
+  match File::open(&instances_path) {
+    Ok(_) => {},
+    Err(_) => {
+      let mut instances_file = File::create(&instances_path)?;
+
+      instances_file.write_all(instances.as_bytes())?;
+    }
+  }
+
+  if let Some(template_props) = &templates.proptypes {
+    if let Some(export_props) = &templates.exports.proptypes {
+      let mut proptypes = read_path(&template_path, template_props);
+      let mut imports: Option<String> = None;
+
+      if let Some(template_proptypes_imports) = &templates.proptypes_imports {
+        let mut template_imports = read_path(&template_path, template_proptypes_imports);
+
+        template_imports = set_keywords(&template_imports, &answers.name);
+        imports = Some(template_imports);
+      } 
+
+      proptypes = set_keywords(&proptypes, &answers.name);
+
+      match File::open(&export_props) {
+        Ok(proptypes_file) => {
+          let mut buf_reader = BufReader::new(&proptypes_file);
+          let mut proptypes_content = String::new();
+          buf_reader.read_to_string(&mut proptypes_content)?;
+
+          let mut new_config = File::create(&export_props)?;
+
+          proptypes_content = proptypes_content.replace("/* NEXT_TYPE */", &proptypes);
+
+          new_config.write_all(proptypes_content.as_bytes())?;
+        },
+        Err(_) => {
+          let mut proptypes_file = File::create(&export_props)?;
+          
+          if let Some(template_imports) = imports {
+            proptypes = template_imports.replace("/* PROPTYPES */", &proptypes);
+          }
+
+          proptypes_file.write_all(proptypes.as_bytes())?;
+        }
+      }
+    }
+  }
+
+  Ok(())
+}
