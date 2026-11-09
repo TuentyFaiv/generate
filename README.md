@@ -1,81 +1,48 @@
-# Turborepo starter
+# tfverse
 
-This is an official starter Turborepo.
+> **Status: v2 rewrite in progress (Phase 0 — workspace scaffold).** Nothing is published from this branch yet.
+> v1 (`@tuentyfaiv/cli` ≤ 0.0.11) is being sunset; see the migration notes once v2 ships.
 
-## Using this example
+tfverse generates projects and code from **packs** — for humans at the terminal and for AI agents over MCP. A pack is
+a versioned bundle of starters, pieces and presets that anyone can publish from a git tag, a tarball URL or a local
+folder. Code a pack adds is yours to edit, and `tfverse update` still merges upstream fixes into it. Pieces adapt to the
+project's stack, declare typed inputs (prompts, flags and MCP schema from one definition) and can patch existing files.
+Packs are verified by hash and optional signature, installs are dependency-free, and every command works
+non-interactively.
 
-Run the following command:
+## Repository layout
 
-```sh
-npx create-turbo@latest
+```text
+crates/
+  tfverse-core/      pack model, rendering, plan → apply (brand constants live here today)
+  tfverse-packs/     pack sources, integrity + signatures, lockfile    (Phase 2)
+  tfverse-mcp/       MCP server over stdio                             (Phase 5)
+  tfverse/           the CLI binary
+  xtask/             repository automation (`cargo xtask <task>`)
+apps/docs/           legacy v1 docs starter, replaced in Phase 6
 ```
 
-## What's inside?
+## Development
 
-This Turborepo includes the following packages/apps:
+Requirements: [rustup](https://rustup.rs) (the pinned toolchain in `rust-toolchain.toml` installs automatically) and
+[Bun](https://bun.sh) ≥ 1.4.4 for Biome.
 
-### Apps and Packages
-
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
-- `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
-
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
-
-### Utilities
-
-This Turborepo has some additional tools already setup for you:
-
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
-
-### Build
-
-To build all apps and packages, run the following command:
-
-```
-cd my-turborepo
-pnpm build
+```bash
+bun install            # Biome only, for JSON/JS formatting and linting
+cargo xtask ci         # everything CI runs: fmt, clippy, rustdoc, tests, cargo-deny, Biome
+cargo xtask fmt        # or a single step: fmt | lint | doc | test | deny | js
+cargo run -- --help    # run the CLI
 ```
 
-### Develop
+`cargo xtask deny` needs [cargo-deny](https://github.com/EmbarkStudios/cargo-deny) on your `PATH`.
 
-To develop all apps and packages, run the following command:
+### Conventions
 
-```
-cd my-turborepo
-pnpm dev
-```
+- Formatting matches `biome.json`: hard tabs, width 2, LF, 120 columns (`rustfmt.toml` mirrors it).
+- Clippy runs with warnings denied; `unwrap`, `expect`, `panic`, `todo` and `dbg!` are errors outside tests.
+- Libraries use `thiserror`; only the binary uses `anyhow`.
+- Every product name comes from `tfverse_core::brand`, so the planned rename stays a one-line change.
 
-### Remote Caching
+## License
 
-Turborepo can use a technique known as [Remote Caching](https://turbo.build/repo/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
-
-By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup), then enter the following commands:
-
-```
-cd my-turborepo
-npx turbo login
-```
-
-This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
-
-Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
-
-```
-npx turbo link
-```
-
-## Useful Links
-
-Learn more about the power of Turborepo:
-
-- [Tasks](https://turbo.build/repo/docs/core-concepts/monorepos/running-tasks)
-- [Caching](https://turbo.build/repo/docs/core-concepts/caching)
-- [Remote Caching](https://turbo.build/repo/docs/core-concepts/remote-caching)
-- [Filtering](https://turbo.build/repo/docs/core-concepts/monorepos/filtering)
-- [Configuration Options](https://turbo.build/repo/docs/reference/configuration)
-- [CLI Usage](https://turbo.build/repo/docs/reference/command-line-reference)
+[MIT](LICENSE) © Tonalli López

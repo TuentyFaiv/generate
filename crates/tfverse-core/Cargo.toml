@@ -1,0 +1,13 @@
+[package]
+name = "tfverse-core"
+description = "Core engine for tfverse: item model, rendering, and generation plans."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+homepage.workspace = true
+
+[lints]
+workspace = true
