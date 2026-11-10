@@ -1,0 +1,170 @@
+schema_version = 1
+name = "organism"
+description = "A distinct section of an interface built from molecules, such as a header."
+target = "src/ui/organisms"
+
+[inputs.name]
+type = "string"
+description = "Component name, e.g. `site-header`."
+example = "ExampleOrganism"
+
+[inputs.tests]
+type = "bool"
+description = "Add a test file."
+prompt = "Add tests?"
+default = true
+
+[inputs.app]
+type = "string"
+description = "App name: the SwiftUI app folder or the Flutter package."
+example = "ExampleApp"
+default = "app"
+
+[inputs.package]
+type = "string"
+description = "Kotlin package for Jetpack Compose."
+example = "com.example.app"
+default = "com.example.app"
+
+[[variants]]
+name = "angular"
+when = { framework = "angular" }
+
+[[variants]]
+name = "qwik"
+when = { framework = "qwik", language = "typescript" }
+
+[[variants]]
+name = "solid"
+when = { framework = "solid", language = "typescript" }
+
+[[variants]]
+name = "astro"
+when = { framework = "astro", language = "typescript" }
+
+[[variants]]
+name = "svelte"
+when = { framework = "svelte", language = "typescript" }
+
+[[variants]]
+name = "vue"
+when = { framework = "vue", language = "typescript" }
+
+[[variants]]
+name = "react"
+when = { framework = "react", language = "typescript" }
+
+[[variants]]
+name = "lit"
+when = { framework = "lit", language = "typescript" }
+
+[[variants]]
+name = "leptos"
+when = { framework = "leptos" }
+
+[[variants]]
+name = "dioxus"
+when = { framework = "dioxus" }
+
+[[variants]]
+name = "yew"
+when = { framework = "yew" }
+
+[[variants]]
+name = "flutter"
+when = { framework = "flutter" }
+target = ""
+
+[[variants]]
+name = "compose-multiplatform"
+when = { framework = "compose-multiplatform" }
+files = "files/compose"
+target = "composeApp/src/commonMain/kotlin/com/example/app/ui/organisms"
+
+[[variants]]
+name = "compose"
+when = { framework = "compose" }
+target = "app/src/main/java/com/example/app/ui/organisms"
+
+[[variants]]
+name = "swiftui-package"
+when = { language = "swift", package_manager = "swiftpm" }
+files = "files/swiftui"
+target = "Sources/ExampleApp/UI/Organisms"
+
+[[variants]]
+name = "swiftui"
+when = { language = "swift" }
+target = "ExampleApp/UI/Organisms"
+
+[[files]]
+path = "example-organism/example-organism.test.tsx"
+when = "tests"
+
+[[files]]
+path = "example-organism/example-organism.test.ts"
+when = "tests"
+
+[[files]]
+path = "example-organism/example-organism.spec.ts"
+when = "tests"
+
+[[files]]
+path = "example-organism/example-organism.module.css"
+when = "!stack.tailwind"
+
+[[files]]
+path = "example-organism/example-organism.css"
+when = "!stack.tailwind"
+
+[[files]]
+path = "test/ui/organisms/example_organism_test.dart"
+when = "tests"
+
+[[dependencies]]
+ecosystem = "npm"
+name = "vitest"
+version = "^4.0"
+dev = true
+variants = ["qwik", "solid", "astro", "svelte", "vue", "react", "lit"]
+when = "tests"
+
+[[dependencies]]
+ecosystem = "npm"
+name = "@testing-library/react"
+version = "^16.3"
+dev = true
+variants = ["react"]
+when = "tests"
+
+[[dependencies]]
+ecosystem = "npm"
+name = "@testing-library/dom"
+version = "^10.4"
+dev = true
+variants = ["react"]
+when = "tests"
+
+[[dependencies]]
+ecosystem = "npm"
+name = "@solidjs/testing-library"
+version = "^0.8"
+dev = true
+variants = ["solid"]
+when = "tests"
+
+[[dependencies]]
+ecosystem = "npm"
+name = "@testing-library/svelte"
+version = "^5.2"
+dev = true
+variants = ["svelte"]
+when = "tests"
+
+[[dependencies]]
+ecosystem = "npm"
+name = "@vue/test-utils"
+version = "^2.4"
+dev = true
+variants = ["vue"]
+when = "tests"

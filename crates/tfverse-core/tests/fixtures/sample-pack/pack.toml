@@ -1,0 +1,8 @@
+schema_version = 1
+name = "sample"
+version = "1.0.0"
+description = "Fixture pack for engine tests."
+license = "MIT"
+
+[permissions]
+write = ["src/**"]

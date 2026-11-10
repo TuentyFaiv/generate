@@ -1,0 +1,2 @@
+# Minisign key ids revoked by the tfverse project, one per line (16 hex digits, as `minisign` prints them).
+# A pack signed by any of these keys is refused, even when its signature is valid.

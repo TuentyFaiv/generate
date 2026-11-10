@@ -1,0 +1,155 @@
+{
+  "$defs": {
+    "RegistryAliases": {
+      "additionalProperties": false,
+      "description": "Import aliases for registry items.",
+      "properties": {
+        "components": {
+          "description": "Components, default `@/components`.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "hooks": {
+          "description": "Hooks, default `@/hooks`.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "lib": {
+          "description": "Library code, default `@/lib`.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "ui": {
+          "description": "UI components, default `<components>/ui`.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "utils": {
+          "description": "The class-name helper module, default `<lib>/utils`.",
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "type": "object"
+    },
+    "RegistryConfig": {
+      "additionalProperties": false,
+      "description": "Placement of `registry:` items, which follow the `registry-item.json` format.",
+      "properties": {
+        "aliases": {
+          "$ref": "#/$defs/RegistryAliases",
+          "description": "Import aliases; unset ones default to `@/components`, `@/components/ui`, `@/lib`, `@/lib/utils`, `@/hooks`."
+        },
+        "css": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/RelPath"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Stylesheet that items' CSS variables go into, e.g. `src/app/globals.css`."
+        },
+        "namespaces": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Item URLs by namespace, e.g. `\"@acme\": \"https://acme.dev/r/{name}.json\"`, so `registry:@acme/card` works.",
+          "type": "object"
+        },
+        "server_components": {
+          "description": "Keep `\"use client\"` directives, for projects with React Server Components.",
+          "type": "boolean"
+        }
+      },
+      "type": "object"
+    },
+    "RelPath": {
+      "description": "Relative path with `/` separators; no `.`, `..` or absolute paths.",
+      "maxLength": 1024,
+      "minLength": 1,
+      "type": "string"
+    },
+    "Value": {
+      "anyOf": [
+        {
+          "description": "`true` or `false`.",
+          "type": "boolean"
+        },
+        {
+          "description": "A whole number.",
+          "format": "int64",
+          "type": "integer"
+        },
+        {
+          "description": "Text.",
+          "type": "string"
+        }
+      ],
+      "description": "A value given to a piece input."
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "`tfverse.json` / `tfverse.toml`, committed with the project.",
+  "properties": {
+    "$schema": {
+      "description": "JSON Schema URL for editor completion.",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "defaults": {
+      "additionalProperties": {
+        "additionalProperties": {
+          "$ref": "#/$defs/Value"
+        },
+        "type": "object"
+      },
+      "description": "Default input values per piece.",
+      "type": "object"
+    },
+    "paths": {
+      "additionalProperties": {
+        "$ref": "#/$defs/RelPath"
+      },
+      "description": "Output folder per piece, replacing the piece's target.",
+      "type": "object"
+    },
+    "registry": {
+      "$ref": "#/$defs/RegistryConfig",
+      "description": "Where `registry:` items go and how their imports read."
+    },
+    "sources": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "description": "Pack namespaces, e.g. `\"@acme\": \"gh:acme/packs@v1.2.0\"`, so `@acme/ui` names a pack in it.",
+      "type": "object"
+    },
+    "stack": {
+      "additionalProperties": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array"
+      },
+      "description": "Stack facts that replace detection, e.g. `framework = [\"svelte\"]`.",
+      "type": "object"
+    }
+  },
+  "title": "ProjectConfig",
+  "type": "object"
+}

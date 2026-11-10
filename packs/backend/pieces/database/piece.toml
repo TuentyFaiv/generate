@@ -1,0 +1,14 @@
+schema_version = 1
+name = "database"
+description = "SQLAlchemy async engine, sessions and the declarative base for FastAPI."
+target = "app"
+
+[[variants]]
+name = "fastapi"
+when = { framework = "fastapi", database = "sqlalchemy" }
+
+[[dependencies]]
+ecosystem = "pypi"
+name = "sqlalchemy"
+version = ">=2.0"
+features = ["asyncio"]

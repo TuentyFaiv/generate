@@ -1,0 +1,22 @@
+.root {
+	display: grid;
+	gap: 0.5rem;
+}
+
+.label {
+	font-size: 0.875rem;
+	font-weight: 600;
+}
+
+.description {
+	margin: 0;
+	font-size: 0.875rem;
+	color: var(--ui-muted-foreground, #71717a);
+}
+
+.content {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 0.5rem;
+}

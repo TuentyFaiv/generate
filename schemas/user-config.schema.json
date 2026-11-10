@@ -1,0 +1,107 @@
+{
+  "$defs": {
+    "ExternalPatcher": {
+      "additionalProperties": false,
+      "description": "An external patcher command.",
+      "properties": {
+        "command": {
+          "description": "Program and arguments.",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "command"
+      ],
+      "type": "object"
+    },
+    "HostAuth": {
+      "additionalProperties": false,
+      "description": "How to authenticate pack downloads from one host.",
+      "properties": {
+        "env": {
+          "description": "Environment variable holding the token, e.g. `GITHUB_TOKEN`.",
+          "type": "string"
+        },
+        "header": {
+          "default": "Authorization",
+          "description": "Header that carries it.",
+          "type": "string"
+        },
+        "scheme": {
+          "default": "Bearer",
+          "description": "Text before the token in the header; empty sends the token alone.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "env"
+      ],
+      "type": "object"
+    },
+    "SigningConfig": {
+      "additionalProperties": false,
+      "description": "Which pack signatures to trust; official packs ship inside tfverse and need none.",
+      "properties": {
+        "keys": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Trusted minisign public keys by name, e.g. `acme = \"RWQ…\"`.",
+          "type": "object"
+        },
+        "require": {
+          "default": false,
+          "description": "Refuse packs without a valid signature from a trusted key.",
+          "type": "boolean"
+        },
+        "revoked": {
+          "description": "Ids of keys whose signatures are refused even when valid, e.g. `\"F7C5EF0A9B1D2E3C\"`.",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "type": "object"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "The user's own config, outside every project: `<config dir>/tfverse/config.toml`.",
+  "properties": {
+    "ast_grep": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/ExternalPatcher"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "The ast-grep program for pack migrations, e.g. `[\"bunx\", \"@ast-grep/cli\"]`; default `ast-grep`."
+    },
+    "auth": {
+      "additionalProperties": {
+        "$ref": "#/$defs/HostAuth"
+      },
+      "description": "Credentials for pack downloads by host, e.g. `github.com`; the token comes from an environment variable.",
+      "type": "object"
+    },
+    "patchers": {
+      "additionalProperties": {
+        "$ref": "#/$defs/ExternalPatcher"
+      },
+      "description": "Your preferred external tool per patch kind.",
+      "type": "object"
+    },
+    "signing": {
+      "$ref": "#/$defs/SigningConfig",
+      "description": "Which pack signatures you trust."
+    }
+  },
+  "title": "UserConfig",
+  "type": "object"
+}

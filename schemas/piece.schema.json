@@ -1,0 +1,568 @@
+{
+  "$defs": {
+    "Dependency": {
+      "additionalProperties": false,
+      "description": "A package the generated code imports.",
+      "properties": {
+        "dev": {
+          "description": "Only needed to develop and test.",
+          "type": "boolean"
+        },
+        "ecosystem": {
+          "$ref": "#/$defs/Ecosystem",
+          "description": "Package registry."
+        },
+        "features": {
+          "description": "Cargo features or Python extras, e.g. `[\"derive\"]`.",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "name": {
+          "description": "Package name, e.g. `zod` or `github.com/google/uuid`.",
+          "type": "string"
+        },
+        "variants": {
+          "description": "Variants that need it; empty for every variant.",
+          "items": {
+            "$ref": "#/$defs/Name"
+          },
+          "type": "array"
+        },
+        "version": {
+          "description": "Version requirement in the ecosystem's syntax, e.g. `^4.1`.",
+          "type": "string"
+        },
+        "when": {
+          "description": "Condition on inputs or stack facts.",
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "ecosystem",
+        "name",
+        "version"
+      ],
+      "type": "object"
+    },
+    "Ecosystem": {
+      "description": "A package registry.",
+      "oneOf": [
+        {
+          "const": "npm",
+          "description": "npm, also used by Bun, pnpm, Yarn and Deno.",
+          "type": "string"
+        },
+        {
+          "const": "cargo",
+          "description": "crates.io.",
+          "type": "string"
+        },
+        {
+          "const": "pypi",
+          "description": "The Python Package Index.",
+          "type": "string"
+        },
+        {
+          "const": "go",
+          "description": "Go modules.",
+          "type": "string"
+        },
+        {
+          "const": "pub",
+          "description": "pub.dev.",
+          "type": "string"
+        },
+        {
+          "const": "rubygems",
+          "description": "The Ruby gem registry.",
+          "type": "string"
+        },
+        {
+          "const": "packagist",
+          "description": "Packagist.",
+          "type": "string"
+        }
+      ]
+    },
+    "FileRule": {
+      "additionalProperties": false,
+      "description": "A condition on one template file.",
+      "properties": {
+        "path": {
+          "description": "Template path inside the variant folder.",
+          "type": "string"
+        },
+        "when": {
+          "description": "Condition that keeps the file.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "path",
+        "when"
+      ],
+      "type": "object"
+    },
+    "Input": {
+      "description": "One input of a piece.",
+      "oneOf": [
+        {
+          "additionalProperties": false,
+          "description": "Text; with a multi-word `example`, an identifier replaced in every case form.",
+          "properties": {
+            "default": {
+              "description": "Value used when none is given.",
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "description": {
+              "description": "Shown in help and schemas.",
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "example": {
+              "description": "Text in the templates that this input replaces.",
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "prompt": {
+              "description": "Interactive prompt.",
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "type": {
+              "const": "string",
+              "type": "string"
+            }
+          },
+          "required": [
+            "type"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "description": "`true` or `false`, for conditions.",
+          "properties": {
+            "default": {
+              "description": "Value used when none is given.",
+              "type": [
+                "boolean",
+                "null"
+              ]
+            },
+            "description": {
+              "description": "Shown in help and schemas.",
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "prompt": {
+              "description": "Interactive prompt.",
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "type": {
+              "const": "bool",
+              "type": "string"
+            }
+          },
+          "required": [
+            "type"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "description": "One of a fixed set of choices, for conditions.",
+          "properties": {
+            "choices": {
+              "description": "Allowed values.",
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "default": {
+              "description": "Value used when none is given.",
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "description": {
+              "description": "Shown in help and schemas.",
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "prompt": {
+              "description": "Interactive prompt.",
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "type": {
+              "const": "enum",
+              "type": "string"
+            }
+          },
+          "required": [
+            "type",
+            "choices"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "description": "A whole number.",
+          "properties": {
+            "default": {
+              "description": "Value used when none is given.",
+              "format": "int64",
+              "type": [
+                "integer",
+                "null"
+              ]
+            },
+            "description": {
+              "description": "Shown in help and schemas.",
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "example": {
+              "description": "Number in the templates that this input replaces.",
+              "format": "int64",
+              "type": [
+                "integer",
+                "null"
+              ]
+            },
+            "max": {
+              "description": "Largest allowed value.",
+              "format": "int64",
+              "type": [
+                "integer",
+                "null"
+              ]
+            },
+            "min": {
+              "description": "Smallest allowed value.",
+              "format": "int64",
+              "type": [
+                "integer",
+                "null"
+              ]
+            },
+            "prompt": {
+              "description": "Interactive prompt.",
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "type": {
+              "const": "number",
+              "type": "string"
+            }
+          },
+          "required": [
+            "type"
+          ],
+          "type": "object"
+        }
+      ]
+    },
+    "Name": {
+      "pattern": "^[a-z](?:[a-z0-9]|-(?=[a-z0-9])){0,63}$",
+      "type": "string"
+    },
+    "PatchSpec": {
+      "description": "An edit to an existing project file.",
+      "oneOf": [
+        {
+          "additionalProperties": false,
+          "description": "Inserts text next to an anchor line; works in every language.",
+          "properties": {
+            "anchor": {
+              "description": "Text identifying the anchor line.",
+              "type": "string"
+            },
+            "file": {
+              "description": "Project file to edit; may contain examples.",
+              "type": "string"
+            },
+            "insert": {
+              "description": "Text to insert; may contain examples.",
+              "type": "string"
+            },
+            "kind": {
+              "const": "anchor",
+              "type": "string"
+            },
+            "position": {
+              "$ref": "#/$defs/Position",
+              "default": "after",
+              "description": "Where to insert relative to the anchor line."
+            },
+            "when": {
+              "description": "Condition that keeps the patch.",
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          "required": [
+            "kind",
+            "file",
+            "anchor",
+            "insert"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "description": "Adds a JavaScript or TypeScript import after the existing imports.",
+          "properties": {
+            "file": {
+              "description": "Project file to edit; may contain examples.",
+              "type": "string"
+            },
+            "import": {
+              "description": "The import statement; may contain examples.",
+              "type": "string"
+            },
+            "kind": {
+              "const": "import",
+              "type": "string"
+            },
+            "when": {
+              "description": "Condition that keeps the patch.",
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          "required": [
+            "kind",
+            "file",
+            "import"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "description": "Adds CSS custom properties to a block such as `:root`, keeping values the project already set.",
+          "properties": {
+            "file": {
+              "description": "Project CSS file to edit; may contain examples.",
+              "type": "string"
+            },
+            "kind": {
+              "const": "css_vars",
+              "type": "string"
+            },
+            "selector": {
+              "description": "The block's selector or at-rule, e.g. `:root`, `.dark` or `@theme inline`.",
+              "type": "string"
+            },
+            "vars": {
+              "additionalProperties": {
+                "type": "string"
+              },
+              "description": "Properties without the leading `--`, e.g. `sidebar-border = \"220 13% 91%\"`.",
+              "type": "object"
+            },
+            "when": {
+              "description": "Condition that keeps the patch.",
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          "required": [
+            "kind",
+            "file",
+            "selector",
+            "vars"
+          ],
+          "type": "object"
+        }
+      ]
+    },
+    "PieceKind": {
+      "description": "What a piece is for.",
+      "oneOf": [
+        {
+          "const": "piece",
+          "description": "A code module such as a component, model or middleware.",
+          "type": "string"
+        },
+        {
+          "const": "preset",
+          "description": "A saved set of answers for other pieces.",
+          "type": "string"
+        },
+        {
+          "const": "config",
+          "description": "Project configuration such as lint or CI settings.",
+          "type": "string"
+        }
+      ]
+    },
+    "Position": {
+      "description": "Where an anchor patch inserts its text.",
+      "oneOf": [
+        {
+          "const": "after",
+          "description": "On the lines after the anchor.",
+          "type": "string"
+        },
+        {
+          "const": "before",
+          "description": "On the lines before the anchor.",
+          "type": "string"
+        }
+      ]
+    },
+    "Variant": {
+      "additionalProperties": false,
+      "description": "A set of templates for one stack.",
+      "properties": {
+        "files": {
+          "description": "Template folder inside the piece; defaults to `files/<name>`.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "name": {
+          "$ref": "#/$defs/Name",
+          "description": "Variant name."
+        },
+        "target": {
+          "description": "Output folder instead of the piece's `target`, e.g. `lib/ui` for Flutter.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "when": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Project facts that must all hold, e.g. `{ framework = \"react\" }`.",
+          "type": "object"
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "type": "object"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "`piece.toml`.",
+  "properties": {
+    "dependencies": {
+      "description": "Packages the generated code imports.",
+      "items": {
+        "$ref": "#/$defs/Dependency"
+      },
+      "type": "array"
+    },
+    "description": {
+      "description": "One-line summary.",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "files": {
+      "description": "Conditions for individual template files.",
+      "items": {
+        "$ref": "#/$defs/FileRule"
+      },
+      "type": "array"
+    },
+    "inputs": {
+      "additionalProperties": {
+        "$ref": "#/$defs/Input"
+      },
+      "default": {},
+      "description": "Inputs by name.",
+      "type": "object"
+    },
+    "kind": {
+      "$ref": "#/$defs/PieceKind",
+      "default": "piece",
+      "description": "What the piece is for."
+    },
+    "name": {
+      "$ref": "#/$defs/Name",
+      "description": "Piece name; must match its folder."
+    },
+    "patches": {
+      "description": "Edits to existing project files.",
+      "items": {
+        "$ref": "#/$defs/PatchSpec"
+      },
+      "type": "array"
+    },
+    "requires": {
+      "description": "Pieces of the same pack this one builds on; added first when the project lacks them.",
+      "items": {
+        "$ref": "#/$defs/Name"
+      },
+      "type": "array"
+    },
+    "schema_version": {
+      "description": "Manifest format version; must be `1`.",
+      "format": "uint32",
+      "minimum": 0,
+      "type": "integer"
+    },
+    "target": {
+      "description": "Default output folder, relative to the project root; may contain examples. Empty for the root.",
+      "type": "string"
+    },
+    "variants": {
+      "description": "Stack-specific template sets, tried in order.",
+      "items": {
+        "$ref": "#/$defs/Variant"
+      },
+      "type": "array"
+    }
+  },
+  "required": [
+    "schema_version",
+    "name",
+    "target"
+  ],
+  "title": "PieceManifest",
+  "type": "object"
+}

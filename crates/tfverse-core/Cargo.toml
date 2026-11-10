@@ -1,0 +1,27 @@
+[package]
+name = "tfverse-core"
+description = "Core engine for tfverse: pack model, rendering, plan and apply."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+homepage.workspace = true
+
+[dependencies]
+imara-diff.workspace = true
+schemars.workspace = true
+semver.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+sha2.workspace = true
+thiserror.workspace = true
+toml.workspace = true
+
+[dev-dependencies]
+insta.workspace = true
+tempfile.workspace = true
+
+[lints]
+workspace = true

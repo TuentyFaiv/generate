@@ -1,0 +1,120 @@
+schema_version = 1
+name = "error"
+description = "Application errors rendered as RFC 9457 problem details, with the framework's error handler."
+target = "src/shared"
+
+[inputs.tests]
+type = "bool"
+description = "Add tests."
+prompt = "Add tests?"
+default = true
+
+[[variants]]
+name = "hono"
+when = { framework = "hono", language = "typescript" }
+files = "files/typescript"
+
+[[variants]]
+name = "express"
+when = { framework = "express", language = "typescript" }
+files = "files/typescript"
+
+[[variants]]
+name = "axum"
+when = { framework = "axum" }
+target = "src"
+
+[[variants]]
+name = "fastapi"
+when = { framework = "fastapi" }
+target = ""
+
+[[variants]]
+name = "chi"
+when = { framework = "chi" }
+files = "files/go"
+target = "internal/apperror"
+
+[[variants]]
+name = "echo"
+when = { framework = "echo" }
+files = "files/go"
+target = "internal/apperror"
+
+[[files]]
+path = "errors.test.ts"
+when = "tests"
+
+[[files]]
+path = "tests/test_errors.py"
+when = "tests"
+
+[[files]]
+path = "apperror_test.go"
+when = "tests"
+
+[[dependencies]]
+ecosystem = "npm"
+name = "zod"
+version = "^4.1"
+variants = ["hono", "express"]
+
+[[dependencies]]
+ecosystem = "npm"
+name = "vitest"
+version = "^4.0"
+dev = true
+variants = ["hono", "express"]
+when = "tests"
+
+[[dependencies]]
+ecosystem = "cargo"
+name = "thiserror"
+version = "2"
+variants = ["axum"]
+
+[[dependencies]]
+ecosystem = "cargo"
+name = "tracing"
+version = "0.1"
+variants = ["axum"]
+
+[[dependencies]]
+ecosystem = "cargo"
+name = "serde"
+version = "1"
+features = ["derive"]
+variants = ["axum"]
+
+[[dependencies]]
+ecosystem = "cargo"
+name = "tokio"
+version = "1"
+features = ["macros", "rt-multi-thread"]
+dev = true
+variants = ["axum"]
+when = "tests"
+
+[[dependencies]]
+ecosystem = "cargo"
+name = "serde_json"
+version = "1"
+dev = true
+variants = ["axum"]
+when = "tests"
+
+[[dependencies]]
+ecosystem = "pypi"
+name = "pytest"
+version = ">=8"
+dev = true
+variants = ["fastapi"]
+when = "tests"
+
+[[dependencies]]
+ecosystem = "pypi"
+name = "httpx"
+version = ">=0.28"
+dev = true
+variants = ["fastapi"]
+when = "tests"

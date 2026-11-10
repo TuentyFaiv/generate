@@ -1,0 +1,13 @@
+<!-- @tfverse if stack.tailwind -->
+<span [id]="labelId" class="text-sm font-semibold">{{ label() }}</span>
+@if (description(); as description) {
+	<p [id]="descriptionId" class="text-sm text-zinc-500">{{ description }}</p>
+}
+<div class="flex flex-wrap items-center gap-2"><ng-content /></div>
+<!-- @tfverse else -->
+<span [id]="labelId" class="label">{{ label() }}</span>
+@if (description(); as description) {
+	<p [id]="descriptionId" class="description">{{ description }}</p>
+}
+<div class="content"><ng-content /></div>
+<!-- @tfverse end -->

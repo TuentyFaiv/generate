@@ -1,0 +1,12 @@
+---
+source: crates/tfverse-core/tests/engine.rs
+expression: plan.report()
+---
+summary: add sample/component
+changes:
+  - path: src/components/user-card.module.css
+    action: create
+  - path: src/components/user-card.tsx
+    action: create
+instances:
+  - component-b4e69a8312

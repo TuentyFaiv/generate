@@ -1,0 +1,203 @@
+---
+source: crates/tfverse-core/tests/official_packs.rs
+expression: listing
+---
+database · fastapi
+  app/database.py
+database · fastapi (orm)
+  app/database.py
+error · hono
+  src/shared/error-handler.ts
+  src/shared/errors.test.ts
+  src/shared/errors.ts
+error · hono (orm)
+  src/shared/error-handler.ts
+  src/shared/errors.test.ts
+  src/shared/errors.ts
+error · express
+  src/shared/error-handler.ts
+  src/shared/errors.test.ts
+  src/shared/errors.ts
+error · express (orm)
+  src/shared/error-handler.ts
+  src/shared/errors.test.ts
+  src/shared/errors.ts
+error · axum
+  src/error.rs
+error · axum (orm)
+  src/error.rs
+error · fastapi
+  app/errors.py
+  tests/test_errors.py
+error · fastapi (orm)
+  app/errors.py
+  tests/test_errors.py
+error · chi
+  internal/apperror/apperror.go
+  internal/apperror/apperror_test.go
+error · chi (orm)
+  internal/apperror/apperror.go
+  internal/apperror/apperror_test.go
+error · echo
+  internal/apperror/apperror.go
+  internal/apperror/apperror_test.go
+error · echo (orm)
+  internal/apperror/apperror.go
+  internal/apperror/apperror_test.go
+middleware · hono
+  src/shared/middleware/status-badge.test.ts
+  src/shared/middleware/status-badge.ts
+middleware · hono (orm)
+  src/shared/middleware/status-badge.test.ts
+  src/shared/middleware/status-badge.ts
+middleware · express
+  src/shared/middleware/status-badge.test.ts
+  src/shared/middleware/status-badge.ts
+middleware · express (orm)
+  src/shared/middleware/status-badge.test.ts
+  src/shared/middleware/status-badge.ts
+middleware · axum
+  src/middleware/status_badge.rs
+middleware · axum (orm)
+  src/middleware/status_badge.rs
+middleware · fastapi
+  app/middleware/status_badge.py
+  tests/middleware/test_status_badge.py
+middleware · fastapi (orm)
+  app/middleware/status_badge.py
+  tests/middleware/test_status_badge.py
+middleware · chi
+  internal/middleware/status_badge.go
+  internal/middleware/status_badge_test.go
+middleware · chi (orm)
+  internal/middleware/status_badge.go
+  internal/middleware/status_badge_test.go
+middleware · echo
+  internal/middleware/status_badge.go
+  internal/middleware/status_badge_test.go
+middleware · echo (orm)
+  internal/middleware/status_badge.go
+  internal/middleware/status_badge_test.go
+resource · hono
+  src/modules/status-badges/status-badge.model.ts
+  src/modules/status-badges/status-badge.repository.ts
+  src/modules/status-badges/status-badge.routes.test.ts
+  src/modules/status-badges/status-badge.routes.ts
+  src/modules/status-badges/status-badge.service.test.ts
+  src/modules/status-badges/status-badge.service.ts
+  src/shared/error-handler.ts
+  src/shared/errors.test.ts
+  src/shared/errors.ts
+resource · hono (orm)
+  src/modules/status-badges/status-badge.drizzle-repository.ts
+  src/modules/status-badges/status-badge.model.ts
+  src/modules/status-badges/status-badge.prisma-repository.ts
+  src/modules/status-badges/status-badge.repository.ts
+  src/modules/status-badges/status-badge.routes.test.ts
+  src/modules/status-badges/status-badge.routes.ts
+  src/modules/status-badges/status-badge.service.test.ts
+  src/modules/status-badges/status-badge.service.ts
+  src/modules/status-badges/status-badge.table.ts
+  src/shared/error-handler.ts
+  src/shared/errors.test.ts
+  src/shared/errors.ts
+resource · express
+  src/modules/status-badges/status-badge.model.ts
+  src/modules/status-badges/status-badge.repository.ts
+  src/modules/status-badges/status-badge.routes.test.ts
+  src/modules/status-badges/status-badge.routes.ts
+  src/modules/status-badges/status-badge.service.test.ts
+  src/modules/status-badges/status-badge.service.ts
+  src/shared/error-handler.ts
+  src/shared/errors.test.ts
+  src/shared/errors.ts
+resource · express (orm)
+  src/modules/status-badges/status-badge.drizzle-repository.ts
+  src/modules/status-badges/status-badge.model.ts
+  src/modules/status-badges/status-badge.prisma-repository.ts
+  src/modules/status-badges/status-badge.repository.ts
+  src/modules/status-badges/status-badge.routes.test.ts
+  src/modules/status-badges/status-badge.routes.ts
+  src/modules/status-badges/status-badge.service.test.ts
+  src/modules/status-badges/status-badge.service.ts
+  src/modules/status-badges/status-badge.table.ts
+  src/shared/error-handler.ts
+  src/shared/errors.test.ts
+  src/shared/errors.ts
+resource · axum
+  src/error.rs
+  src/status_badges/mod.rs
+  src/status_badges/model.rs
+  src/status_badges/repository.rs
+  src/status_badges/routes.rs
+  src/status_badges/service.rs
+resource · axum (orm)
+  src/error.rs
+  src/status_badges/mod.rs
+  src/status_badges/model.rs
+  src/status_badges/repository.rs
+  src/status_badges/routes.rs
+  src/status_badges/service.rs
+resource · fastapi
+  app/errors.py
+  app/status_badges/__init__.py
+  app/status_badges/dependencies.py
+  app/status_badges/models.py
+  app/status_badges/repository.py
+  app/status_badges/router.py
+  app/status_badges/schemas.py
+  app/status_badges/service.py
+  tests/status_badges/test_status_badge_router.py
+  tests/status_badges/test_status_badge_service.py
+  tests/test_errors.py
+resource · fastapi (orm)
+  app/errors.py
+  app/status_badges/__init__.py
+  app/status_badges/dependencies.py
+  app/status_badges/models.py
+  app/status_badges/repository.py
+  app/status_badges/router.py
+  app/status_badges/schemas.py
+  app/status_badges/service.py
+  app/status_badges/tables.py
+  tests/status_badges/test_status_badge_router.py
+  tests/status_badges/test_status_badge_service.py
+  tests/test_errors.py
+resource · chi
+  internal/apperror/apperror.go
+  internal/apperror/apperror_test.go
+  internal/statusbadges/handler.go
+  internal/statusbadges/handler_test.go
+  internal/statusbadges/model.go
+  internal/statusbadges/repository.go
+  internal/statusbadges/service.go
+  internal/statusbadges/service_test.go
+resource · chi (orm)
+  internal/apperror/apperror.go
+  internal/apperror/apperror_test.go
+  internal/statusbadges/gorm_repository.go
+  internal/statusbadges/handler.go
+  internal/statusbadges/handler_test.go
+  internal/statusbadges/model.go
+  internal/statusbadges/repository.go
+  internal/statusbadges/service.go
+  internal/statusbadges/service_test.go
+resource · echo
+  internal/apperror/apperror.go
+  internal/apperror/apperror_test.go
+  internal/statusbadges/handler.go
+  internal/statusbadges/handler_test.go
+  internal/statusbadges/model.go
+  internal/statusbadges/repository.go
+  internal/statusbadges/service.go
+  internal/statusbadges/service_test.go
+resource · echo (orm)
+  internal/apperror/apperror.go
+  internal/apperror/apperror_test.go
+  internal/statusbadges/gorm_repository.go
+  internal/statusbadges/handler.go
+  internal/statusbadges/handler_test.go
+  internal/statusbadges/model.go
+  internal/statusbadges/repository.go
+  internal/statusbadges/service.go
+  internal/statusbadges/service_test.go

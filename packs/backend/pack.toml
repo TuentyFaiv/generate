@@ -1,0 +1,9 @@
+schema_version = 1
+name = "backend"
+version = "0.1.0"
+description = "Layered backend pieces: REST resources, problem-details errors and middleware for Hono, Express, Axum, FastAPI, chi and Echo."
+license = "MIT"
+
+[permissions]
+write = ["src/**", "app/**", "tests/**", "internal/**"]
+dependencies = true

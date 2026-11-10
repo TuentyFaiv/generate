@@ -1,0 +1,56 @@
+[workspace]
+resolver = "3"
+members = ["crates/*"]
+# Everything except xtask, so plain `cargo run` resolves to the tfverse binary.
+default-members = ["crates/tfverse", "crates/tfverse-core", "crates/tfverse-mcp", "crates/tfverse-packs", "crates/tfverse-rpc"]
+
+[workspace.package]
+version = "2.0.0-alpha.0"
+edition = "2024"
+rust-version = "1.99"
+license = "MIT"
+authors = ["Tonalli López <contact@tuentyfaiv.com>"]
+repository = "https://github.com/TuentyFaiv/generate"
+homepage = "https://cli.tuentyfaiv.com"
+
+[workspace.dependencies]
+tfverse-core = { path = "crates/tfverse-core", version = "=2.0.0-alpha.0" }
+tfverse-packs = { path = "crates/tfverse-packs", version = "=2.0.0-alpha.0" }
+tfverse-mcp = { path = "crates/tfverse-mcp", version = "=2.0.0-alpha.0" }
+tfverse-rpc = { path = "crates/tfverse-rpc", version = "=2.0.0-alpha.0" }
+
+anyhow = "1.0.104"
+clap = { version = "4.6.7", features = ["derive"] }
+flate2 = "1.1.11"
+imara-diff = "0.2.0"
+schemars = { version = "1.2.3", features = ["semver1"] }
+semver = { version = "1.0.28", features = ["serde"] }
+serde = { version = "1.0.229", features = ["derive"] }
+serde_json = "1.0.154"
+sha2 = "0.11.1"
+tar = { version = "0.4.46", default-features = false }
+thiserror = "2.0.21"
+toml = "1.2.1"
+rustls = { version = "0.23.46", default-features = false, features = ["ring", "std", "tls12"] }
+rustls-native-certs = "0.8.5"
+minisign-verify = "0.3.0"
+ureq = { version = "3.5.1", default-features = false, features = ["rustls-no-provider"] }
+
+assert_cmd = "2.2.2"
+insta = { version = "1.49.0", features = ["yaml"] }
+predicates = "3.1.4"
+tempfile = "3.27.0"
+
+[workspace.lints.rust]
+unsafe_code = "forbid"
+missing_docs = "warn"
+
+[workspace.lints.clippy]
+all = { level = "deny", priority = -1 }
+pedantic = { level = "warn", priority = -1 }
+missing_errors_doc = "allow"
+unwrap_used = "deny"
+expect_used = "deny"
+panic = "deny"
+todo = "deny"
+dbg_macro = "deny"

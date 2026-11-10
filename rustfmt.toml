@@ -1,0 +1,8 @@
+# Stable options only, aligned with the Biome formatter settings in biome.json.
+# Import grouping (std / external / workspace / crate) is kept by convention:
+# `group_imports` and `imports_granularity` require nightly rustfmt.
+edition = "2024"
+hard_tabs = true
+tab_spaces = 2
+max_width = 120
+newline_style = "Unix"

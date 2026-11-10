@@ -1,0 +1,233 @@
+{
+  "$defs": {
+    "Digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "FileRecord": {
+      "additionalProperties": false,
+      "description": "A generated file and the hash of the version tfverse wrote.",
+      "properties": {
+        "base": {
+          "$ref": "#/$defs/Digest",
+          "description": "Hash of the original generated content."
+        },
+        "path": {
+          "$ref": "#/$defs/RelPath",
+          "description": "Project-relative path."
+        }
+      },
+      "required": [
+        "path",
+        "base"
+      ],
+      "type": "object"
+    },
+    "Instance": {
+      "additionalProperties": false,
+      "description": "One generated piece.",
+      "properties": {
+        "file": {
+          "description": "Files the piece created.",
+          "items": {
+            "$ref": "#/$defs/FileRecord"
+          },
+          "type": "array"
+        },
+        "id": {
+          "description": "Stable id, derived from pack, piece and inputs.",
+          "type": "string"
+        },
+        "inputs": {
+          "additionalProperties": {
+            "$ref": "#/$defs/Value"
+          },
+          "description": "Resolved input values.",
+          "type": "object"
+        },
+        "pack": {
+          "$ref": "#/$defs/Name",
+          "description": "Pack name."
+        },
+        "pack_version": {
+          "$ref": "#/$defs/SemVer",
+          "description": "Pack version used."
+        },
+        "patch": {
+          "description": "Regions the piece inserted into existing files.",
+          "items": {
+            "$ref": "#/$defs/PatchRecord"
+          },
+          "type": "array"
+        },
+        "piece": {
+          "$ref": "#/$defs/Name",
+          "description": "Piece name."
+        },
+        "stack": {
+          "$ref": "#/$defs/Stack",
+          "description": "Stack facts used, so the original can be rendered again."
+        },
+        "target": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/RelPath"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Output folder used, or `None` for the project root."
+        },
+        "variant": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Name"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Variant used, if any."
+        }
+      },
+      "required": [
+        "id",
+        "pack",
+        "pack_version",
+        "piece"
+      ],
+      "type": "object"
+    },
+    "Name": {
+      "pattern": "^[a-z](?:[a-z0-9]|-(?=[a-z0-9])){0,63}$",
+      "type": "string"
+    },
+    "PackRecord": {
+      "additionalProperties": false,
+      "description": "A pack the project uses.",
+      "properties": {
+        "digest": {
+          "$ref": "#/$defs/Digest",
+          "description": "SHA-256 of every file in the pack; a different hash for the same version is refused."
+        },
+        "name": {
+          "$ref": "#/$defs/Name",
+          "description": "Pack name."
+        },
+        "signer": {
+          "description": "Id of the key that signed it; later versions must be signed by the same key.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "source": {
+          "description": "Where it came from, e.g. `gh:acme/packs@v1.2.0`; absent for a folder on this machine.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "version": {
+          "$ref": "#/$defs/SemVer",
+          "description": "Pack version."
+        }
+      },
+      "required": [
+        "name",
+        "version",
+        "digest"
+      ],
+      "type": "object"
+    },
+    "PatchRecord": {
+      "additionalProperties": false,
+      "description": "A region a patch inserted, owned by its instance.",
+      "properties": {
+        "file": {
+          "$ref": "#/$defs/RelPath",
+          "description": "Project-relative path of the edited file."
+        },
+        "inserted": {
+          "$ref": "#/$defs/Digest",
+          "description": "Hash of the inserted text."
+        }
+      },
+      "required": [
+        "file",
+        "inserted"
+      ],
+      "type": "object"
+    },
+    "RelPath": {
+      "description": "Relative path with `/` separators; no `.`, `..` or absolute paths.",
+      "maxLength": 1024,
+      "minLength": 1,
+      "type": "string"
+    },
+    "SemVer": {
+      "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?$",
+      "type": "string"
+    },
+    "Stack": {
+      "additionalProperties": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array",
+        "uniqueItems": true
+      },
+      "description": "Detected or configured stack facts, e.g. `framework = {react, next}`.",
+      "type": "object"
+    },
+    "Value": {
+      "anyOf": [
+        {
+          "description": "`true` or `false`.",
+          "type": "boolean"
+        },
+        {
+          "description": "A whole number.",
+          "format": "int64",
+          "type": "integer"
+        },
+        {
+          "description": "Text.",
+          "type": "string"
+        }
+      ],
+      "description": "A value given to a piece input."
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "`tfverse.lock`.",
+  "properties": {
+    "instance": {
+      "description": "Generated pieces.",
+      "items": {
+        "$ref": "#/$defs/Instance"
+      },
+      "type": "array"
+    },
+    "pack": {
+      "description": "Packs the project uses, pinned by content hash.",
+      "items": {
+        "$ref": "#/$defs/PackRecord"
+      },
+      "type": "array"
+    },
+    "version": {
+      "description": "Format version; must be `1`.",
+      "format": "uint32",
+      "minimum": 0,
+      "type": "integer"
+    }
+  },
+  "required": [
+    "version"
+  ],
+  "title": "Lockfile",
+  "type": "object"
+}

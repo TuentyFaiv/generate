@@ -1,0 +1,9 @@
+---
+source: crates/tfverse-core/tests/engine.rs
+expression: "fs::read_to_string(dir.path().join(\"src/components/UserCard.svelte\"))?"
+---
+<script lang="ts">
+	let { title }: { title: string } = $props();
+</script>
+
+<h2 class="user-card">{title}</h2>
