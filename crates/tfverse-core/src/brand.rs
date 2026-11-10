@@ -26,6 +26,9 @@ pub const CONFIG_FILES: [&str; 2] = [CONFIG_FILE_JSON, CONFIG_FILE_TOML];
 /// Lockfile with installed packs, hashes and per-file base versions.
 pub const LOCK_FILE: &str = concat!(brand_name!(), ".lock");
 
+/// Local, gitignored state folder: object cache and history.
+pub const STATE_DIR: &str = concat!(".", brand_name!());
+
 /// Prefix for every environment variable, e.g. `TFVERSE_LOG`.
 pub const ENV_PREFIX: &str = "TFVERSE_";
 

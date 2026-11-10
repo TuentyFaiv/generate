@@ -1,0 +1,26 @@
+schema_version = 1
+name = "component"
+description = "A UI component."
+target = "src/components"
+
+[inputs.name]
+type = "string"
+description = "Component name."
+example = "MyExample"
+
+[inputs.styled]
+type = "bool"
+prompt = "Add styles?"
+default = false
+
+[[variants]]
+name = "react"
+when = { framework = "react" }
+
+[[variants]]
+name = "svelte"
+when = { framework = "svelte" }
+
+[[files]]
+path = "my-example.module.css"
+when = "styled"

@@ -1,0 +1,161 @@
+{
+  "$defs": {
+    "Glob": {
+      "description": "Relative path glob: `*` within a segment, `?` one character, `**` any segments.",
+      "minLength": 1,
+      "type": "string"
+    },
+    "Migration": {
+      "additionalProperties": false,
+      "description": "A change to project code made when an update crosses `to`, shown in the plan like any other change.",
+      "properties": {
+        "ast_grep": {
+          "description": "An ast-grep rule file in the pack, e.g. `migrations/2.0.0.yml`; needs the `ast-grep` program.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "description": {
+          "description": "What it changes, for the plan.",
+          "type": "string"
+        },
+        "files": {
+          "description": "Project files it runs on; they must also be in `permissions.write`.",
+          "items": {
+            "$ref": "#/$defs/Glob"
+          },
+          "type": "array"
+        },
+        "rename": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Rename"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Renames an identifier, matching whole words only."
+        },
+        "to": {
+          "$ref": "#/$defs/SemVer",
+          "description": "Runs when updating from a version below this one to this one or later."
+        }
+      },
+      "required": [
+        "to",
+        "description",
+        "files"
+      ],
+      "type": "object"
+    },
+    "Name": {
+      "pattern": "^[a-z](?:[a-z0-9]|-(?=[a-z0-9])){0,63}$",
+      "type": "string"
+    },
+    "Permissions": {
+      "additionalProperties": false,
+      "description": "What a pack may do; granted by the user on install.",
+      "properties": {
+        "commands": {
+          "description": "External commands the pack may run.",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "dependencies": {
+          "description": "Whether the pack may add dependencies.",
+          "type": "boolean"
+        },
+        "write": {
+          "default": [],
+          "description": "Paths the pack may create or modify.",
+          "items": {
+            "$ref": "#/$defs/Glob"
+          },
+          "type": "array"
+        }
+      },
+      "type": "object"
+    },
+    "Rename": {
+      "additionalProperties": false,
+      "description": "An identifier rename.",
+      "properties": {
+        "from": {
+          "description": "The old name.",
+          "type": "string"
+        },
+        "to": {
+          "description": "The new name.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "from",
+        "to"
+      ],
+      "type": "object"
+    },
+    "SemVer": {
+      "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?$",
+      "type": "string"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "`pack.toml`.",
+  "properties": {
+    "description": {
+      "description": "One-line summary.",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "license": {
+      "description": "SPDX license expression.",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "migrations": {
+      "description": "Changes to project code that updates crossing a version make.",
+      "items": {
+        "$ref": "#/$defs/Migration"
+      },
+      "type": "array"
+    },
+    "name": {
+      "$ref": "#/$defs/Name",
+      "description": "Pack name."
+    },
+    "permissions": {
+      "$ref": "#/$defs/Permissions",
+      "default": {
+        "write": []
+      },
+      "description": "What the pack may do in a project."
+    },
+    "schema_version": {
+      "description": "Manifest format version; must be `1`.",
+      "format": "uint32",
+      "minimum": 0,
+      "type": "integer"
+    },
+    "version": {
+      "$ref": "#/$defs/SemVer",
+      "description": "Semantic version of the pack."
+    }
+  },
+  "required": [
+    "schema_version",
+    "name",
+    "version"
+  ],
+  "title": "PackManifest",
+  "type": "object"
+}

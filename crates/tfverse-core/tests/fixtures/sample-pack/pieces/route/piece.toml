@@ -1,0 +1,20 @@
+schema_version = 1
+name = "route"
+description = "A page registered in src/routes.ts."
+target = "src/pages"
+
+[inputs.name]
+type = "string"
+example = "MyPage"
+
+[[patches]]
+kind = "import"
+file = "src/routes.ts"
+import = "import { MyPage } from './pages/my-page';"
+
+[[patches]]
+kind = "anchor"
+file = "src/routes.ts"
+anchor = "// @tfverse:routes"
+position = "before"
+insert = "{ path: '/my-page', component: MyPage },"

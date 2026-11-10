@@ -1,0 +1,186 @@
+schema_version = 1
+name = "resource"
+description = "A REST resource in layers: model, repository, service, routes and tests; adds the `error` piece if missing."
+target = "src/modules/example-items"
+requires = ["error"]
+
+[inputs.name]
+type = "string"
+description = "Singular name, e.g. `blog-post`."
+example = "ExampleItem"
+
+[inputs.plural]
+type = "string"
+description = "Plural name for routes, tables and folders, e.g. `blog-posts`."
+example = "ExampleItems"
+
+[inputs.tests]
+type = "bool"
+description = "Add tests."
+prompt = "Add tests?"
+default = true
+
+[inputs.module]
+type = "string"
+description = "Go module path from `go.mod`."
+example = "example.com/app"
+default = "example.com/app"
+
+[[variants]]
+name = "hono"
+when = { framework = "hono", language = "typescript" }
+files = "files/typescript"
+
+[[variants]]
+name = "express"
+when = { framework = "express", language = "typescript" }
+files = "files/typescript"
+
+[[variants]]
+name = "axum"
+when = { framework = "axum" }
+target = "src/example_items"
+
+[[variants]]
+name = "fastapi"
+when = { framework = "fastapi" }
+target = ""
+
+[[variants]]
+name = "chi"
+when = { framework = "chi" }
+files = "files/go"
+target = "internal/exampleitems"
+
+[[variants]]
+name = "echo"
+when = { framework = "echo" }
+files = "files/go"
+target = "internal/exampleitems"
+
+[[files]]
+path = "example-item.table.ts"
+when = "stack.drizzle"
+
+[[files]]
+path = "example-item.drizzle-repository.ts"
+when = "stack.drizzle"
+
+[[files]]
+path = "example-item.prisma-repository.ts"
+when = "stack.prisma"
+
+[[files]]
+path = "example-item.service.test.ts"
+when = "tests"
+
+[[files]]
+path = "example-item.routes.test.ts"
+when = "tests"
+
+[[files]]
+path = "app/example_items/tables.py"
+when = "stack.sqlalchemy"
+
+[[files]]
+path = "tests/example_items/test_example_item_service.py"
+when = "tests"
+
+[[files]]
+path = "tests/example_items/test_example_item_router.py"
+when = "tests"
+
+[[files]]
+path = "gorm_repository.go"
+when = "stack.gorm"
+
+[[files]]
+path = "service_test.go"
+when = "tests"
+
+[[files]]
+path = "handler_test.go"
+when = "tests"
+
+[[dependencies]]
+ecosystem = "npm"
+name = "zod"
+version = "^4.1"
+variants = ["hono", "express"]
+
+[[dependencies]]
+ecosystem = "npm"
+name = "vitest"
+version = "^4.0"
+dev = true
+variants = ["hono", "express"]
+when = "tests"
+
+[[dependencies]]
+ecosystem = "cargo"
+name = "serde"
+version = "1"
+features = ["derive"]
+variants = ["axum"]
+
+[[dependencies]]
+ecosystem = "cargo"
+name = "chrono"
+version = "0.4"
+features = ["serde"]
+variants = ["axum"]
+
+[[dependencies]]
+ecosystem = "cargo"
+name = "uuid"
+version = "1"
+features = ["serde", "v7"]
+variants = ["axum"]
+
+[[dependencies]]
+ecosystem = "cargo"
+name = "tokio"
+version = "1"
+features = ["macros", "rt-multi-thread"]
+dev = true
+variants = ["axum"]
+when = "tests"
+
+[[dependencies]]
+ecosystem = "cargo"
+name = "tower"
+version = "0.5"
+features = ["util"]
+dev = true
+variants = ["axum"]
+when = "tests"
+
+[[dependencies]]
+ecosystem = "cargo"
+name = "serde_json"
+version = "1"
+dev = true
+variants = ["axum"]
+when = "tests"
+
+[[dependencies]]
+ecosystem = "pypi"
+name = "pytest"
+version = ">=8"
+dev = true
+variants = ["fastapi"]
+when = "tests"
+
+[[dependencies]]
+ecosystem = "pypi"
+name = "httpx"
+version = ">=0.28"
+dev = true
+variants = ["fastapi"]
+when = "tests"
+
+[[dependencies]]
+ecosystem = "go"
+name = "github.com/google/uuid"
+version = "v1.6.0"
+variants = ["chi", "echo"]

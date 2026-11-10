@@ -1,0 +1,22 @@
+[package]
+name = "tfverse-rpc"
+description = "Stdio JSON-RPC API for the tfverse engine, shared by the CLI, MCP server and GUI."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+homepage.workspace = true
+
+[dependencies]
+serde.workspace = true
+serde_json.workspace = true
+tfverse-core.workspace = true
+tfverse-packs.workspace = true
+
+[dev-dependencies]
+tempfile.workspace = true
+
+[lints]
+workspace = true

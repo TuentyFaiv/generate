@@ -1,6 +1,6 @@
 [package]
 name = "tfverse-packs"
-description = "Pack sources for tfverse: versioned packs, integrity and signature checks, lockfile."
+description = "Pack sources for tfverse: official, local, git and tarball packs, pinned by content hash."
 version.workspace = true
 edition.workspace = true
 rust-version.workspace = true
@@ -8,6 +8,27 @@ license.workspace = true
 authors.workspace = true
 repository.workspace = true
 homepage.workspace = true
+
+[dependencies]
+flate2.workspace = true
+minisign-verify.workspace = true
+rustls = { workspace = true, optional = true }
+rustls-native-certs = { workspace = true, optional = true }
+tar.workspace = true
+tfverse-core.workspace = true
+semver.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+ureq = { workspace = true, optional = true }
+
+[features]
+default = ["remote"]
+# Network sources (`gh:`, `https://` and `git:` over SSH); without them only official, folder and cached packs load.
+remote = ["dep:rustls", "dep:rustls-native-certs", "dep:ureq"]
+
+[dev-dependencies]
+tempfile.workspace = true
 
 [lints]
 workspace = true

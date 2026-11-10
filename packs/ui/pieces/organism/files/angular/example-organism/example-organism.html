@@ -1,0 +1,12 @@
+<!-- @tfverse if stack.tailwind -->
+<header class="flex flex-wrap items-center justify-between gap-3">
+	<h2 [id]="headingId" class="text-lg font-semibold">{{ heading() }}</h2>
+	<div class="flex gap-2"><ng-content select="[actions]" /></div>
+</header>
+<!-- @tfverse else -->
+<header class="header">
+	<h2 [id]="headingId" class="title">{{ heading() }}</h2>
+	<div class="actions"><ng-content select="[actions]" /></div>
+</header>
+<!-- @tfverse end -->
+<ng-content />

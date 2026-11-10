@@ -9,5 +9,14 @@ authors.workspace = true
 repository.workspace = true
 homepage.workspace = true
 
+
+[dependencies]
+serde_json.workspace = true
+tfverse-core.workspace = true
+tfverse-rpc.workspace = true
+
+[dev-dependencies]
+tempfile.workspace = true
+
 [lints]
 workspace = true

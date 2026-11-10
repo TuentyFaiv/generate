@@ -279,3 +279,6 @@ target/
 lcov.info
 # Bun
 .bun-cache/
+# insta snapshot drafts; accept them with `cargo insta accept` or delete them
+*.snap.new
+*.pending-snap

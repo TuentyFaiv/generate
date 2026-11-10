@@ -14,7 +14,8 @@ Tasks:
   test    Run the workspace tests
   deny    Check dependencies with cargo-deny (requires cargo-deny)
   js      Check JS/JSON formatting and lints with Biome (requires bun)
-  ci      Run fmt, lint, doc, test, deny and js in order";
+  ci      Run fmt, lint, doc, test, deny and js in order
+  schema  Regenerate the JSON Schemas in schemas/";
 
 /// Repository task made of one or more commands.
 #[derive(Clone, Copy, Debug)]
@@ -26,6 +27,7 @@ enum Task {
 	Deny,
 	Js,
 	Ci,
+	Schema,
 }
 
 impl Task {
@@ -38,6 +40,7 @@ impl Task {
 			"deny" => Some(Self::Deny),
 			"js" => Some(Self::Js),
 			"ci" => Some(Self::Ci),
+			"schema" => Some(Self::Schema),
 			_ => None,
 		}
 	}
@@ -45,16 +48,29 @@ impl Task {
 	fn steps(self) -> Vec<Step> {
 		match self {
 			Self::Fmt => vec![Step::cargo(&["fmt", "--all", "--check"])],
-			Self::Lint => vec![Step::cargo(&[
-				"clippy",
-				"--workspace",
-				"--all-targets",
-				"--all-features",
-				"--locked",
-				"--",
-				"-D",
-				"warnings",
-			])],
+			Self::Lint => vec![
+				Step::cargo(&[
+					"clippy",
+					"--workspace",
+					"--all-targets",
+					"--all-features",
+					"--locked",
+					"--",
+					"-D",
+					"warnings",
+				]),
+				Step::cargo(&[
+					"clippy",
+					"--package",
+					"tfverse-packs",
+					"--all-targets",
+					"--no-default-features",
+					"--locked",
+					"--",
+					"-D",
+					"warnings",
+				]),
+			],
 			Self::Doc => vec![
 				Step::cargo(&["doc", "--workspace", "--all-features", "--no-deps", "--locked"])
 					.env("RUSTDOCFLAGS", "-D warnings"),
@@ -62,6 +78,10 @@ impl Task {
 			Self::Test => vec![Step::cargo(&["test", "--workspace", "--all-features", "--locked"])],
 			Self::Deny => vec![Step::cargo(&["deny", "--all-features", "check"])],
 			Self::Js => vec![Step::new("bunx", &["biome", "ci", "."])],
+			Self::Schema => vec![
+				Step::cargo(&["test", "--package", "tfverse-core", "--lib", "--locked", "schema::"])
+					.env("TFVERSE_UPDATE_SCHEMAS", "1"),
+			],
 			Self::Ci => [Self::Fmt, Self::Lint, Self::Doc, Self::Test, Self::Deny, Self::Js]
 				.into_iter()
 				.flat_map(Self::steps)
@@ -180,6 +200,7 @@ mod tests {
 			[
 				"fmt --all --check",
 				"clippy --workspace --all-targets --all-features --locked -- -D warnings",
+				"clippy --package tfverse-packs --all-targets --no-default-features --locked -- -D warnings",
 				"doc --workspace --all-features --no-deps --locked",
 				"test --workspace --all-features --locked",
 				"deny --all-features check",

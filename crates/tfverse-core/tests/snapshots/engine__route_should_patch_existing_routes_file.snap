@@ -1,0 +1,12 @@
+---
+source: crates/tfverse-core/tests/engine.rs
+expression: "fs::read_to_string(dir.path().join(\"src/routes.ts\"))?"
+---
+import { Home } from './pages/home';
+import { Settings } from './pages/settings';
+
+export const routes = [
+	{ path: '/', component: Home },
+	{ path: '/settings', component: Settings },
+	// @tfverse:routes
+];

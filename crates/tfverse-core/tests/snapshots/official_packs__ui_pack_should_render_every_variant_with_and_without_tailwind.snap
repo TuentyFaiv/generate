@@ -1,0 +1,314 @@
+---
+source: crates/tfverse-core/tests/official_packs.rs
+expression: listing
+---
+atom · angular
+  src/ui/atoms/status-badge/index.ts
+  src/ui/atoms/status-badge/status-badge.css
+  src/ui/atoms/status-badge/status-badge.spec.ts
+  src/ui/atoms/status-badge/status-badge.ts
+atom · angular (tailwind)
+  src/ui/atoms/status-badge/index.ts
+  src/ui/atoms/status-badge/status-badge.spec.ts
+  src/ui/atoms/status-badge/status-badge.ts
+atom · qwik
+  src/ui/atoms/status-badge/index.ts
+  src/ui/atoms/status-badge/status-badge.css
+  src/ui/atoms/status-badge/status-badge.test.tsx
+  src/ui/atoms/status-badge/status-badge.tsx
+atom · qwik (tailwind)
+  src/ui/atoms/status-badge/index.ts
+  src/ui/atoms/status-badge/status-badge.test.tsx
+  src/ui/atoms/status-badge/status-badge.tsx
+atom · solid
+  src/ui/atoms/status-badge/index.ts
+  src/ui/atoms/status-badge/status-badge.module.css
+  src/ui/atoms/status-badge/status-badge.test.tsx
+  src/ui/atoms/status-badge/status-badge.tsx
+atom · solid (tailwind)
+  src/ui/atoms/status-badge/index.ts
+  src/ui/atoms/status-badge/status-badge.test.tsx
+  src/ui/atoms/status-badge/status-badge.tsx
+atom · astro
+  src/ui/atoms/status-badge/index.ts
+  src/ui/atoms/status-badge/status-badge.astro
+  src/ui/atoms/status-badge/status-badge.test.ts
+atom · astro (tailwind)
+  src/ui/atoms/status-badge/index.ts
+  src/ui/atoms/status-badge/status-badge.astro
+  src/ui/atoms/status-badge/status-badge.test.ts
+atom · svelte
+  src/ui/atoms/status-badge/index.ts
+  src/ui/atoms/status-badge/status-badge.svelte
+  src/ui/atoms/status-badge/status-badge.test.ts
+atom · svelte (tailwind)
+  src/ui/atoms/status-badge/index.ts
+  src/ui/atoms/status-badge/status-badge.svelte
+  src/ui/atoms/status-badge/status-badge.test.ts
+atom · vue
+  src/ui/atoms/status-badge/index.ts
+  src/ui/atoms/status-badge/status-badge.test.ts
+  src/ui/atoms/status-badge/status-badge.vue
+atom · vue (tailwind)
+  src/ui/atoms/status-badge/index.ts
+  src/ui/atoms/status-badge/status-badge.test.ts
+  src/ui/atoms/status-badge/status-badge.vue
+atom · react
+  src/ui/atoms/status-badge/index.ts
+  src/ui/atoms/status-badge/status-badge.module.css
+  src/ui/atoms/status-badge/status-badge.test.tsx
+  src/ui/atoms/status-badge/status-badge.tsx
+atom · react (tailwind)
+  src/ui/atoms/status-badge/index.ts
+  src/ui/atoms/status-badge/status-badge.test.tsx
+  src/ui/atoms/status-badge/status-badge.tsx
+atom · lit
+  src/ui/atoms/status-badge/index.ts
+  src/ui/atoms/status-badge/status-badge.test.ts
+  src/ui/atoms/status-badge/status-badge.ts
+atom · lit (tailwind)
+  src/ui/atoms/status-badge/index.ts
+  src/ui/atoms/status-badge/status-badge.test.ts
+  src/ui/atoms/status-badge/status-badge.ts
+atom · leptos
+  src/ui/atoms/status_badge.rs
+atom · leptos (tailwind)
+  src/ui/atoms/status_badge.rs
+atom · dioxus
+  src/ui/atoms/status_badge.rs
+atom · dioxus (tailwind)
+  src/ui/atoms/status_badge.rs
+atom · yew
+  src/ui/atoms/status_badge.rs
+atom · yew (tailwind)
+  src/ui/atoms/status_badge.rs
+atom · flutter
+  lib/ui/atoms/status_badge.dart
+  test/ui/atoms/status_badge_test.dart
+atom · flutter (tailwind)
+  lib/ui/atoms/status_badge.dart
+  test/ui/atoms/status_badge_test.dart
+atom · compose-multiplatform
+  composeApp/src/commonMain/kotlin/dev/acme/shop/ui/atoms/StatusBadge.kt
+atom · compose-multiplatform (tailwind)
+  composeApp/src/commonMain/kotlin/dev/acme/shop/ui/atoms/StatusBadge.kt
+atom · compose
+  app/src/main/java/dev/acme/shop/ui/atoms/StatusBadge.kt
+atom · compose (tailwind)
+  app/src/main/java/dev/acme/shop/ui/atoms/StatusBadge.kt
+atom · swiftui-package
+  Sources/Shop/UI/Atoms/StatusBadge.swift
+atom · swiftui-package (tailwind)
+  Sources/Shop/UI/Atoms/StatusBadge.swift
+atom · swiftui
+  Shop/UI/Atoms/StatusBadge.swift
+atom · swiftui (tailwind)
+  Shop/UI/Atoms/StatusBadge.swift
+molecule · angular
+  src/ui/molecules/status-badge/index.ts
+  src/ui/molecules/status-badge/status-badge.css
+  src/ui/molecules/status-badge/status-badge.html
+  src/ui/molecules/status-badge/status-badge.spec.ts
+  src/ui/molecules/status-badge/status-badge.ts
+molecule · angular (tailwind)
+  src/ui/molecules/status-badge/index.ts
+  src/ui/molecules/status-badge/status-badge.html
+  src/ui/molecules/status-badge/status-badge.spec.ts
+  src/ui/molecules/status-badge/status-badge.ts
+molecule · qwik
+  src/ui/molecules/status-badge/index.ts
+  src/ui/molecules/status-badge/status-badge.css
+  src/ui/molecules/status-badge/status-badge.test.tsx
+  src/ui/molecules/status-badge/status-badge.tsx
+molecule · qwik (tailwind)
+  src/ui/molecules/status-badge/index.ts
+  src/ui/molecules/status-badge/status-badge.test.tsx
+  src/ui/molecules/status-badge/status-badge.tsx
+molecule · solid
+  src/ui/molecules/status-badge/index.ts
+  src/ui/molecules/status-badge/status-badge.module.css
+  src/ui/molecules/status-badge/status-badge.test.tsx
+  src/ui/molecules/status-badge/status-badge.tsx
+molecule · solid (tailwind)
+  src/ui/molecules/status-badge/index.ts
+  src/ui/molecules/status-badge/status-badge.test.tsx
+  src/ui/molecules/status-badge/status-badge.tsx
+molecule · astro
+  src/ui/molecules/status-badge/index.ts
+  src/ui/molecules/status-badge/status-badge.astro
+  src/ui/molecules/status-badge/status-badge.test.ts
+molecule · astro (tailwind)
+  src/ui/molecules/status-badge/index.ts
+  src/ui/molecules/status-badge/status-badge.astro
+  src/ui/molecules/status-badge/status-badge.test.ts
+molecule · svelte
+  src/ui/molecules/status-badge/index.ts
+  src/ui/molecules/status-badge/status-badge.svelte
+  src/ui/molecules/status-badge/status-badge.test.ts
+molecule · svelte (tailwind)
+  src/ui/molecules/status-badge/index.ts
+  src/ui/molecules/status-badge/status-badge.svelte
+  src/ui/molecules/status-badge/status-badge.test.ts
+molecule · vue
+  src/ui/molecules/status-badge/index.ts
+  src/ui/molecules/status-badge/status-badge.test.ts
+  src/ui/molecules/status-badge/status-badge.vue
+molecule · vue (tailwind)
+  src/ui/molecules/status-badge/index.ts
+  src/ui/molecules/status-badge/status-badge.test.ts
+  src/ui/molecules/status-badge/status-badge.vue
+molecule · react
+  src/ui/molecules/status-badge/index.ts
+  src/ui/molecules/status-badge/status-badge.module.css
+  src/ui/molecules/status-badge/status-badge.test.tsx
+  src/ui/molecules/status-badge/status-badge.tsx
+molecule · react (tailwind)
+  src/ui/molecules/status-badge/index.ts
+  src/ui/molecules/status-badge/status-badge.test.tsx
+  src/ui/molecules/status-badge/status-badge.tsx
+molecule · lit
+  src/ui/molecules/status-badge/index.ts
+  src/ui/molecules/status-badge/status-badge.test.ts
+  src/ui/molecules/status-badge/status-badge.ts
+molecule · lit (tailwind)
+  src/ui/molecules/status-badge/index.ts
+  src/ui/molecules/status-badge/status-badge.test.ts
+  src/ui/molecules/status-badge/status-badge.ts
+molecule · leptos
+  src/ui/molecules/status_badge.rs
+molecule · leptos (tailwind)
+  src/ui/molecules/status_badge.rs
+molecule · dioxus
+  src/ui/molecules/status_badge.rs
+molecule · dioxus (tailwind)
+  src/ui/molecules/status_badge.rs
+molecule · yew
+  src/ui/molecules/status_badge.rs
+molecule · yew (tailwind)
+  src/ui/molecules/status_badge.rs
+molecule · flutter
+  lib/ui/molecules/status_badge.dart
+  test/ui/molecules/status_badge_test.dart
+molecule · flutter (tailwind)
+  lib/ui/molecules/status_badge.dart
+  test/ui/molecules/status_badge_test.dart
+molecule · compose-multiplatform
+  composeApp/src/commonMain/kotlin/dev/acme/shop/ui/molecules/StatusBadge.kt
+molecule · compose-multiplatform (tailwind)
+  composeApp/src/commonMain/kotlin/dev/acme/shop/ui/molecules/StatusBadge.kt
+molecule · compose
+  app/src/main/java/dev/acme/shop/ui/molecules/StatusBadge.kt
+molecule · compose (tailwind)
+  app/src/main/java/dev/acme/shop/ui/molecules/StatusBadge.kt
+molecule · swiftui-package
+  Sources/Shop/UI/Molecules/StatusBadge.swift
+molecule · swiftui-package (tailwind)
+  Sources/Shop/UI/Molecules/StatusBadge.swift
+molecule · swiftui
+  Shop/UI/Molecules/StatusBadge.swift
+molecule · swiftui (tailwind)
+  Shop/UI/Molecules/StatusBadge.swift
+organism · angular
+  src/ui/organisms/status-badge/index.ts
+  src/ui/organisms/status-badge/status-badge.css
+  src/ui/organisms/status-badge/status-badge.html
+  src/ui/organisms/status-badge/status-badge.spec.ts
+  src/ui/organisms/status-badge/status-badge.ts
+organism · angular (tailwind)
+  src/ui/organisms/status-badge/index.ts
+  src/ui/organisms/status-badge/status-badge.html
+  src/ui/organisms/status-badge/status-badge.spec.ts
+  src/ui/organisms/status-badge/status-badge.ts
+organism · qwik
+  src/ui/organisms/status-badge/index.ts
+  src/ui/organisms/status-badge/status-badge.css
+  src/ui/organisms/status-badge/status-badge.test.tsx
+  src/ui/organisms/status-badge/status-badge.tsx
+organism · qwik (tailwind)
+  src/ui/organisms/status-badge/index.ts
+  src/ui/organisms/status-badge/status-badge.test.tsx
+  src/ui/organisms/status-badge/status-badge.tsx
+organism · solid
+  src/ui/organisms/status-badge/index.ts
+  src/ui/organisms/status-badge/status-badge.module.css
+  src/ui/organisms/status-badge/status-badge.test.tsx
+  src/ui/organisms/status-badge/status-badge.tsx
+organism · solid (tailwind)
+  src/ui/organisms/status-badge/index.ts
+  src/ui/organisms/status-badge/status-badge.test.tsx
+  src/ui/organisms/status-badge/status-badge.tsx
+organism · astro
+  src/ui/organisms/status-badge/index.ts
+  src/ui/organisms/status-badge/status-badge.astro
+  src/ui/organisms/status-badge/status-badge.test.ts
+organism · astro (tailwind)
+  src/ui/organisms/status-badge/index.ts
+  src/ui/organisms/status-badge/status-badge.astro
+  src/ui/organisms/status-badge/status-badge.test.ts
+organism · svelte
+  src/ui/organisms/status-badge/index.ts
+  src/ui/organisms/status-badge/status-badge.svelte
+  src/ui/organisms/status-badge/status-badge.test.ts
+organism · svelte (tailwind)
+  src/ui/organisms/status-badge/index.ts
+  src/ui/organisms/status-badge/status-badge.svelte
+  src/ui/organisms/status-badge/status-badge.test.ts
+organism · vue
+  src/ui/organisms/status-badge/index.ts
+  src/ui/organisms/status-badge/status-badge.test.ts
+  src/ui/organisms/status-badge/status-badge.vue
+organism · vue (tailwind)
+  src/ui/organisms/status-badge/index.ts
+  src/ui/organisms/status-badge/status-badge.test.ts
+  src/ui/organisms/status-badge/status-badge.vue
+organism · react
+  src/ui/organisms/status-badge/index.ts
+  src/ui/organisms/status-badge/status-badge.module.css
+  src/ui/organisms/status-badge/status-badge.test.tsx
+  src/ui/organisms/status-badge/status-badge.tsx
+organism · react (tailwind)
+  src/ui/organisms/status-badge/index.ts
+  src/ui/organisms/status-badge/status-badge.test.tsx
+  src/ui/organisms/status-badge/status-badge.tsx
+organism · lit
+  src/ui/organisms/status-badge/index.ts
+  src/ui/organisms/status-badge/status-badge.test.ts
+  src/ui/organisms/status-badge/status-badge.ts
+organism · lit (tailwind)
+  src/ui/organisms/status-badge/index.ts
+  src/ui/organisms/status-badge/status-badge.test.ts
+  src/ui/organisms/status-badge/status-badge.ts
+organism · leptos
+  src/ui/organisms/status_badge.rs
+organism · leptos (tailwind)
+  src/ui/organisms/status_badge.rs
+organism · dioxus
+  src/ui/organisms/status_badge.rs
+organism · dioxus (tailwind)
+  src/ui/organisms/status_badge.rs
+organism · yew
+  src/ui/organisms/status_badge.rs
+organism · yew (tailwind)
+  src/ui/organisms/status_badge.rs
+organism · flutter
+  lib/ui/organisms/status_badge.dart
+  test/ui/organisms/status_badge_test.dart
+organism · flutter (tailwind)
+  lib/ui/organisms/status_badge.dart
+  test/ui/organisms/status_badge_test.dart
+organism · compose-multiplatform
+  composeApp/src/commonMain/kotlin/dev/acme/shop/ui/organisms/StatusBadge.kt
+organism · compose-multiplatform (tailwind)
+  composeApp/src/commonMain/kotlin/dev/acme/shop/ui/organisms/StatusBadge.kt
+organism · compose
+  app/src/main/java/dev/acme/shop/ui/organisms/StatusBadge.kt
+organism · compose (tailwind)
+  app/src/main/java/dev/acme/shop/ui/organisms/StatusBadge.kt
+organism · swiftui-package
+  Sources/Shop/UI/Organisms/StatusBadge.swift
+organism · swiftui-package (tailwind)
+  Sources/Shop/UI/Organisms/StatusBadge.swift
+organism · swiftui
+  Shop/UI/Organisms/StatusBadge.swift
+organism · swiftui (tailwind)
+  Shop/UI/Organisms/StatusBadge.swift
